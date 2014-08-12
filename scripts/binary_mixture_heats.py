@@ -1,18 +1,22 @@
-# Plan ITC experiment.
+"""
+Script for generation of binary mixture ITC titrations.
+"""
 
-import itc
+
 from simtk.unit import *
 
-
-
+from itctools.protocols import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
+from itctools.chemicals import Solvent, Compound, SimpleSolution, PipettingLocation
+from itctools.labware import Labware
+ 
 
 # Define solvents.
-from automation import Solvent
+#TODO command line specification of density and name
 water = Solvent('water', density=0.9970479*grams/milliliter)
 buffer = Solvent('buffer', density=1.014*grams/milliliter)
 
 # Define compounds.
-from automation import Compound
+
 nguests = 6  # overnight from 5pm till 9am
 #nguests = 14 # number of guest compounds
 #nguests = 7 # number of guest compounds # DEBUG (one source plate only)
@@ -23,7 +27,7 @@ guests = [ Compound(name='guest%02d' % (guest_index+1), molecular_weight=guest_m
 
 
 # Define troughs on the instrument.
-from labware import Labware
+
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
 buffer_trough = Labware(RackLabel='Buffer', RackType='Trough 100ml')
 
@@ -34,7 +38,7 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 # Define source solutions on the deck.one
 # TODO : Use actual compound and solvent masses.
 # NOTE: Host solution is diluted by 10x.
-from automation import SimpleSolution, PipettingLocation
+
 host_solution = SimpleSolution(compound=host, compound_mass=16.76*milligrams, solvent=buffer, solvent_mass=10.2628*grams, location=PipettingLocation(source_plate.RackLabel, source_plate.RackType, 1))
 guest_solutions = list()
 
@@ -47,7 +51,7 @@ for guest_index in range(nguests):
     guest_solutions.append( SimpleSolution(compound=guests[guest_index], compound_mass=guest_compound_masses[guest_index], solvent=buffer, solvent_mass=guest_solvent_masses[guest_index], location=PipettingLocation(source_plate.RackLabel, source_plate.RackType, 2+guest_index)) )
 
 # Define ITC protocol.
-from itc import ITCProtocol
+
 # Protocol for 'control' titrations (water-water, buffer-buffer, titrations into buffer, etc.)
 control_protocol = ITCProtocol('control protocol', sample_prep_method='Plates Quick.setup', itc_method='ChoderaWaterWater.inj', analysis_method='Control')
 # Protocol for 1:1 binding analyis
@@ -57,7 +61,7 @@ binding_protocol = ITCProtocol('1:1 binding protocol', sample_prep_method='Plate
 cleaning_protocol = ITCProtocol('cleaning protocol', sample_prep_method='Plates Clean.setup', itc_method='water5inj.inj', analysis_method='Control')
 
 # Define ITC Experiment.
-from itc import ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
+
 itc_experiment_set = ITCExperimentSet(name='SAMPL4-CB7 host-guest experiments') # use specified protocol by default
 # Add available plates for experiments.
 itc_experiment_set.addDestinationPlate(Labware(RackLabel='DestinationPlate', RackType='ITC Plate'))

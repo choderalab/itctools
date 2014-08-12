@@ -21,3 +21,13 @@ class Labware(object):
         self.RackID = RackID
     
         
+#==============================================================================
+# PIPETTING LOCATION
+#==============================================================================
+
+class PipettingLocation(object):
+    def __init__(self, RackLabel, RackType, Position):
+        # Information for Tecan LiHa.
+        self.RackLabel = RackLabel
+        self.RackType = RackType
+        self.Position = Position

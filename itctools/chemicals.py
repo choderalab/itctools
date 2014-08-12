@@ -79,17 +79,7 @@ class Compound(object):
         self.molecular_weight = molecular_weight
         self.purity = purity
 
-#==============================================================================
-# PIPETTING LOCATION
-#==============================================================================
-
-class PipettingLocation(object):
-    def __init__(self, RackLabel, RackType, Position):
-        # Information for Tecan LiHa.
-        self.RackLabel = RackLabel
-        self.RackType = RackType
-        self.Position = Position
-            
+           
 #==============================================================================
 # SOLUTION
 #==============================================================================

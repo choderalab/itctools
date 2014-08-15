@@ -1,12 +1,8 @@
 
 import numpy
-
 import simtk.unit as units
-
 import openpyxl # Excel spreadsheet I/O (for Auto iTC-200)
-
 from distutils.version import StrictVersion #For version testing 
-
 from datetime import datetime 
 
 class ITCProtocol(object):
@@ -28,6 +24,7 @@ class ITCProtocol(object):
         self.sample_prep_method = sample_prep_method
         self.itc_method = itc_method
         self.analysis_method = analysis_method
+       
 
 class ITCExperiment(object):
     def __init__(self, name, syringe_source, cell_source, protocol, buffer_source=None, syringe_concentration=None, cell_concentration=None):
@@ -90,6 +87,7 @@ class ITCExperiment(object):
                 raise Exception("buffer must be specified if either syringe or cell concentrations are specified")
             if (self.cell_dilution_factor > 1.0):
                 raise Exception("Requested cell concentration (%s) is greater than cell source concentration (%s)." % (str(cell_concentration), str(cell_source.concentration)))
+
 
 class ITCHeuristicExperiment(ITCExperiment):
     def heuristic_syringe(self,Ka,m,v,V0,approx=False):
@@ -189,7 +187,26 @@ class ITCHeuristicExperiment(ITCExperiment):
         self.cell_dilution_factor = self.cell_concentration / self.cell_source.concentration
 
         return sfactor * cfactor
-            
+
+
+class HeatOfMixingExperiment(object):
+    def __init__(self, name, cell_mixture, syringe_mixture, protocol):
+        """
+        Parameters
+        ----------
+        name : str
+           Name of the ITC experiment.
+        cell_mixture : SimpleMixture
+            Initial composition of the cell mixture
+        syringe_mixture : SimpleMixture
+            Composition of the syringe mixture
+        protocol : ITCProtocol
+           Protocol to be used for ITC experiment and analysis.
+        """
+        self.name = name
+        self.cell_mixture = cell_mixture
+        self.syringe_mixture = syringe_mixture
+        self.protocol = protocol
 
 class ITCExperimentSet(object):
     def __init__(self, name):
@@ -576,3 +593,10 @@ class ITCExperimentSet(object):
         wb.save(filename)
 
 
+def HeatOfMixingExperimentSet(ITCExperimentSet):
+    """
+    Set up experiments to calculate the heat of mixing for a mixture.
+
+    TODO: Work out the concepts
+    """
+    pass

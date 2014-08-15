@@ -6,7 +6,7 @@ Script for generation of binary mixture ITC titrations.
 from simtk.unit import *
 
 from itctools.protocols import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
-from itctools.chemicals import Solvent, SimpleSolution
+from itctools.chemicals import Compound, Solvent, SimpleSolution
 from itctools.labware import Labware, PipettingLocation
  
 
@@ -15,13 +15,21 @@ from itctools.labware import Labware, PipettingLocation
 # Mimic command line input by manually setting variables for now
 label1 = 'Water'
 dens1 = 0.9970479 *grams/milliliter
+mw1= 18.01528*gram / mole
+pur1= 1.0
 
 label2 = 'Dimethyl sulfoxide'
 dens2 = 1.092*grams/milliliter
+mw2=  78.13 * gram /mole 
+pur2= 1.0
 
-# Define mixture components
-comp1 = Solvent(label1, density=dens1)
-comp2 = Solvent(label2, density=dens2)
+#Define molecular properties
+comp1 = Compound(label1, molecular_weight=mw1, purity=pur1)
+comp2 = Compound(label2, molecular_weight=mw2, purity=pur2)
+
+# Define mixture components as liquids
+solv1 = Solvent(label1, density=dens1)
+solv2 = Solvent(label2, density=dens2)
 
 # Not using troughs. #
 #Definition of an example trough

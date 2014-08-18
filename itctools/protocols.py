@@ -25,8 +25,10 @@ class ITCProtocol(object):
         self.sample_prep_method = sample_prep_method
         self.itc_method = itc_method
         self.analysis_method = analysis_method
-       
 
+#Alias
+MixingProtocol=ITCProtocol
+       
 class ITCExperiment(object):
     def __init__(self, name, syringe_source, cell_source, protocol, buffer_source=None, syringe_concentration=None, cell_concentration=None):
         """
@@ -315,7 +317,7 @@ class ITCExperimentSet(object):
                 self.destination_locations.append(location)
     
     
-    def validate(self, print_volumes=True,omit_zeroes=True):
+    def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
 
@@ -324,10 +326,11 @@ class ITCExperimentSet(object):
         volumes - bool (default=True)
             Print out pipetting volumes
         omit_zeroes - bool (default = True)
-            Omit operations with volumes below 0.01 ul 
-
+            Omit operations with volumes below vlimit
+	vlimit - float (default = 10.0)
+	    Minimal volume for pipetting operation in microliters
         """
-        vlimit=10.0 #microliters
+        
         # TODO: Try to set up experiment, throwing exception upon failure.
         
         # Make a list of all the possible destination pipetting locations.
@@ -604,6 +607,42 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
     TODO: Work out the concepts
     """
+
+    
+def setup_mixing_experiments(cell_volume = 400.0, syringe_volume=120)
+    """
+    Build the worklist for heat of mixing experiments
+    
+    cell_volume - float (default = 400.0)
+    total volume to prepare for cell in microliters
+    syringe_volume - float (default = 120.0)
+    total volume to prepare for syringe in microliters
+    
+    """
+    # Make a list of all the possible destination pipetting locations.        
+    self._allocate_destinations()
+        
+    # Build worklist script.
+    worklist_script = ""
+
+    # Reset tracked quantities.
+    self._resetTrackedQuantities()
+    
+    for (experiment_number, experiment) in enumerate(self.experiments):
+      
+      #Assign experiment number
+      experiment.experiment_number = experiment_number
+      
+      itcdata = HeatOfMixingExperimentSet.ITCData()
+      tecandata = HeatOfMixingExperimentSet.TecanData()
+      
+      #Ensure there are ITC wells available
+      if len(self.destination_locations) == 0:
+        raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
+      tecandata.cell_destination = self.destination_locations.pop(0)
+      
+      experiment.HeatOfMixingExperiment.cell_mixture.components
+    
 def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
@@ -614,38 +653,18 @@ def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
             Print out pipetting volumes
         omit_zeroes - bool (default = True)
             Omit operations with volumes below vlimit
-        vlimit - float
-            Minimal volume for operations, in microliters
+        vlimit - float (default = 10.0)
+	    Minimal volume for pipetting operation in microliters
         
         TODO: Try to set up experiment, throwing exception upon failure.
         """
-        # Make a list of all the possible destination pipetting locations.        
-        self._allocate_destinations()
         
-        # Build worklist script.
-        worklist_script = ""
-
-        # Reset tracked quantities.
-        self._resetTrackedQuantities()
 
         for (experiment_number, experiment) in enumerate(self.experiments):
-            #volume logging
-            volume_report = str()
-            
-            experiment.experiment_number = experiment_number
-           
-            #volume logging
-            volume_report += "Experiment: %d\n" % ( experiment.experiment_number + 1 )
-            
-            itcdata = ITCExperimentSet.ITCData()
-            tecandata = ITCExperimentSet.TecanData()
+        
 
-            # Find a place to put cell contents.
-            if len(self.destination_locations) == 0:
-                raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
-            tecandata.cell_destination = self.destination_locations.pop(0)
 
-            cell_volume = 400.0 # microliters
+            #cell_volume = 400.0 # microliters
             transfer_volume = cell_volume
 
             if (experiment.cell_dilution_factor is not None):

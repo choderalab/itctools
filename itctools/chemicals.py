@@ -184,8 +184,7 @@ class SimpleMixture(Solvent):
         """
         self.components = components
         self.molefractions = molefractions
-        self.locations = locations
-               
+        self.locations = locations        
         #Consistency checks
         
         #Input length
@@ -207,10 +206,10 @@ class SimpleMixture(Solvent):
         #Volume of compound relative to total volume (ideal solution assumption)
         self.volumefractions = list()
                 
-        #Normalizing constant for molecular weight
-        normalweight = sum(comp.molecular_weight for comp in self.components )
+        #Normalizing constant for molecular weight        
+        normalweight = sum((comp.molecular_weight for comp in self.components), 0*units.grams / units.mole )
         #Normalizing constant for liquid density
-        normaldens   = sum(comp.density for comp in self.components) 
+        normaldens   = sum((comp.density for comp in self.components), 0*units.grams / units.milliliter) 
         
         #Derive fractional masses from molecular weight
         for c,comp in enumerate(components):

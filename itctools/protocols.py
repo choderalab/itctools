@@ -27,7 +27,7 @@ class ITCProtocol(object):
         self.analysis_method = analysis_method
 
 #In case these will diverge at some point, declare alias for Mixture usage.
-MixingProtocol=ITCProtocol
+HeatOfMixingProtocol=ITCProtocol
        
 class ITCExperiment(object):
     def __init__(self, name, syringe_source, cell_source, protocol, buffer_source=None, syringe_concentration=None, cell_concentration=None):
@@ -609,39 +609,39 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
     """
 
     
-def setup_mixing_experiments(cell_volume = 400.0, syringe_volume=120):
-    """
-    Build the worklist for heat of mixing experiments
-    
-    cell_volume - float (default = 400.0)
-    total volume to prepare for cell in microliters
-    syringe_volume - float (default = 120.0)
-    total volume to prepare for syringe in microliters
-    
-    """
-    # Make a list of all the possible destination pipetting locations.        
-    self._allocate_destinations()
+    def setup_mixing_experiments(self, cell_volume = 400.0, syringe_volume=120):
+        """
+        Build the worklist for heat of mixing experiments
         
-    # Build worklist script.
-    worklist_script = ""
+        cell_volume - float (default = 400.0)
+        total volume to prepare for cell in microliters
+        syringe_volume - float (default = 120.0)
+        total volume to prepare for syringe in microliters
+        
+        """
+        # Make a list of all the possible destination pipetting locations.        
+        self._allocate_destinations()
+            
+        # Build worklist script.
+        worklist_script = ""
 
-    # Reset tracked quantities.
-    self._resetTrackedQuantities()
-    
-    for (experiment_number, experiment) in enumerate(self.experiments):
-      
-      #Assign experiment number
-      experiment.experiment_number = experiment_number
-      
-      itcdata = HeatOfMixingExperimentSet.ITCData()
-      tecandata = HeatOfMixingExperimentSet.TecanData()
-      
-      #Ensure there are ITC wells available
-      if len(self.destination_locations) == 0:
-        raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
-      tecandata.cell_destination = self.destination_locations.pop(0)
-      
-      experiment.HeatOfMixingExperiment.cell_mixture.components
+        # Reset tracked quantities.
+        self._resetTrackedQuantities()
+        
+        for (experiment_number, experiment) in enumerate(self.experiments):
+        
+            #Assign experiment number
+            experiment.experiment_number = experiment_number
+            
+            itcdata = HeatOfMixingExperimentSet.ITCData()
+            tecandata = HeatOfMixingExperimentSet.TecanData()
+            
+            #Ensure there are ITC wells available
+            if len(self.destination_locations) == 0:
+                raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
+            tecandata.cell_destination = self.destination_locations.pop(0)
+            
+            experiment.cell_mixture.components
     
 def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         """

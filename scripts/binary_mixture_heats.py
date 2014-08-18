@@ -5,8 +5,8 @@ Script for generation of binary mixture ITC titrations.
 
 from simtk.unit import *
 
-from itctools.protocols import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
-from itctools.chemicals import Compound, Solvent, SimpleSolution
+from itctools.protocols import HeatOfMixingProtocol, HeatOfMixingExperimentSet, HeatOfMixingExperiment
+from itctools.chemicals import Compound, Solvent, SimpleSolution, PureLiquid, SimpleMixture
 from itctools.labware import Labware, PipettingLocation
  
 
@@ -59,15 +59,15 @@ for l,liquid in enumerate(liquids):
 # Define Mixing protocols.
 
 # Protocol for 'control' titrations (water-water)
-control_protocol = MixingProtocol('control protocol', sample_prep_method='Plates Quick.setup', itc_method='ChoderaWaterWater.inj', analysis_method='Control')
+control_protocol = HeatOfMixingProtocol('control protocol', sample_prep_method='Plates Quick.setup', itc_method='ChoderaWaterWater.inj', analysis_method='Control')
 # Protocol for a titration with increasing mole fraction
 #TODO Define the mixing protocol at the ITC machine
-mixing_protocol = MixingProtocol('mixture protocol',  sample_prep_method='Plates Quick.setup', itc_method='ChoderaHostGuest.inj', analysis_method='Onesite')
+mixing_protocol = HeatOfMixingProtocol('mixture protocol',  sample_prep_method='Plates Quick.setup', itc_method='ChoderaHostGuest.inj', analysis_method='Onesite')
 # Protocol for cleaning protocol
-cleaning_protocol = MixingProtocol('cleaning protocol', sample_prep_method='Plates Clean.setup', itc_method='water5inj.inj', analysis_method='Control')
+cleaning_protocol = HeatOfMixingProtocol('cleaning protocol', sample_prep_method='Plates Clean.setup', itc_method='water5inj.inj', analysis_method='Control')
 
 # Define the experiment set.
-mixing_experiment_set = MixingExperimentSet(name=set_name) # use specified protocol by default
+mixing_experiment_set = HeatOfMixingExperimentSet(name=set_name) # use specified protocol by default
 
 # Add available plates for experiments.
 mixing_experiment_set.addDestinationPlate(Labware(RackLabel='DestinationPlate', RackType='ITC Plate'))
@@ -77,18 +77,18 @@ nreplicates = 1 # number of replicates of each experiment
 ncontrols = 1 #initial controls
 nfinal = 1 # final (water-water) controls
 
-control_mixture = (components=[control_liquid], molefractions=[1.0], locations=[locations[control_index]], normalize_fractions=False)
+control_mixture = SimpleMixture(components=[control_liquid], molefractions=[1.0], locations=[locations[control_index]], normalize_fractions=False)
 
 # Add cleaning titration
 
 name = 'initial cleaning water titration'
-mixing_experiment_set.addExperiment(HeatOfMixingExperiment(name=name, control_mixture, control_mixture, cleaning_protocol))
+mixing_experiment_set.addExperiment(HeatOfMixingExperiment(name, control_mixture, control_mixture, cleaning_protocol))
 
 # Add control titrations.
 #TODO Perform control for liquid x into x, for every input liquid?
 for replicate in range(ncontrols):
     name = 'water into water %d' % (replicate+1)
-    mixing_experiment_set.addExperiment( HeatOfMixingExperiment(name=name, control_mixture, control_mixture, protocol=control_protocol) )
+    mixing_experiment_set.addExperiment( HeatOfMixingExperiment(name, control_mixture, control_mixture, protocol=control_protocol) )
 
 #Define mixing experiments here
 
@@ -96,7 +96,7 @@ for replicate in range(ncontrols):
 #Add cleaning experiment.
 if final_cleaning:
     name = 'initial cleaning water titration'
-    mixing_experiment_set.addExperiment(HeatOfMixingExperiment(name=name, control_mixture, control_mixture, cleaning_protocol))
+    mixing_experiment_set.addExperiment(HeatOfMixingExperiment(name, control_mixture, control_mixture, cleaning_protocol))
 
 
 # Water control titrations.
@@ -104,7 +104,7 @@ if final_cleaning:
 #TODO Perform control for liquid x into x, for every input liquid?
 for replicate in range(nfinal):
     name = 'water into water %d' % (replicate+1)
-    mixing_experiment_set.addExperiment( HeatOfMixingExperiment(name=name, control_mixture, control_mixture, protocol=control_protocol) )
+    mixing_experiment_set.addExperiment( HeatOfMixingExperiment(name, control_mixture, control_mixture, protocol=control_protocol) )
 
 # Check that the experiment can be carried out using available solutions and plates.
 #TODO make validation function complete

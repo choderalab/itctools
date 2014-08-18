@@ -190,7 +190,7 @@ class SimpleMixture(Solvent):
         
         #Input length
         if not len(components) == len(molefractions) == len(locations):
-            raise RuntimeError("Input lists do not have same length!")
+            raise ValueError("Input lists do not have same length!")
         
         #Ensure total mole fraction equals 1
         if normalize_fractions:
@@ -199,7 +199,7 @@ class SimpleMixture(Solvent):
         else:
             # Check if mole fraction is 1 within arbitrary precision
             if  abs(1.0 - sum(self.molefractions)) > 0.0001:
-                raise RuntimeError("Total mole fractions out of bounds!")
+                raise ValueError("Total mole fractions out of bounds!")
         
         
         #Mass of compound relative to total mass

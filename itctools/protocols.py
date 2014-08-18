@@ -4,7 +4,7 @@ import openpyxl # Excel spreadsheet I/O (for Auto iTC-200)
 from openpyxl import Workbook
 from distutils.version import StrictVersion #For version testing 
 from datetime import datetime 
-from Labware import PipettingLocation
+from labware import PipettingLocation
 
 class ITCProtocol(object):
     def __init__(self, name, sample_prep_method, itc_method, analysis_method):
@@ -298,7 +298,23 @@ class ITCExperimentSet(object):
             self._tracked_quantities[name] += volume
         else:
             self._tracked_quantities[name] = volume
-
+    
+    def _allocate_destinations(self):
+	# Make a list of all the possible destination pipetting locations.
+        # TODO: Change this to go left-to-right in ITC plates?
+        self.destination_locations = list()
+        for (plate_index, plate) in enumerate(self.destination_plates):
+            PlateNumber = plate_index + 1
+            for index in range(96):
+                Position = index + 1
+                WellName = self._wellIndexToName(Position)
+                location = PipettingLocation(plate.RackLabel, plate.RackType, Position)
+                # Add plate number and well name for Auto iTC-200.
+                location.PlateNumber = PlateNumber
+                location.WellName = WellName
+                self.destination_locations.append(location)
+    
+    
     def validate(self, print_volumes=True,omit_zeroes=True):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
@@ -315,18 +331,7 @@ class ITCExperimentSet(object):
         # TODO: Try to set up experiment, throwing exception upon failure.
         
         # Make a list of all the possible destination pipetting locations.
-        # TODO: Change this to go left-to-right in ITC plates?
-        destination_locations = list()
-        for (plate_index, plate) in enumerate(self.destination_plates):
-            PlateNumber = plate_index + 1
-            for index in range(96):
-                Position = index + 1
-                WellName = self._wellIndexToName(Position)
-                location = PipettingLocation(plate.RackLabel, plate.RackType, Position)
-                # Add plate number and well name for Auto iTC-200.
-                location.PlateNumber = PlateNumber
-                location.WellName = WellName
-                destination_locations.append(location)
+        self._allocate_destinations()
 
         # Build worklist script.
         worklist_script = ""
@@ -347,9 +352,9 @@ class ITCExperimentSet(object):
             tecandata = ITCExperimentSet.TecanData()
 
             # Find a place to put cell contents.
-            if len(destination_locations) == 0:
+            if len(self.destination_locations) == 0:
                 raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
-            tecandata.cell_destination = destination_locations.pop(0)
+            tecandata.cell_destination = self.destination_locations.pop(0)
 
             cell_volume = 400.0 # microliters
             transfer_volume = cell_volume
@@ -404,9 +409,9 @@ class ITCExperimentSet(object):
                 self._trackQuantities(experiment.cell_source, transfer_volume * units.microliters)
 
             # Find a place to put syringe contents.
-            if len(destination_locations) == 0:
+            if len(self.destination_locations) == 0:
                 raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
-            tecandata.syringe_destination = destination_locations.pop(0)
+            tecandata.syringe_destination = self.destination_locations.pop(0)
 
             syringe_volume = 120.0 # microliters
             transfer_volume = cell_volume
@@ -614,21 +619,9 @@ def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         
         TODO: Try to set up experiment, throwing exception upon failure.
         """
-        # Make a list of all the possible destination pipetting locations.
+        # Make a list of all the possible destination pipetting locations.        
+        self._allocate_destinations()
         
-        # TODO: Change this to go left-to-right in ITC plates?
-        destination_locations = list()
-        for (plate_index, plate) in enumerate(self.destination_plates):
-            PlateNumber = plate_index + 1
-            for index in range(96):
-                Position = index + 1
-                WellName = self._wellIndexToName(Position)
-                location = PipettingLocation(plate.RackLabel, plate.RackType, Position)
-                # Add plate number and well name for Auto iTC-200.
-                location.PlateNumber = PlateNumber
-                location.WellName = WellName
-                destination_locations.append(location)
-
         # Build worklist script.
         worklist_script = ""
 
@@ -648,9 +641,9 @@ def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
             tecandata = ITCExperimentSet.TecanData()
 
             # Find a place to put cell contents.
-            if len(destination_locations) == 0:
+            if len(self.destination_locations) == 0:
                 raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
-            tecandata.cell_destination = destination_locations.pop(0)
+            tecandata.cell_destination = self.destination_locations.pop(0)
 
             cell_volume = 400.0 # microliters
             transfer_volume = cell_volume
@@ -705,9 +698,9 @@ def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
                 self._trackQuantities(experiment.cell_source, transfer_volume * units.microliters)
 
             # Find a place to put syringe contents.
-            if len(destination_locations) == 0:
+            if len(self.destination_locations) == 0:
                 raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
-            tecandata.syringe_destination = destination_locations.pop(0)
+            tecandata.syringe_destination = self.destination_locations.pop(0)
 
             syringe_volume = 120.0 # microliters
             transfer_volume = cell_volume

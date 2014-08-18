@@ -1,8 +1,10 @@
 import numpy
 import simtk.unit as units
 import openpyxl # Excel spreadsheet I/O (for Auto iTC-200)
+from openpyxl import Workbook
 from distutils.version import StrictVersion #For version testing 
 from datetime import datetime 
+from Labware import PipettingLocation
 
 class ITCProtocol(object):
     def __init__(self, name, sample_prep_method, itc_method, analysis_method):
@@ -313,7 +315,6 @@ class ITCExperimentSet(object):
         # TODO: Try to set up experiment, throwing exception upon failure.
         
         # Make a list of all the possible destination pipetting locations.
-        from automation import PipettingLocation
         # TODO: Change this to go left-to-right in ITC plates?
         destination_locations = list()
         for (plate_index, plate) in enumerate(self.destination_plates):
@@ -563,7 +564,7 @@ class ITCExperimentSet(object):
             self.validate()
 
         # Create new Excel spreadsheet.
-        from openpyxl import Workbook
+        
         wb = Workbook()
 
         # Create plate sheet.
@@ -598,7 +599,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
     TODO: Work out the concepts
     """
-def validate(self, print_volumes=True,omit_zeroes=True):
+def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
 
@@ -607,14 +608,14 @@ def validate(self, print_volumes=True,omit_zeroes=True):
         volumes - bool (default=True)
             Print out pipetting volumes
         omit_zeroes - bool (default = True)
-            Omit operations with volumes below 0.01 ul 
-
-        """
-        vlimit=10.0 #microliters
-        # TODO: Try to set up experiment, throwing exception upon failure.
+            Omit operations with volumes below vlimit
+        vlimit - float
+            Minimal volume for operations, in microliters
         
+        TODO: Try to set up experiment, throwing exception upon failure.
+        """
         # Make a list of all the possible destination pipetting locations.
-        from Labware import PipettingLocation
+        
         # TODO: Change this to go left-to-right in ITC plates?
         destination_locations = list()
         for (plate_index, plate) in enumerate(self.destination_plates):

@@ -124,3 +124,7 @@ mixing_experiment_set.setup_mixing_experiments()
 # Write Auto iTC-200 experiment spreadsheet.
 #excel_filename = 'run-itc.xlsx'
 #mixing_experiment_set.writeAutoITCExcel(excel_filename)
+
+#For now, if we import the script, don't do anything
+if not __name__ == "__main__":
+    pass

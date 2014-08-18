@@ -13,139 +13,114 @@ from itctools.labware import Labware, PipettingLocation
 
 #TODO command line specification of density and name
 # Mimic command line input by manually setting variables for now
-label1 = 'Water'
-dens1 = 0.9970479 *grams/milliliter
-mw1= 18.01528*gram / mole
-pur1= 1.0
+
+#Name for the entire set of experiments
+set_name = 'water-dmso mixtures'
+
+#Do a cleaning titration at the end of the set
+final_cleaning = False
+
+#For every liquid that is to be mixted, define
+label1 = 'Water' #identifier
+dens1 = 0.9970479 *grams/milliliter #density at standard conditions
+mw1= 18.01528*gram / mole    # molecular weight
+pur1= 1.0 #purity ( TODO might make this optional)
 
 label2 = 'Dimethyl sulfoxide'
 dens2 = 1.092*grams/milliliter
 mw2=  78.13 * gram /mole 
 pur2= 1.0
 
-#Define molecular properties
-comp1 = Compound(label1, molecular_weight=mw1, purity=pur1)
-comp2 = Compound(label2, molecular_weight=mw2, purity=pur2)
-
-# Define mixture components as liquids
-solv1 = Solvent(label1, density=dens1)
-solv2 = Solvent(label2, density=dens2)
-
-# Not using troughs. #
-#Definition of an example trough
-#comp1_trough = Labware(RackLabel=label1, RackType='Trough 100ml')
+#Which liquid to use for controls (Probably water)
+#TODO We may want to do the controls with every liquid
+control_index = 0
 
 
-# Define source labware
+# END of user input
+
+
+#Define all the liquids used
+liquids = list()
+liquids.append(PureLiquid(label1, dens1, mw1, purity=pur1))
+liquids.append(PureLiquid(label2, dens2, mw2, purity=pur2))
+control_liquid = liquids[control_index] #TODO  more than 1 control liquid
+
+# Define the vial holder
 source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 
-# Define source solutions on the deck.one
+#Define the location of all liquids in the vial holder
+# NOTE Vials must be put in vial holder in the order that they were specified as input
+locations = list()
+for l,liquid in enumerate(liquids):
+    locations.append(PipettingLocation(source_plate.RackLabel, source_plate.RackType, l))
+    
 
-host_solution = SimpleSolution(compound=host, compound_mass=16.76*milligrams, solvent=buffer, solvent_mass=10.2628*grams, location=PipettingLocation(source_plate.RackLabel, source_plate.RackType, 1))
-guest_solutions = list()
 
-# Define ITC protocolss.
+# Define Mixing protocols.
 
 # Protocol for 'control' titrations (water-water)
-control_protocol = ITCProtocol('control protocol', sample_prep_method='Plates Quick.setup', itc_method='ChoderaWaterWater.inj', analysis_method='Control')
-# Protocol for 1:1 binding analyis
-mixing_protocol = ITCProtocol('mixture protocol',  sample_prep_method='Plates Quick.setup', itc_method='ChoderaHostGuest.inj', analysis_method='Onesite')
+control_protocol = MixingProtocol('control protocol', sample_prep_method='Plates Quick.setup', itc_method='ChoderaWaterWater.inj', analysis_method='Control')
+# Protocol for a titration with increasing mole fraction
+#TODO Define the mixing protocol at the ITC machine
+mixing_protocol = MixingProtocol('mixture protocol',  sample_prep_method='Plates Quick.setup', itc_method='ChoderaHostGuest.inj', analysis_method='Onesite')
 # Protocol for cleaning protocol
-cleaning_protocol = ITCProtocol('cleaning protocol', sample_prep_method='Plates Clean.setup', itc_method='water5inj.inj', analysis_method='Control')
+cleaning_protocol = MixingProtocol('cleaning protocol', sample_prep_method='Plates Clean.setup', itc_method='water5inj.inj', analysis_method='Control')
 
-# Define ITC Experiment.
+# Define the experiment set.
+mixing_experiment_set = MixingExperimentSet(name=set_name) # use specified protocol by default
 
-itc_experiment_set = ITCExperimentSet(name='SAMPL4-CB7 host-guest experiments') # use specified protocol by default
 # Add available plates for experiments.
-itc_experiment_set.addDestinationPlate(Labware(RackLabel='DestinationPlate', RackType='ITC Plate'))
-itc_experiment_set.addDestinationPlate(Labware(RackLabel='DestinationPlate2', RackType='ITC Plate'))
+mixing_experiment_set.addDestinationPlate(Labware(RackLabel='DestinationPlate', RackType='ITC Plate'))
+mixing_experiment_set.addDestinationPlate(Labware(RackLabel='DestinationPlate2', RackType='ITC Plate'))
 
 nreplicates = 1 # number of replicates of each experiment
+ncontrols = 1 #initial controls
+nfinal = 1 # final (water-water) controls
 
-# Add cleaning experiment.
+control_mixture = (components=[control_liquid], molefractions=[1.0], locations=[locations[control_index]], normalize_fractions=False)
+
+# Add cleaning titration
+
 name = 'initial cleaning water titration'
-itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol) )
+mixing_experiment_set.addExperiment(HeatOfMixingExperiment(name=name, control_mixture, control_mixture, cleaning_protocol))
 
-# Add water control titrations.
-for replicate in range(1):
+# Add control titrations.
+#TODO Perform control for liquid x into x, for every input liquid?
+for replicate in range(ncontrols):
     name = 'water into water %d' % (replicate+1)
-    itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=control_protocol) )
+    mixing_experiment_set.addExperiment( HeatOfMixingExperiment(name=name, control_mixture, control_mixture, protocol=control_protocol) )
 
-# Add buffer control titrations.
-for replicate in range(1):
-    name = 'buffer into buffer %d' % (replicate+1)
-    itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=buffer_trough, cell_source=buffer_trough, protocol=control_protocol) )
-
-# Host into buffer.
-for replicate in range(1):
-    name = 'host into buffer %d' % (replicate+1)
-    itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=host_solution, cell_source=buffer_trough, protocol=binding_protocol) )
-
-# Host/guests.
-# scale cell concentration to fix necessary syringe concentrations
-cell_scaling = 1.
-for guest_index in range(nguests):
-
-    #We need to store the experiments before adding them to the set
-    host_guest_experiments = list()
-    buff_guest_experiments = list()
-
-    #Scaling factors per replicate
-    factors = list()
-
-    # Define host into guest experiments.
-    for replicate in range(1):
-        name = 'host into %s' % guests[guest_index].name
-        experiment = ITCHeuristicExperiment(name=name, syringe_source=host_solution, cell_source=guest_solutions[guest_index], protocol=binding_protocol, cell_concentration=0.2*millimolar*cell_scaling, buffer_source=buffer_trough)
-        #optimize the syringe_concentration using heuristic equations and known binding constants
-        #TODO extract m, v and V0 from protocol somehow?
-        experiment.heuristic_syringe(guest_compound_Ka[guest_index], 10, 3. * microliters, 202.8 * microliters)
-        #rescale if syringe > stock. Store factor.
-        factors.append(experiment.rescale())
-        host_guest_experiments.append(experiment)
-
-    # Define buffer into guest experiments.
-    for replicate in range(1):
-        name = 'buffer into %s' % guests[guest_index].name
-        experiment = ITCHeuristicExperiment(name=name, syringe_source=buffer_trough, cell_source=guest_solutions[guest_index], protocol=blank_protocol, cell_concentration=0.2*millimolar, buffer_source=buffer_trough)
-        #rescale to match host into guest experiment concentrations.
-        experiment.rescale(tfactor=factors[replicate])
-        buff_guest_experiments.append(experiment)
-
-    # Add buffer to guest experiment(s) to set
-    for buff_guest_experiment in buff_guest_experiments:
-        itc_experiment_set.addExperiment(buff_guest_experiment)
-
-    # Add host to guest experiment(s) to set
-    for host_guest_experiment in host_guest_experiments:
-        itc_experiment_set.addExperiment(host_guest_experiment)
+#Define mixing experiments here
 
 
-# Add cleaning experiment.
-#name = 'final cleaning water titration'
-#itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol) )
+#Add cleaning experiment.
+if final_cleaning:
+    name = 'initial cleaning water titration'
+    mixing_experiment_set.addExperiment(HeatOfMixingExperiment(name=name, control_mixture, control_mixture, cleaning_protocol))
+
 
 # Water control titrations.
-nfinal = 2
+# Add control titrations.
+#TODO Perform control for liquid x into x, for every input liquid?
 for replicate in range(nfinal):
-    name = 'final water into water test %d' % (replicate+1)
-    itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=control_protocol) )
+    name = 'water into water %d' % (replicate+1)
+    mixing_experiment_set.addExperiment( HeatOfMixingExperiment(name=name, control_mixture, control_mixture, protocol=control_protocol) )
 
 # Check that the experiment can be carried out using available solutions and plates.
+#TODO make validation function complete
+#itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
-itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
+
+#Allocate experiment resources, destinations, et cetera
+mixing_experiment_set.setup_mixing_experiments()
+
 
 #For convenience, concentrations
-for g,guest in enumerate(guest_solutions, start=1):
-    print "guest%02d"% g, guest.concentration.in_units_of(millimolar)
-
-print "host", host_solution.concentration.in_units_of(millimolar)
-
 
 # Write Tecan EVO pipetting operations.
-worklist_filename = 'setup-itc.gwl'
-itc_experiment_set.writeTecanWorklist(worklist_filename)
+#worklist_filename = 'mixing-itc.gwl'
+#mixing_experiment_set.writeTecanWorklist(worklist_filename)
 
 # Write Auto iTC-200 experiment spreadsheet.
-excel_filename = 'run-itc.xlsx'
-itc_experiment_set.writeAutoITCExcel(excel_filename)
+#excel_filename = 'run-itc.xlsx'
+#mixing_experiment_set.writeAutoITCExcel(excel_filename)

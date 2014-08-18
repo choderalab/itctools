@@ -26,7 +26,7 @@ class ITCProtocol(object):
         self.itc_method = itc_method
         self.analysis_method = analysis_method
 
-#Alias
+#In case these will diverge at some point, declare alias for Mixture usage.
 MixingProtocol=ITCProtocol
        
 class ITCExperiment(object):
@@ -168,7 +168,7 @@ class ITCHeuristicExperiment(ITCExperiment):
             #scale down to stock
             sfactor *= tfactor
             self.syringe_concentration *= sfactor
-            #cell is scaled by same factor
+            ##cell is scaled by same factor
             self.cell_concentration *= sfactor
 
         # Cell concentration scaling factor
@@ -609,7 +609,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
     """
 
     
-def setup_mixing_experiments(cell_volume = 400.0, syringe_volume=120)
+def setup_mixing_experiments(cell_volume = 400.0, syringe_volume=120):
     """
     Build the worklist for heat of mixing experiments
     

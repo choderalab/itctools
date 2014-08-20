@@ -5,7 +5,7 @@ Script for generation of binary mixture ITC titrations.
 
 from simtk.unit import *
 
-from itctools.protocols import HeatOfMixingProtocol, HeatOfMixingExperimentSet, HeatOfMixingExperiment
+from itctools.procedures import HeatOfMixingProtocol, HeatOfMixingExperimentSet, HeatOfMixingExperiment
 from itctools.chemicals import Compound, Solvent, SimpleSolution, PureLiquid, SimpleMixture
 from itctools.labware import Labware, PipettingLocation
 import itertools 

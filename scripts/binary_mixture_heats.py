@@ -8,11 +8,13 @@ from simtk.unit import *
 from itctools.protocols import HeatOfMixingProtocol, HeatOfMixingExperimentSet, HeatOfMixingExperiment
 from itctools.chemicals import Compound, Solvent, SimpleSolution, PureLiquid, SimpleMixture
 from itctools.labware import Labware, PipettingLocation
- 
+import itertools 
 
 
 #TODO command line specification of density and name
 # Mimic command line input by manually setting variables for now
+
+# START of user input ##################
 
 #Name for the entire set of experiments
 set_name = 'water-dmso mixtures'
@@ -31,12 +33,15 @@ dens2 = 1.092*grams/milliliter
 mw2=  78.13 * gram /mole 
 pur2= 1.0
 
+#Mole fractions to consider as initial starting conditions
+mspace = [.0, .25, .5, .75, 1.0]
+
 #Which liquid to use for controls (Probably water)
 #TODO We may want to do the controls with every liquid
 control_index = 0
 
 
-# END of user input
+# END of user input #######################
 
 
 #Define all the liquids used
@@ -55,14 +60,52 @@ for l,liquid in enumerate(liquids):
     locations.append(PipettingLocation(source_plate.RackLabel, source_plate.RackType, l))
     
 
+# Define a control mixture (100% water)
+control_mixture = SimpleMixture(components=[control_liquid], molefractions=[1.0], locations=[locations[control_index]], normalize_fractions=False )    
 
-# Define Mixing protocols.
+# Define cell mixtures
+
+#Number of different components
+n = len(liquids)
+
+#Make all possible combinations using cartesian product
+def perm(n, seq):
+    """
+    Returns a list of all possible combinations of elements in seq, with length n.
+    (Like permutation with replacement)
+    """
+    options = list()
+    for p in itertools.product(seq, repeat=n):
+       options.append(p)
+    return options
+    
+#Restrict combinations to those that sum up to 1
+compositions = list()
+for fracs in perm(n, mspace):
+    if sum(fracs) == 1:       compositions.append(fracs)    
+
+#Define all cell mixtures    
+mixtures = list()
+for combi in compositions:
+    mixtures.append(SimpleMixture(components=liquids, molefractions=combi, locations=locations))
+ 
+#Verify the compositions generated 
+#for mix in mixtures:
+#    print "Mixture"
+#    for n,c in enumerate(mix.components):
+#        print c.name, mix.molefractions[n]
+
+
+
+# Define protocols.
 
 # Protocol for 'control' titrations (water-water)
 control_protocol = HeatOfMixingProtocol('control protocol', sample_prep_method='Plates Quick.setup', itc_method='ChoderaWaterWater.inj', analysis_method='Control')
+
 # Protocol for a titration with increasing mole fraction
 #TODO Define the mixing protocol at the ITC machine
 mixing_protocol = HeatOfMixingProtocol('mixture protocol',  sample_prep_method='Plates Quick.setup', itc_method='ChoderaHostGuest.inj', analysis_method='Onesite')
+
 # Protocol for cleaning protocol
 cleaning_protocol = HeatOfMixingProtocol('cleaning protocol', sample_prep_method='Plates Clean.setup', itc_method='water5inj.inj', analysis_method='Control')
 
@@ -77,7 +120,6 @@ nreplicates = 1 # number of replicates of each experiment
 ncontrols = 1 #initial controls
 nfinal = 1 # final (water-water) controls
 
-control_mixture = SimpleMixture(components=[control_liquid], molefractions=[1.0], locations=[locations[control_index]], normalize_fractions=False)
 
 # Add cleaning titration
 
@@ -114,8 +156,6 @@ for replicate in range(nfinal):
 #Allocate experiment resources, destinations, et cetera
 mixing_experiment_set.setup_mixing_experiments()
 
-
-#For convenience, concentrations
 
 # Write Tecan EVO pipetting operations.
 #worklist_filename = 'mixing-itc.gwl'

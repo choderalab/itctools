@@ -641,7 +641,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                 raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
             tecandata.cell_destination = self.destination_locations.pop(0)
             
-            experiment.cell_mixture.components
+            
     
 def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         """

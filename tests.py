@@ -10,4 +10,4 @@ def test_heatofmixing():
     """Run the Heat of mixing preparation script."""
     import sys
     sys.path.append('./scripts/')
-    import binary_mixture_heats 
+    import mixture_heats 

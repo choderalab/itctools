@@ -609,7 +609,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
     """
 
     
-    def setup_mixing_experiments(self, cell_volume = 400.0, syringe_volume=120):
+    def setup_mixing_experiments(self, cell_volume = 400.0, syringe_volume=120,vlimit=10.0):
         """
         Build the worklist for heat of mixing experiments
         
@@ -641,9 +641,19 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                 raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
             tecandata.cell_destination = self.destination_locations.pop(0)
             
+            #Calculate volumes for cell mixture
+            cell_volumes = list()
+            for cellfrac in experiment.cell_mixture.molefractions:
+                cell_volumes.append(cell_volume*cellfrac)
             
-    
-def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
+            #Calculate volumes for syringe mixture            
+            syr_volumes = list()
+            for syrfrac in experiment.syringe_mixture.molefractions:
+                syr_volumes.append(syringe_volume*syrfrac)
+            
+            
+            
+    def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
 
@@ -663,40 +673,16 @@ def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         for (experiment_number, experiment) in enumerate(self.experiments):
         
 
-
-            #cell_volume = 400.0 # microliters
-            transfer_volume = cell_volume
-
-            if (experiment.cell_dilution_factor is not None):
-                # Compute buffer volume needed.
-                buffer_volume = cell_volume * (1.0 - experiment.cell_dilution_factor)
-                transfer_volume = cell_volume - buffer_volume 
-                 
-                #volume logging
-                bflag = tflag = ""
-                if buffer_volume < vlimit:
-                    if buffer_volume < 0.01 and omit_zeroes:
-                        bflag="\033[5;31m !!!"
-                    else:
-                        bflag="\033[5;41m !!!"
-                if transfer_volume < vlimit:
-                    if transfer_volume < 0.01 and omit_zeroes:
-                        tflag="\033[5;31m !!!"
-                    else:
-                        tflag="\033[5;41m !!!"
-                
-                volume_report += "%s Buffer   (ul):%.2f\033[0;0m \n" % (bflag, buffer_volume)
-                volume_report += "%s Transfer (ul):%.2f\033[0;0m \n" % (tflag, transfer_volume)
                 
                 # Schedule buffer transfer.
-                tipmask = 1
-                if buffer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.buffer_source.RackLabel, experiment.buffer_source.RackType, 1, buffer_volume, tipmask)
-                    worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, buffer_volume, tipmask)
+            tipmask = 1
+            if buffer_volume > 0.01 or not omit_zeroes:
+                worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.buffer_source.RackLabel, experiment.buffer_source.RackType, 1, buffer_volume, tipmask)
+                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, buffer_volume, tipmask)
                     
-                    #no wash if no actions taken
-                    worklist_script += 'W;\r\n' # queue wash tips                    
-                    self._trackQuantities(experiment.buffer_source, buffer_volume * units.microliters)
+                #no wash if no actions taken
+                worklist_script += 'W;\r\n' # queue wash tips                    
+                self._trackQuantities(experiment.buffer_source, buffer_volume * units.microliters)
 
             # Schedule cell solution transfer.
             tipmask = 2

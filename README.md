@@ -10,19 +10,27 @@ simtk
 
 itertools
 
+nose
+
 Contains
 --------
-itctools/
+`itctools/`
 
 A library for setting up experiments
 
-  - chemicals.py
+  - `chemicals.py`
     - Contains the objects to define chemical compounds, solutions and mixtures
-  - procedures.py
+  - `procedures.py`
     - Contains classes that set up experimental procedures, like binding experiments or heat of mixing.
-  - labware.py
+  - `labware.py`
     - Defines chemical containers and their locations on the EVO Deck.
+  - `itctools.py`
+    - Contains useful functions that don't fall into any other category. 
 
-scripts/
+`scripts/`
 
 Some example scripts that use the library.
+
+`tests.py`
+
+Test the integrity of the library. Run `nosetests` in order to make sure the script is functional.

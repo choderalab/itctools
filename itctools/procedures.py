@@ -664,7 +664,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             for i in range(len(experiment.cell_mixture.components)):
                 worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.cell_mixture.locations[i].RackLabel, experiment.cell_mixture.locations[i].RackType, experiment.cell_mixture.locations[i].Position, cell_volumes[i], dictips[experiment.cell_mixture.components[i]])
                 
-                #worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, buffer_volume, tipmask)
+                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, cell_volumes[i], dictips[experiment.cell_mixture.components[i]])
                     
                 #no wash if no actions taken
                 worklist_script += 'W;\r\n' # queue wash tips                    

@@ -57,7 +57,7 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 #Define the location of all liquids in the vial holder
 # NOTE Vials must be put in vial holder in the order that they were specified as input
 locations = list()
-for l,liquid in enumerate(liquids):
+for l,liquid in enumerate(liquids,start=1):
     locations.append(PipettingLocation(source_plate.RackLabel, source_plate.RackType, l))
     
 

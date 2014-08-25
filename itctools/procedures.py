@@ -651,6 +651,14 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             for syrfrac in experiment.syringe_mixture.molefractions:
                 syr_volumes.append(syringe_volume*syrfrac)
             
+            allcomponents = experiment.cell_mixture.components + experiment.syringe_mixture.components
+            allcomponents = list(set(allcomponents))
+            
+            #dictionary for tip masks
+            dictips = dict()
+            for val,key in enumerate(allcomponents):
+                dictips[key] = 2**val
+                
             
             
     def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):

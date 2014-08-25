@@ -660,6 +660,16 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                 dictips[key] = 2**val
                 
             
+            #Start mixing up our cell volume
+            for i in range(len(experiment.cell_mixture.components)):
+                worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.cell_mixture.locations[i].RackLabel, experiment.cell_mixture.locations[i].RackType, experiment.cell_mixture.locations[i].Position, cell_volumes[i], dictips[experiment.cell_mixture.components[i]])
+                
+                #worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, buffer_volume, tipmask)
+                    
+                #no wash if no actions taken
+                worklist_script += 'W;\r\n' # queue wash tips                    
+                #self._trackQuantities(experiment.buffer_source, buffer_volume * units.microliters)
+                print worklist_script
             
     def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
         """
@@ -681,18 +691,6 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         for (experiment_number, experiment) in enumerate(self.experiments):
         
 
-                
-                # Schedule buffer transfer.
-            tipmask = 1
-            if buffer_volume > 0.01 or not omit_zeroes:
-                worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.buffer_source.RackLabel, experiment.buffer_source.RackType, 1, buffer_volume, tipmask)
-                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, buffer_volume, tipmask)
-                    
-                #no wash if no actions taken
-                worklist_script += 'W;\r\n' # queue wash tips                    
-                self._trackQuantities(experiment.buffer_source, buffer_volume * units.microliters)
-
-            # Schedule cell solution transfer.
             tipmask = 2
             try:
                 # Assume source is Solution.

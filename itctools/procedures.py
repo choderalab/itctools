@@ -300,9 +300,9 @@ class ITCExperimentSet(object):
             self._tracked_quantities[name] += volume
         else:
             self._tracked_quantities[name] = volume
-    
+
     def _allocate_destinations(self):
-	# Make a list of all the possible destination pipetting locations.
+        # Make a list of all the possible destination pipetting locations.
         # TODO: Change this to go left-to-right in ITC plates?
         self.destination_locations = list()
         for (plate_index, plate) in enumerate(self.destination_plates):
@@ -323,16 +323,18 @@ class ITCExperimentSet(object):
 
         Additional experiment data fields (tecandata, itcdata)
         
-        volumes - bool (default=True)
-            Print out pipetting volumes
-        omit_zeroes - bool (default = True)
-            Omit operations with volumes below vlimit
-	vlimit - float (default = 10.0)
-	    Minimal volume for pipetting operation in microliters
+        Parameters
+        ----------
+        volumes : bool 
+            Print out pipetting volumes (default=True)            
+        omit_zeroes : bool 
+            Omit operations with volumes below vlimit (default = True)
+        vlimit : float 
+            Minimal volume for pipetting operation in microliters (default = 10.0)
         """
-        
+
         # TODO: Try to set up experiment, throwing exception upon failure.
-        
+
         # Make a list of all the possible destination pipetting locations.
         self._allocate_destinations()
 
@@ -477,9 +479,6 @@ class ITCExperimentSet(object):
                     sflag="\033[5;41m !!!"
                     
             volume_report += "%s Syringe (ul):%.2f \033[0;0m \n\n" % (sflag, syringe_volume)
-            
-            
-
 
             # Finish worklist section.
             worklist_script += 'B;\r\n' # execute queued batch of commands
@@ -607,51 +606,62 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
     TODO: Work out the concepts
     """
-    def __init__(self,name):        
+    def __init__(self,name):
+        """
+        Parameters
+        ----------
+        name : str
+            Identifier for the experiment set.
+
+        """
         super(HeatOfMixingExperimentSet,self).__init__(name)
         self._worklist_complete = False
         self._autoitc_complete = False
         self._validated = False
     
-    def populate_worklist(self, cell_volume = 400.0, syringe_volume=120):
+    def populate_worklist(self, cell_volume = 400.0 * units.microliters , syringe_volume=120.0 * units.microliters):
         """
         Build the worklist for heat of mixing experiments
         
-        cell_volume - float (default = 400.0)
-        total volume to prepare for cell in microliters
-        syringe_volume - float (default = 120.0)
-        total volume to prepare for syringe in microliters
-        
+        Parameters
+        ----------
+        cell_volume : simtk.unit.Quantity with units compatible with microliters
+            Total volume to prepare for cell in microliters  (opt., default = 400.0 * microliters )
+        syringe_volume : simtk.unit.Quantity with units compatible with microliters
+            Total volume to prepare for syringe in microliters (default = 120.0 * microliters )
         """
+
         # Make a list of all the possible destination pipetting locations.        
         self._allocate_destinations()
-            
+
         # Build worklist script.
         worklist_script = ""
 
         # Reset tracked quantities.
         self._resetTrackedQuantities()
-        
+
         for (experiment_number, experiment) in enumerate(self.experiments):
-        
+
             #Assign experiment number
             experiment.experiment_number = experiment_number
             tecandata = HeatOfMixingExperimentSet.TecanData()
-            
+
             #Ensure there are ITC wells available
             if len(self.destination_locations) == 0:
                 raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
             tecandata.cell_destination = self.destination_locations.pop(0)
-            
-            #Calculate volumes for cell mixture
+
+            #Calculate volumes per component for cell mixture
             cell_volumes = list()
             for cellfrac in experiment.cell_mixture.molefractions:
-                cell_volumes.append(cell_volume*cellfrac)
-            
-            #Calculate volumes for syringe mixture            
+                #Ensure units are correct
+                cell_volumes.append(float(cell_volume*cellfrac / units.microliters))
+
+            #Calculate volumes per component for syringe mixture            
             syr_volumes = list()
             for syrfrac in experiment.syringe_mixture.molefractions:
-                syr_volumes.append(syringe_volume*syrfrac)
+                #Ensure units are correct
+                syr_volumes.append(float(syringe_volume*syrfrac /units.microliters))
             
             allcomponents = experiment.cell_mixture.components + experiment.syringe_mixture.components
             allcomponents = list(set(allcomponents))

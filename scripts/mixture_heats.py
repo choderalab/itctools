@@ -41,6 +41,10 @@ sspace =[.0, 1.0]
 #TODO We may want to do the controls with every liquid
 control_index = 0
 
+#Volume sizes for individual experiment
+cell_volume = 400.0 * microliter 
+syringe_volume = 120.0 * microliter 
+
 #Name for the Tecan gemini worklist file
 worklist_filename = 'mixing-itc.gwl'
 
@@ -154,7 +158,7 @@ for replicate in range(nfinal):
 # Check that the experiment can be carried out using available solutions and plates.
 
 #Allocate resources on the tecan worklist and schedule volume transfers
-mixing_experiment_set.populate_worklist()
+mixing_experiment_set.populate_worklist(cell_volume = cell_volume, syringe_volume=syringe_volume)
 
 #Define all experiments in Auto-iTC200 xlsx format
 mixing_experiment_set.populate_autoitc_spreadsheet()

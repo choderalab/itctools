@@ -25,15 +25,15 @@ class Solvent(object):
 
         Examples
         --------
-        
+
         Register a solvent.
 
         >>> water = Solvent('water', density=0.9970479*units.grams/units.centimeter**3)
 
         Register a solvent with density information.
-        
+
         >>> dmso = Solvent('dmso', density=1.1004*units.grams/units.centimeter**3)
-        
+
         """
         self.name = name
         self.density = density
@@ -47,7 +47,7 @@ class Compound(object):
     A Compound object represents a compound that can be dissolved in a solvent.
 
     """
-    
+
     def __init__(self, name, molecular_weight=None, purity=1.0):
         """
         Parameters
@@ -61,11 +61,11 @@ class Compound(object):
 
         Examples
         --------
-        
+
         Register a compound.
 
         >>> nacl = Compound('sodium chloride')
-        
+
         Register a compound with molecular weight.
 
         >>> imatinib = Compound('imatinib mesylate', molecular_weight=589.7*units.grams/units.mole)
@@ -94,8 +94,7 @@ class PureLiquid(Compound):
         """
         super(PureLiquid,self).__init__(name, molecular_weight=molecular_weight, purity=purity)
         self.density = density
-      
-      
+
 #==============================================================================
 # SOLUTION
 #==============================================================================
@@ -119,12 +118,12 @@ class SimpleSolution(Solvent):
            The mass of solvent used for the solution.
         location : PipettingLocation
            The pipetting location holding the solution.
-           
+
         Examples
         --------
-        
+
         Create a simple salt solution.
-        
+
         >>> salt = Compound('sodium chloride', molecular_weight=58.44277*units.grams/units.mole)
         >>> water = Solvent('water', density=0.9970479*units.grams/units.centimeter**3)
         >>> location = PipettingLocation('BufferTrough', 'Trough 100ml', 1)
@@ -135,7 +134,7 @@ class SimpleSolution(Solvent):
         * Allow specification of quantity of compound and solvent in various ways (mass, moles, volume) with automated conversions.
 
         """
-        
+
         self.compound = compound
         self.compound_mass = compound_mass
         self.solvent = solvent

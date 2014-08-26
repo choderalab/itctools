@@ -28,7 +28,7 @@ class ITCProtocol(object):
 
 #In case these will diverge at some point, declare alias for Mixture usage.
 HeatOfMixingProtocol=ITCProtocol
-       
+
 class ITCExperiment(object):
     def __init__(self, name, syringe_source, cell_source, protocol, buffer_source=None, syringe_concentration=None, cell_concentration=None):
         """
@@ -125,7 +125,7 @@ class ITCHeuristicExperiment(ITCExperiment):
         else:
             # Use approximate equation [X]_s = R_m * [M]0 V/(m*v)
             self.syringe_concentration = rm * self.cell_concentration * V0 / (m * v)
-                
+
         #compute the dilution factors
         self.syringe_dilution_factor = numpy.float(self.syringe_concentration / self.syringe_source.concentration)
 

@@ -6,7 +6,7 @@ from itctools.procedures import HeatOfMixingProtocol, HeatOfMixingExperimentSet,
 from itctools.materials import Compound, Solvent, SimpleSolution, PureLiquid, SimpleMixture
 from itctools.labware import Labware, PipettingLocation
 from itctools.itctools import permutation_with_replacement as perm
-#import itertools 
+#import itertools
 
 
 #TODO command line specification of density and name
@@ -28,7 +28,7 @@ pur1= 1.0 #purity ( TODO might make this optional)
 
 label2 = 'Dimethyl sulfoxide'
 dens2 = 1.092*grams/milliliter
-mw2=  78.13 * gram /mole 
+mw2=  78.13 * gram /mole
 pur2= 1.0
 
 #Mole fractions to consider as initial starting conditions
@@ -42,14 +42,18 @@ sspace =[.0, 1.0]
 control_index = 0
 
 #Volume sizes for individual experiment
-cell_volume = 400.0 * microliter 
-syringe_volume = 120.0 * microliter 
+cell_volume = 400.0 * microliter
+syringe_volume = 120.0 * microliter
 
 #Name for the Tecan gemini worklist file
 worklist_filename = 'mixing-itc.gwl'
 
 #Name for the Auto-iTC200 spreadsheet
 excel_filename = 'mixing-itc.xlsx'
+
+nreplicates = 1 # number of replicates of each experiment
+ncontrols = 1 #initial controls
+nfinal = 1 # final (water-water) controls
 
 # END of user input #######################
 
@@ -68,10 +72,10 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 locations = list()
 for l,liquid in enumerate(liquids,start=1):
     locations.append(PipettingLocation(source_plate.RackLabel, source_plate.RackType, l))
-    
+
 
 # Define a control mixture (100% water)
-control_mixture = SimpleMixture(components=[control_liquid], molefractions=[1.0], locations=[locations[control_index]], normalize_fractions=False )    
+control_mixture = SimpleMixture(components=[control_liquid], molefractions=[1.0], locations=[locations[control_index]], normalize_fractions=False )
 
 # Define cell mixtures
 
@@ -82,9 +86,9 @@ n = len(liquids)
 #Restrict combinations to those that sum up to 1
 cell_compositions = list()
 for fracs in perm(n, cspace):
-    if sum(fracs) == 1:  cell_compositions.append(fracs)    
+    if sum(fracs) == 1:  cell_compositions.append(fracs)
 
-#Define all cell mixtures    
+#Define all cell mixtures
 cell_mixtures = list()
 for combi in cell_compositions:
     cell_mixtures.append(SimpleMixture(components=liquids, molefractions=combi, locations=locations))
@@ -93,9 +97,9 @@ for combi in cell_compositions:
 #Restrict combinations to those that sum up to 1
 syr_compositions = list()
 for fracs in perm(n, sspace):
-    if sum(fracs) == 1:  syr_compositions.append(fracs)    
+    if sum(fracs) == 1:  syr_compositions.append(fracs)
 
-#Define all cell mixtures    
+#Define all cell mixtures
 syr_mixtures = list()
 for combi in syr_compositions:
     syr_mixtures.append(SimpleMixture(components=liquids, molefractions=combi, locations=locations))
@@ -119,13 +123,7 @@ mixing_experiment_set = HeatOfMixingExperimentSet(name=set_name) # use specified
 mixing_experiment_set.addDestinationPlate(Labware(RackLabel='DestinationPlate', RackType='ITC Plate'))
 mixing_experiment_set.addDestinationPlate(Labware(RackLabel='DestinationPlate2', RackType='ITC Plate'))
 
-nreplicates = 1 # number of replicates of each experiment
-ncontrols = 1 #initial controls
-nfinal = 1 # final (water-water) controls
-
-
 # Add cleaning titration
-
 name = 'initial cleaning water titration'
 mixing_experiment_set.addExperiment(HeatOfMixingExperiment(name, control_mixture, control_mixture, cleaning_protocol))
 

@@ -41,6 +41,11 @@ sspace =[.0, 1.0]
 #TODO We may want to do the controls with every liquid
 control_index = 0
 
+#Name for the Tecan gemini worklist file
+worklist_filename = 'mixing-itc.gwl'
+
+#Name for the Auto-iTC200 spreadsheet
+excel_filename = 'mixing-itc.xlsx'
 
 # END of user input #######################
 
@@ -98,7 +103,7 @@ control_protocol = HeatOfMixingProtocol('control protocol', sample_prep_method='
 
 # Protocol for a titration with increasing mole fraction
 #TODO Define the mixing protocol at the ITC machine
-mixing_protocol = HeatOfMixingProtocol('mixture protocol',  sample_prep_method='Plates Quick.setup', itc_method='ChoderaHostGuest.inj', analysis_method='Onesite')
+mixing_protocol = HeatOfMixingProtocol('mixture protocol',  sample_prep_method='Plates Quick.setup', itc_method='ChoderaHeatofMixing.inj', analysis_method='Control')
 
 # Protocol for cleaning protocol
 cleaning_protocol = HeatOfMixingProtocol('cleaning protocol', sample_prep_method='Plates Clean.setup', itc_method='water5inj.inj', analysis_method='Control')
@@ -130,7 +135,7 @@ for replicate in range(ncontrols):
 for smixture in syr_mixtures:
     for cmixture in cell_mixtures:
         for replicate in range(nreplicates):
-            name = str(cmixture)
+            name = cmixture.describe()
             mixing_experiment_set.addExperiment(HeatOfMixingExperiment(name,cmixture,smixture,mixing_protocol))
 
 #Add cleaning experiment.
@@ -147,23 +152,21 @@ for replicate in range(nfinal):
     mixing_experiment_set.addExperiment( HeatOfMixingExperiment(name, control_mixture, control_mixture, protocol=control_protocol) )
 
 # Check that the experiment can be carried out using available solutions and plates.
-#TODO make validation function complete
-#itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
-
 
 #Allocate resources on the tecan worklist and schedule volume transfers
 mixing_experiment_set.populate_worklist()
+
+#Define all experiments in Auto-iTC200 xlsx format
 mixing_experiment_set.populate_autoitc_spreadsheet()
 
-#validate
+#Verify that both Tecan worklist and auto-iTC200 data is ready for writing
 mixing_experiment_set.validate()
 
-
+#Display quantities used
+mixing_experiment_set.report_quantities()
 
 # Write Tecan EVO pipetting operations.
-worklist_filename = 'mixing-itc.gwl'
 mixing_experiment_set.writeTecanWorklist(worklist_filename)
 
 # Write Auto iTC-200 experiment spreadsheet.
-excel_filename = 'mixing-itc.xlsx'
 mixing_experiment_set.writeAutoITCExcel(excel_filename)

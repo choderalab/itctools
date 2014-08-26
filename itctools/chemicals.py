@@ -220,15 +220,17 @@ class SimpleMixture(Solvent):
             self.volumefractions.append(self.massfractions[c] * comp.density / normaldens)
         
     def __str__(self):
-        """Represent a mixture by its composition."""
-        _composition = str()
+        """Represent a mixture by its composition."""        
+        return "<%s: %s>" % (self.__class__, self.describe())
+    
+    def describe(self):
+        """Give a description of the mixture composition."""
+        composition = str()
         for n, comp in enumerate(self.components):
-            _composition += comp.name
-            _composition += " %f"%self.molefractions[n]
-            _composition += "; "
-        return "<%s: %s>" % (self.__class__, _composition)
-        
-        
+            composition += comp.name
+            composition += " %f"%self.molefractions[n]
+            composition += "; "
+        return composition
 
 #==============================================================================
 # MAIN AND TESTS

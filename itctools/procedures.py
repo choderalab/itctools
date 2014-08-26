@@ -609,7 +609,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
     """
 
     
-    def setup_mixing_experiments(self, cell_volume = 400.0, syringe_volume=120,vlimit=10.0):
+    def populate_worklist(self, cell_volume = 400.0, syringe_volume=120,vlimit=10.0):
         """
         Build the worklist for heat of mixing experiments
         
@@ -666,12 +666,30 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                 
                 worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, cell_volumes[i], dictips[experiment.cell_mixture.components[i]])
                     
-                #no wash if no actions taken
                 worklist_script += 'W;\r\n' # queue wash tips                    
-                #self._trackQuantities(experiment.buffer_source, buffer_volume * units.microliters)
-                print worklist_script
+                self._trackQuantities(experiment.cell_mixture.components[i], cell_volumes[i]* units.microliters)
             
-    def validate(self, print_volumes=True,omit_zeroes=True,vlimit=10.0):
+            # Find a place to put syringe contents.
+            if len(self.destination_locations) == 0:
+                raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
+            tecandata.syringe_destination = self.destination_locations.pop(0)
+            
+            #Start mixing up our syringe volume
+            for i in range(len(experiment.syringe_mixture.components)):
+                worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.syringe_mixture.locations[i].RackLabel, experiment.syringe_mixture.locations[i].RackType, experiment.syringe_mixture.locations[i].Position, syr_volumes[i], dictips[experiment.syringe_mixture.components[i]])
+                
+                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.syringe_destination.RackLabel, tecandata.syringe_destination.RackType, tecandata.syringe_destination.Position, syr_volumes[i], dictips[experiment.syringe_mixture.components[i]])
+               
+                worklist_script += 'W;\r\n' # queue wash tips                    
+                self._trackQuantities(experiment.syringe_mixture.components[i], syr_volumes[i] * units.microliters)
+                
+            # Finish worklist section.
+            worklist_script += 'B;\r\n' # execute queued batch of commands
+            
+            self.worklist = worklist_script
+           
+            
+    def populate_autoitc_spreadsheet(self):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
 
@@ -684,125 +702,28 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         vlimit - float (default = 10.0)
 	    Minimal volume for pipetting operation in microliters
         
-        TODO: Try to set up experiment, throwing exception upon failure.
+        
         """
         
 
         for (experiment_number, experiment) in enumerate(self.experiments):
         
-
-            tipmask = 2
-            try:
-                # Assume source is Solution.
-                if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.cell_source.location.RackLabel, experiment.cell_source.location.RackType, experiment.cell_source.location.Position, transfer_volume, tipmask)
-            except:
-                # Assume source is Labware.
-                if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.cell_source.RackLabel, experiment.cell_source.RackType, 2, transfer_volume, tipmask)
-            
-            if transfer_volume > 0.01 or not omit_zeroes:
-                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, transfer_volume, tipmask)
-                
-                #no wash if no actions taken
-                worklist_script += 'W;\r\n' # queue wash tips
-                self._trackQuantities(experiment.cell_source, transfer_volume * units.microliters)
-
-            # Find a place to put syringe contents.
-            if len(self.destination_locations) == 0:
-                raise Exception("Ran out of destination plates for experiment %d / %d" % (experiment_number, len(self.experiments)))
-            tecandata.syringe_destination = self.destination_locations.pop(0)
-
-            syringe_volume = 120.0 # microliters
-            transfer_volume = cell_volume
-
-            if (experiment.syringe_dilution_factor is not None):
-                # Compute buffer volume needed.
-                buffer_volume = syringe_volume * (1.0 - experiment.syringe_dilution_factor)
-                transfer_volume = syringe_volume - buffer_volume 
-                
-                #volume logging
-                bflag = sflag = ""
-                
-                if buffer_volume < vlimit:
-                    if buffer_volume < 0.01 and omit_zeroes:
-                        bflag="\033[5;31m !!!"
-                    else:
-                        bflag="\033[5;41m !!!"
-                if syringe_volume < vlimit:
-                    if syringe_volume < 0.01 and omit_zeroes:
-                        sflag="\033[5;31m !!!"
-                    else:
-                        sflag="\033[5;41m !!!"
-                    
-                volume_report += "%s Buffer  (ul):%.2f \033[0;0m \n" % (bflag, buffer_volume)
-                volume_report += "%s Syringe (ul):%.2f \033[0;0m \n\n" % (sflag, syringe_volume)
-                
-                # Schedule buffer transfer.
-                tipmask = 4
-                
-                if buffer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.buffer_source.RackLabel, experiment.buffer_source.RackType, 3, buffer_volume, tipmask)
-                    worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.syringe_destination.RackLabel, tecandata.syringe_destination.RackType, tecandata.syringe_destination.Position, buffer_volume, tipmask)
-                    
-                    #no wash if no actions taken
-                    worklist_script += 'W;\r\n' # queue wash tips
-                    self._trackQuantities(experiment.buffer_source, buffer_volume * units.microliters)
-
-            # Schedule syringe solution transfer.
-            tipmask = 8
-            try:
-                # Assume source is Solution.
-                if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.syringe_source.location.RackLabel, experiment.syringe_source.location.RackType, experiment.syringe_source.location.Position, transfer_volume, tipmask)
-            except:
-                # Assume source is Labware.
-                if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (experiment.syringe_source.RackLabel, experiment.syringe_source.RackType, 4, transfer_volume, tipmask)
-
-            if transfer_volume > 0.01 or not omit_zeroes:            
-                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.syringe_destination.RackLabel, tecandata.syringe_destination.RackType, tecandata.syringe_destination.Position, transfer_volume, tipmask)
-                worklist_script += 'W;\r\n' # queue wash tips
-                self._trackQuantities(experiment.syringe_source, transfer_volume * units.microliters)
-            
-            #volume logging
-            sflag = ""
-            if syringe_volume < vlimit:
-                if syringe_volume < 0.01 and omit_zeroes:
-                    sflag="\033[5;31m !!!"
-                else:
-                    sflag="\033[5;41m !!!"
-                    
-            volume_report += "%s Syringe (ul):%.2f \033[0;0m \n\n" % (sflag, syringe_volume)
-            
-            
-
-
-            # Finish worklist section.
-            worklist_script += 'B;\r\n' # execute queued batch of commands
-
             # Create datafile name.
             now = datetime.now()
             datecode = now.strftime("%Y%m%d")
             seriescode = 'a' # TODO: Use intelligent coding?
             indexcode = '%d' % (experiment_number + 1)
             itcdata.DataFile = datecode + seriescode + indexcode
-
             itcdata.SampleName = experiment.name
             itcdata.SamplePrepMethod = experiment.protocol.sample_prep_method
             itcdata.ItcMethod = experiment.protocol.itc_method
             itcdata.AnalysisMethod = experiment.protocol.analysis_method
 
             millimolar = 0.001 * units.moles / units.liter
-            try:
-                itcdata.CellConcentration = experiment.cell_concentration / millimolar
-            except:
-                itcdata.CellConcentration = 0
-
-            try:
-                itcdata.PipetteConcentration = experiment.syringe_concentration / millimolar
-            except:
-                itcdata.PipetteConcentration = 0
+            
+            #Not a binding experiment, set concentrations to 0
+            itcdata.CellConcentration = 0
+            itcdata.PipetteConcentration = 0
 
             itcdata.CellSource = 'Plate%d, %s' % (tecandata.cell_destination.PlateNumber, tecandata.cell_destination.WellName)
             itcdata.PipetteSource = 'Plate%d, %s' % (tecandata.syringe_destination.PlateNumber, tecandata.syringe_destination.WellName)

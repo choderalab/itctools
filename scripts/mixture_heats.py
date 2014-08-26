@@ -151,8 +151,9 @@ for replicate in range(nfinal):
 #itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
 
-#Allocate experiment resources, destinations, et cetera
-mixing_experiment_set.setup_mixing_experiments()
+#Allocate resources on the tecan worklist and schedule volume transfers
+mixing_experiment_set.populate_worklist()
+
 
 
 # Write Tecan EVO pipetting operations.

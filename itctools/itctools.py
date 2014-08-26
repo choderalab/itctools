@@ -1,5 +1,6 @@
-#Make all possible combinations using cartesian product
+# Make all possible combinations using cartesian product
 import itertools
+
 
 def permutation_with_replacement(n, seq):
     """
@@ -8,6 +9,5 @@ def permutation_with_replacement(n, seq):
     """
     options = list()
     for p in itertools.product(seq, repeat=n):
-       options.append(p)
+        options.append(p)
     return options
-    

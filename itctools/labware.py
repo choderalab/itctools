@@ -1,7 +1,9 @@
 
 import simtk.unit as units
 
+
 class Labware(object):
+
     def __init__(self, RackLabel, RackType, RackID=None):
         """
         Define basic Tecan labware.
@@ -13,19 +15,20 @@ class Labware(object):
         RackType : str
            Tecan labeware type (e.g. 'Trough 100ml', 'ITC Plate')
         RackID : str, optional
-           Tecan barcode.        
-        
+           Tecan barcode.
+
         """
         self.RackLabel = RackLabel
         self.RackType = RackType
         self.RackID = RackID
-    
-        
+
+
 #==============================================================================
 # PIPETTING LOCATION
 #==============================================================================
 
 class PipettingLocation(object):
+
     def __init__(self, RackLabel, RackType, Position):
         # Information for Tecan LiHa.
         self.RackLabel = RackLabel

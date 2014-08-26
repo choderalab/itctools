@@ -923,7 +923,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         for key in keys:
             print "%32s %12.3f mL" % (key, 0.05 * self._tracked_quantities[key] / units.milliliters)
 
-    def validate(self, strict=False):
+    def validate(self, strict=True):
         """Make sure that necessary steps have been taken before writing to files."""
         if not self._autoitc_complete:
             message = "Auto-iTC200 spreadsheet (.xls) not yet populated!"

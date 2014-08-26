@@ -8,7 +8,9 @@ import simtk.unit as units
 # SOLVENT
 #==============================================================================
 
+
 class Solvent(object):
+
     """
     A Solvent object represents a liquid that may be pipetted, and in which compounds may be dissolved.
 
@@ -42,7 +44,9 @@ class Solvent(object):
 # COMPOUND
 #==============================================================================
 
+
 class Compound(object):
+
     """
     A Compound object represents a compound that can be dissolved in a solvent.
 
@@ -79,8 +83,11 @@ class Compound(object):
         self.molecular_weight = molecular_weight
         self.purity = purity
 
+
 class PureLiquid(Compound):
+
     """A PureLiquid describes a pure liquid that can be part of a mixture of liquids."""
+
     def __init__(self, name, density, molecular_weight, purity=1.0):
         """
         name : str
@@ -90,23 +97,37 @@ class PureLiquid(Compound):
         molecular weight : simtk.unit.Quantity with units compatible with grams/mole
             molecular weight of pure liquid
         purity : float, optional, default = 1.0
-            fraction of liquid that is pure       
+            fraction of liquid that is pure
         """
-        super(PureLiquid,self).__init__(name, molecular_weight=molecular_weight, purity=purity)
+        super(
+            PureLiquid,
+            self).__init__(
+            name,
+            molecular_weight=molecular_weight,
+            purity=purity)
         self.density = density
 
 #==============================================================================
 # SOLUTION
 #==============================================================================
 
+
 class SimpleSolution(Solvent):
+
     """
     A SimpleSolution object represents a solution containing one compound and one solvent.
 
     The solution is assumed to be ideal, with the same volume as that of the solvent.
 
     """
-    def __init__(self, compound, compound_mass, solvent, solvent_mass, location):
+
+    def __init__(
+            self,
+            compound,
+            compound_mass,
+            solvent,
+            solvent_mass,
+            location):
         """
         compound : Compound
            The compound added to the solution.
@@ -150,30 +171,38 @@ class SimpleSolution(Solvent):
         self.volume = solvent_mass / solvent.density
 
         # Compute number of moles of compound.
-        self.compound_moles = compound_mass / compound.molecular_weight * compound.purity # number of moles of compound
+        # number of moles of compound
+        self.compound_moles = compound_mass / compound.molecular_weight * compound.purity
 
         # Compute molarity.
         self.concentration = self.compound_moles / self.volume
-                   
+
         # Store location.
         self.location = location
-        
+
 
 #==============================================================================
 # MIXTURE
 #==============================================================================
 
 class SimpleMixture(Solvent):
+
     """
     A SimpleMixture object represents a solution containing a mixture of various solvents.
 
     The solution is assumed to be ideal, with the same volume as that of the solvent.
 
     """
-    def __init__(self, components=list(), molefractions=list(), locations= list(), normalize_fractions=False):
+
+    def __init__(
+            self,
+            components=list(),
+            molefractions=list(),
+            locations=list(),
+            normalize_fractions=False):
         """
         components : list of PureLiquid
-            components of the mixture        
+            components of the mixture
         molefractions : list of float
             mole fraction per component
         locations : list of PipettingLocation
@@ -183,51 +212,65 @@ class SimpleMixture(Solvent):
         """
         self.components = components
         self.molefractions = molefractions
-        self.locations = locations        
-        #Consistency checks
-        
-        #Input length
+        self.locations = locations
+        # Consistency checks
+
+        # Input length
         if not len(components) == len(molefractions) == len(locations):
             raise ValueError("Input lists do not have same length!")
-        
-        #Ensure total mole fraction equals 1
+
+        # Ensure total mole fraction equals 1
         if normalize_fractions:
             total = sum(self.molefractions)
             self.molefractions = map(lambda x: x / total, self.molefractions)
         else:
             # Check if mole fraction is 1 within arbitrary precision
-            if  abs(1.0 - sum(self.molefractions)) > 0.0001:
+            if abs(1.0 - sum(self.molefractions)) > 0.0001:
                 raise ValueError("Total mole fractions out of bounds!")
-        
-        
-        #Mass of compound relative to total mass
-        self.massfractions = list() 
-        #Volume of compound relative to total volume (ideal solution assumption)
-        self.volumefractions = list()
-                
-        #Normalizing constant for molecular weight        
-        normalweight = sum((comp.molecular_weight for comp in self.components), 0*units.grams / units.mole )
-        #Normalizing constant for liquid density
-        normaldens   = sum((comp.density for comp in self.components), 0*units.grams / units.milliliter) 
-        
-        #Derive fractional masses from molecular weight
-        for c,comp in enumerate(components):
-            self.massfractions.append(self.molefractions[c] * comp.molecular_weight / normalweight)
 
-        #Derive fractional volumes from mass and density
-        for c,comp in enumerate(components):
-            self.volumefractions.append(self.massfractions[c] * comp.density / normaldens)
-        
+        # Mass of compound relative to total mass
+        self.massfractions = list()
+        # Volume of compound relative to total volume (ideal solution
+        # assumption)
+        self.volumefractions = list()
+
+        # Normalizing constant for molecular weight
+        normalweight = sum(
+            (comp.molecular_weight for comp in self.components),
+            0 *
+            units.grams /
+            units.mole)
+        # Normalizing constant for liquid density
+        normaldens = sum(
+            (comp.density for comp in self.components),
+            0 *
+            units.grams /
+            units.milliliter)
+
+        # Derive fractional masses from molecular weight
+        for c, comp in enumerate(components):
+            self.massfractions.append(
+                self.molefractions[c] *
+                comp.molecular_weight /
+                normalweight)
+
+        # Derive fractional volumes from mass and density
+        for c, comp in enumerate(components):
+            self.volumefractions.append(
+                self.massfractions[c] *
+                comp.density /
+                normaldens)
+
     def __str__(self):
-        """Represent a mixture by its composition."""        
+        """Represent a mixture by its composition."""
         return "<%s: %s>" % (self.__class__, self.describe())
-    
+
     def describe(self):
         """Give a description of the mixture composition."""
         composition = str()
         for n, comp in enumerate(self.components):
             composition += comp.name
-            composition += " %f"%self.molefractions[n]
+            composition += " %f" % self.molefractions[n]
             composition += "; "
         return composition
 
@@ -238,4 +281,3 @@ class SimpleMixture(Solvent):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-

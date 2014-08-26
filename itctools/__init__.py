@@ -1,1 +1,1 @@
-__all__ = ["chemicals", "procedures", "labware", "itctools"]
+__all__ = ["materials", "procedures", "labware", "itctools"]

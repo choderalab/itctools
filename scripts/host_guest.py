@@ -1,15 +1,10 @@
 """
 Script for generation of binary mixture ITC titrations.
 """
-
-
 from simtk.unit import *
-
 from itctools.procedures import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
-from itctools.chemicals import Solvent, Compound, SimpleSolution 
+from itctools.materials import Solvent, Compound, SimpleSolution 
 from itctools.labware import Labware, PipettingLocation
- 
- 
 
 # Define solvents.
 #TODO command line specification of density and name

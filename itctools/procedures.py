@@ -607,7 +607,11 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
     TODO: Work out the concepts
     """
-
+    def __init__(self,name):        
+        super(HeatOfMixingExperimentSet,self).__init__(name)
+        self._worklist_complete = False
+        self._autoitc_complete = False
+        self._validated = False
     
     def populate_worklist(self, cell_volume = 400.0, syringe_volume=120,vlimit=10.0):
         """
@@ -632,8 +636,6 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         
             #Assign experiment number
             experiment.experiment_number = experiment_number
-            
-            itcdata = HeatOfMixingExperimentSet.ITCData()
             tecandata = HeatOfMixingExperimentSet.TecanData()
             
             #Ensure there are ITC wells available
@@ -686,8 +688,12 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             # Finish worklist section.
             worklist_script += 'B;\r\n' # execute queued batch of commands
             
-            self.worklist = worklist_script
-           
+            #Store Tecan data for this experiment
+            experiment.tecandata = tecandata
+            
+        #Store the completed worklist, containing all experiments
+        self.worklist = worklist_script
+        self._worklist_complete = True
             
     def populate_autoitc_spreadsheet(self):
         """
@@ -707,7 +713,8 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         
 
         for (experiment_number, experiment) in enumerate(self.experiments):
-        
+            
+            itcdata = HeatOfMixingExperimentSet.ITCData()
             # Create datafile name.
             now = datetime.now()
             datecode = now.strftime("%Y%m%d")
@@ -725,8 +732,8 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             itcdata.CellConcentration = 0
             itcdata.PipetteConcentration = 0
 
-            itcdata.CellSource = 'Plate%d, %s' % (tecandata.cell_destination.PlateNumber, tecandata.cell_destination.WellName)
-            itcdata.PipetteSource = 'Plate%d, %s' % (tecandata.syringe_destination.PlateNumber, tecandata.syringe_destination.WellName)
+            itcdata.CellSource = 'Plate%d, %s' % (experiment.tecandata.cell_destination.PlateNumber, experiment.tecandata.cell_destination.WellName)
+            itcdata.PipetteSource = 'Plate%d, %s' % (experiment.tecandata.syringe_destination.PlateNumber, experiment.tecandata.syringe_destination.WellName)
 
             # TODO: Autodetect if prerinse is used.
             itcdata.PreRinseSource = ''
@@ -734,13 +741,11 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             # TODO: Autodetect if sample destination is used.
             itcdata.SaveSampleDestination = itcdata.CellSource
 
-            # Store Tecan and Excel data for this experiment.
-            experiment.tecandata = tecandata
+            # Store Excel data for this experiment.
             experiment.itcdata = itcdata
-            if print_volumes: print volume_report
-        # Save Tecan worklist.
-        self.worklist = worklist_script
+        self._autoitc_complete = True
 
+    def report_quantities(self):
         # Report tracked quantities.
         print "Necessary volumes:"
         keys = self._tracked_quantities.keys()
@@ -754,6 +759,21 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         keys.sort()
         for key in keys:
             print "%32s %12.3f mL" % (key, 0.03 * self._tracked_quantities[key] / units.milliliters)
-
+            
+    def validate(self, strict=False):
         # Set validated flag.
-        self._validated = True
+        if not self._autoitc_complete:
+            message="Auto-iTC200 spreadsheet (.xls) not yet generated!"
+            if strict:
+                raise RuntimeError(message)
+            else:
+                print "Warning: ",message
+        elif not self._worklist_complete:
+            message="Tecan worklist (.gwl) not yet generated!"
+            if strict:
+                raise RuntimeError(message)
+            else:
+                print "Warning: ",message
+        else:
+            self._validated = True
+            

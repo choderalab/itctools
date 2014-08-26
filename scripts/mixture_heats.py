@@ -153,17 +153,17 @@ for replicate in range(nfinal):
 
 #Allocate resources on the tecan worklist and schedule volume transfers
 mixing_experiment_set.populate_worklist()
+mixing_experiment_set.populate_autoitc_spreadsheet()
+
+#validate
+mixing_experiment_set.validate()
 
 
 
 # Write Tecan EVO pipetting operations.
-#worklist_filename = 'mixing-itc.gwl'
-#mixing_experiment_set.writeTecanWorklist(worklist_filename)
+worklist_filename = 'mixing-itc.gwl'
+mixing_experiment_set.writeTecanWorklist(worklist_filename)
 
 # Write Auto iTC-200 experiment spreadsheet.
-#excel_filename = 'run-itc.xlsx'
-#mixing_experiment_set.writeAutoITCExcel(excel_filename)
-
-#For now, if we import the script, don't do anything
-if not __name__ == "__main__":
-    pass
+excel_filename = 'mixing-itc.xlsx'
+mixing_experiment_set.writeAutoITCExcel(excel_filename)

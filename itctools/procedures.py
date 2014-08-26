@@ -613,7 +613,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         self._autoitc_complete = False
         self._validated = False
     
-    def populate_worklist(self, cell_volume = 400.0, syringe_volume=120,vlimit=10.0):
+    def populate_worklist(self, cell_volume = 400.0, syringe_volume=120):
         """
         Build the worklist for heat of mixing experiments
         
@@ -668,7 +668,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                 
                 worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (tecandata.cell_destination.RackLabel, tecandata.cell_destination.RackType, tecandata.cell_destination.Position, cell_volumes[i], dictips[experiment.cell_mixture.components[i]])
                     
-                worklist_script += 'W;\r\n' # queue wash tips                    
+                worklist_script += 'W;\r\n' # queue wash tips
                 self._trackQuantities(experiment.cell_mixture.components[i], cell_volumes[i]* units.microliters)
             
             # Find a place to put syringe contents.
@@ -697,23 +697,14 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             
     def populate_autoitc_spreadsheet(self):
         """
-        Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
-
-        Additional experiment data fields (tecandata, itcdata)
-        
-        volumes - bool (default=True)
-            Print out pipetting volumes
-        omit_zeroes - bool (default = True)
-            Omit operations with volumes below vlimit
-        vlimit - float (default = 10.0)
-	    Minimal volume for pipetting operation in microliters
-        
-        
-        """
-        
+        Populate all the fields in the Auto-iTC200 spreadsheet
+        """        
+        #Plate wells need to be assigned in order to generate the spreadsheet
+        if not self._worklist_complete:
+            raise Exception("Please generate a Tecan Worklist first!")
 
         for (experiment_number, experiment) in enumerate(self.experiments):
-            
+
             itcdata = HeatOfMixingExperimentSet.ITCData()
             # Create datafile name.
             now = datetime.now()
@@ -761,15 +752,15 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             print "%32s %12.3f mL" % (key, 0.05 * self._tracked_quantities[key] / units.milliliters)
             
     def validate(self, strict=False):
-        # Set validated flag.
+        """Make sure that necessary steps have been taken before writing to files."""
         if not self._autoitc_complete:
-            message="Auto-iTC200 spreadsheet (.xls) not yet generated!"
+            message="Auto-iTC200 spreadsheet (.xls) not yet populated!"
             if strict:
                 raise RuntimeError(message)
             else:
                 print "Warning: ",message
         elif not self._worklist_complete:
-            message="Tecan worklist (.gwl) not yet generated!"
+            message="Tecan worklist (.gwl) not yet populated!"
             if strict:
                 raise RuntimeError(message)
             else:

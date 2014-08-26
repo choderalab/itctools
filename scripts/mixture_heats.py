@@ -1,5 +1,5 @@
 """
-Script for generation of binary mixture ITC titrations.
+Script for generation of mixture ITC titrations.
 """
 from simtk.unit import *
 from itctools.procedures import HeatOfMixingProtocol, HeatOfMixingExperimentSet, HeatOfMixingExperiment

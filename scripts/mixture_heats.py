@@ -186,7 +186,7 @@ for replicate in range(ncontrols):
 for smixture in syr_mixtures:
     for cmixture in cell_mixtures:
         for replicate in range(nreplicates):
-            name = cmixture.describe()
+            name ="%s into: %s" % (smixture.describe(), cmixture.describe())
             mixing_experiment_set.addExperiment(
                 HeatOfMixingExperiment(
                     name,

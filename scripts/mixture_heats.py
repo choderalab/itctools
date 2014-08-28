@@ -33,9 +33,9 @@ pur2 = 1.0
 
 # Mole fractions to consider as initial starting conditions
 # cell
-cspace = [.0, .25, .5, .75, 1.0]
+cspace = [.0, .2, .4, .6, .8, 1.]
 # syringe
-sspace = [.0, 1.0]
+sspace = [.0, 1.]
 
 # Which liquid to use for controls (Probably water)
 # TODO We may want to do the controls with every liquid

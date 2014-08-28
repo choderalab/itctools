@@ -269,9 +269,10 @@ class SimpleMixture(Solvent):
         """Give a description of the mixture composition."""
         composition = str()
         for n, comp in enumerate(self.components):
-            composition += comp.name
-            composition += " %f" % self.molefractions[n]
-            composition += "; "
+            if self.molefractions[n] > 0.0:
+                composition += comp.name
+                composition += " %f" % self.molefractions[n]
+                composition += "; "
         return composition
 
 #==============================================================================

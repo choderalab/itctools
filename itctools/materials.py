@@ -271,7 +271,7 @@ class SimpleMixture(Solvent):
         for n, comp in enumerate(self.components):
             if self.molefractions[n] > 0.0:
                 composition += comp.name
-                composition += " %f" % self.molefractions[n]
+                composition += " %.2f" % self.molefractions[n]
                 composition += "; "
         return composition
 

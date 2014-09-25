@@ -4,13 +4,12 @@ Tools for setting up ITC experiments in an automated fashion using the Tecan EVO
 
 Requires
 --------
-python 2.7 or above
-
-simtk
-
-itertools
-
-nose
+python 2.7 or above  
+simtk  
+numpy  
+openpyxl  
+itertools  
+nose  
 
 Contains
 --------

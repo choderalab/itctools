@@ -1,10 +1,15 @@
 __author__ = 'Bas Rustenburg'
 
-from behave import given, when, then, use_step_matcher
+from behave import *
 
-import sys
-import os
-sys.path.append(os.path.abspath('../../'))
+@given(u'the module is in the current directory')
+def step_impl(context):
+    import os
+    cwd = os.getcwd()
+    try:
+        os.environ['PYTHONPATH'] += ":%s:" % cwd
+    except KeyError:
+        os.environ['PYTHONPATH'] = cwd
 
 @given(u'that scripts are in the directory "{directory}"')
 def step_impl(context, directory):
@@ -30,16 +35,18 @@ def step_impl(context, directory):
     :return:
     """
     import os
-    if not os.path.isdir(directory) is True:
-        os.makedirs(directory)
+    fullpath = '%s/%s' % (context.tmpdir, directory)
+    if not os.path.isdir(fullpath) is True:
+        os.makedirs(fullpath)
 
-    context.workdir = os.path.abspath(directory)
+    context.workdir = os.path.abspath(fullpath)
 
 
-@when(u'the script "{scriptname}" is called')
+@when(u'the script "{scriptname}" is called successfully from the working directory')
 def step_impl(context, scriptname):
     """
     Execute a script on the command line.
+    Fails if script returns error code other than 0
 
     :param context:
     :param str scriptname:
@@ -47,10 +54,17 @@ def step_impl(context, scriptname):
     :return:
     """
     import os
+    from subprocess import Popen, PIPE
     oldwd = os.getcwd()
     os.chdir(context.workdir)
-    print(os.system('%s/%s' % (context.scripts, scriptname)))
-    os.chdir(oldwd)
+    try:
+        script = Popen('%s/%s' % (context.scripts, scriptname), stdout=PIPE, stderr=PIPE)
+        print(script.communicate())
+
+        assert script.stderr
+
+    finally:
+        os.chdir(oldwd)
 
 @then(u'a file called "{filename}" is created')
 def step_impl(context, filename):

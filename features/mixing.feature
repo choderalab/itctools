@@ -9,8 +9,9 @@ Feature: Heat of mixing experiments
 
   Scenario: Running the script
     Given that scripts are in the directory "scripts"
-      And the working directory is "tmp/mixture-itc"
-     When the script "mixture_heats.py" is called
+      And the module is in the current directory
+      And the working directory is "mixture-itc"
+     When the script "mixture_heats.py" is called successfully from the working directory
      Then a file called "mixing-itc.gwl" is created
       And "mixing-itc.gwl" is not an empty file
       And a file called "mixing-itc.xlsx" is created

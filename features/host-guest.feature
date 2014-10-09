@@ -4,8 +4,9 @@ Feature: Host-Guest binding ITC experiment
 
     Scenario: Running the script
       Given that scripts are in the directory "scripts"
-        And the working directory is "tmp/host-guest-itc"
-       When the script "host_guest.py" is called
+        And the module is in the current directory
+        And the working directory is "host-guest-itc"
+       When the script "host_guest.py" is called successfully from the working directory
        Then a file called "host-guest-itc.gwl" is created
         And "host-guest-itc.gwl" is not an empty file
         And a file called "host-guest-itc.xlsx" is created

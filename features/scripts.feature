@@ -8,7 +8,7 @@ Feature: Heat of mixing experiments
   Reasons for this are the large heats generated because of the large mismatch in concentrations
 
   Scenario: Running the script
-    Given that a directory is made called mixture-itc
+    Given a directory called mixture-itc
      When the python script mixture_heats.py is called
      Then a file called mixing-itc.gwl is created
       And mixing-itc.gwl is formatted as a .gwl file
@@ -21,7 +21,7 @@ Feature: Host-Guest binding ITC experiment
     Also generates a worksheet (.xlsx) file containing instructions for the AutoITC200
 
     Scenario: Running the script
-      Given that a directory exists called host-guest-itc
+      Given a directory called host-guest-itc
        When the python script host_guest.py is called
        Then a file called host-guest-itc.gwl is created
         And host-guest-itc.gwl is formatted as a .gwl file

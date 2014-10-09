@@ -8,9 +8,10 @@ Feature: Heat of mixing experiments
   Reasons for this are the large heats generated because of the large mismatch in concentrations
 
   Scenario: Running the script
-    Given a directory called "mixture-itc"
-     When the python script "mixture_heats.py" is called
+    Given that scripts are in the directory "scripts"
+      And the working directory is "tmp/mixture-itc"
+     When the script "mixture_heats.py" is called
      Then a file called "mixing-itc.gwl" is created
-      And "mixing-itc.gwl" is a .gwl file
+      And "mixing-itc.gwl" is not an empty file
       And a file called "mixing-itc.xlsx" is created
-      And "mixing-itc.xlsx" is a .xslx file
+      And "mixing-itc.xlsx" is not an empty file

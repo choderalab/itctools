@@ -3,9 +3,10 @@ Feature: Host-Guest binding ITC experiment
     Also generates a worksheet (.xlsx) file containing instructions for the AutoITC200
 
     Scenario: Running the script
-      Given a directory called "host-guest-itc"
-       When the python script "host_guest.py" is called
+      Given that scripts are in the directory "scripts"
+        And the working directory is "tmp/host-guest-itc"
+       When the script "host_guest.py" is called
        Then a file called "host-guest-itc.gwl" is created
-        And "host-guest-itc.gwl" is a .gwl file
+        And "host-guest-itc.gwl" is not an empty file
         And a file called "host-guest-itc.xlsx" is created
-        And "host-guest-itc.xlsx" is a .xslx file
+        And "host-guest-itc.xlsx" is not an empty file

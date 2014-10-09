@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 """
 Script for generation of mixture ITC titrations.
 """

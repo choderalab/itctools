@@ -1,8 +1,10 @@
 __author__ = 'Bas Rustenburg'
 
-from behave import *
+from behave import given, when, then, use_step_matcher
 
-@given('a directory called "{directory}"')
+
+
+@given(u'a directory called "{directory}"')
 def step_impl(context, directory):
     """
     Check whether a given directory exists.
@@ -14,18 +16,18 @@ def step_impl(context, directory):
     """
     pass
 
-@when('the python script "{scriptname}" is called')
-def step_impl(context, scriptname):
+@when(u'the {lang} script "{scriptname}" is called')
+def step_impl(context, lang, scriptname):
     """
-    Execute a python script on the command line.
-
+    Execute a script on the command line.
+    :param str lang:
     :param context:
     :param str scriptname:
     :return:
     """
     pass
 
-@then('a file called "{filename}" is created')
+@then(u'a file called "{filename}" is created')
 def step_impl(context, filename):
     """
     Check for existence of a file.
@@ -36,12 +38,12 @@ def step_impl(context, filename):
     """
     pass
 
-@then('"{filename}" is formatted as a? ."{format}" file')
-def step_impl(context, format):
+@then(u'"{filename}" is a .{format} file')
+def step_impl(context, filename, format):
     """
-    Verify the format of a file.
-
+    Verify format of given file
     :param context:
+    :param str filename:
     :param str format:
     :return:
     """

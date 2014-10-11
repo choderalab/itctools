@@ -4,12 +4,11 @@ Tools for setting up ITC experiments in an automated fashion using the Tecan EVO
 
 Requires
 --------
-python 2.7 or above  
-simtk  
-numpy  
-openpyxl  
-itertools  
-behave
+`anaconda` with `python` 2.7 or above  
+`simtk`  
+`numpy`  
+`openpyxl  `
+`pip` - to install `behave`
 
 Contains
 --------

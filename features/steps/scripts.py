@@ -4,6 +4,11 @@ from behave import *
 
 @given(u'the module is in the current directory')
 def step_impl(context):
+    """
+    Adds the current directory to the python path.
+    :param context:
+    :return:
+    """
     import os
     cwd = os.getcwd()
     try:
@@ -50,7 +55,6 @@ def step_impl(context, scriptname):
 
     :param context:
     :param str scriptname:
-    :param str dirname:
     :return:
     """
     import os
@@ -84,7 +88,6 @@ def step_impl(context, filename):
     Verify that the given file is not empty
     :param context:
     :param str filename:
-    :param str format:
     :return:
     """
     import os

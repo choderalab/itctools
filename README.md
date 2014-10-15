@@ -6,10 +6,20 @@ New:
 ---
 Run `bash install.sh` to set up a new python environment using miniconda at ${HOME}/miniconda. It should take care of all dependencies. 
 
+To access the new python enviroment you can type 
+```shell
+source ${HOME}/miniconda/bin/activate 2.7
+```
+or extend your `${PATH}` variable with `${HOME}/miniconda/bin`:
+```shell
+export PATH=${PATH}:${HOME}/minconda/bin
+```
+To use the scripts within an existing environment, please look at the dependencies and install them accordingly.
+
 Requires
 --------
-`anaconda` with `python` 2.7 or above  
-`simtk`  
+`anaconda` or `miniconda` with `python` 2.7 or above  
+`simtk` (which is part of `openmm`.)  
 `numpy`  
 `openpyxl`  
 `pip` - to install:  

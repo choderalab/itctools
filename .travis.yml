@@ -1,0 +1,23 @@
+language: c
+
+#os:
+#  - linux
+#  - osx
+
+install:
+  - source install.sh
+  - export PYTHONUNBUFFERED=true
+
+script:
+  - export CC="gcc -std=c89"
+  - source deactivate
+  - source activate $python
+  - conda list -e
+  - nosetests
+
+env:
+  matrix:
+    - python=2.6  CONDA_PY=26
+    - python=2.7  CONDA_PY=27
+    - python=3.3  CONDA_PY=33
+    - python=3.4  CONDA_PY=34

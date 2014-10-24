@@ -1,7 +1,9 @@
 #! /usr/bin/env bash
 
-export python=2.7
-export CONDA_PY=27
+if [[ "$TRAVIS" = true ]]; then
+  export python=2.7
+  export CONDA_PY=27
+fi
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     wget http://repo.continuum.io/miniconda/Miniconda-3.7.0-Linux-x86_64.sh  -O  Miniconda_installer.sh

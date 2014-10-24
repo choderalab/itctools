@@ -1,5 +1,7 @@
 itctools
 =========
+[![Build Status](https://travis-ci.org/choderalab/itctools.svg)](https://travis-ci.org/choderalab/itctools)
+
 Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200.
 
 New:
@@ -14,11 +16,11 @@ or extend your `${PATH}` variable with `${HOME}/miniconda/bin`:
 ```shell
 export PATH=${PATH}:${HOME}/miniconda/bin
 ```
-To use the scripts within an existing environment, please look at the dependencies and install them accordingly.
+To use the scripts within an existing environment, please look at the dependencies and install them accordingly. You can use the requirements files from the installer.
 
 Requires
 --------
-`anaconda` or `miniconda` with `python` 2.7 or above  
+`anaconda` or `miniconda` with `python` 2.7 or 3.3  
 `simtk` (which is part of `openmm`.)  
 `numpy`  
 `openpyxl`  

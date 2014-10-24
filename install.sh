@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 
 if [[ ! "$TRAVIS" = true ]]; then
-  export python=2.7
-  export CONDA_PY=27
+    export python=2.7
+    export CONDA_PY=27
 fi
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -23,3 +23,8 @@ conda create --yes -n ${python} python=${python} --file requirements-conda.txt
 source ${HOME}/miniconda/bin/activate ${python}
 
 pip install -r requirements-pip.txt
+
+if [[ ! "$TRAVIS" = true ]]; then
+    behave
+fi
+

@@ -4,7 +4,7 @@ import openpyxl  # Excel spreadsheet I/O (for Auto iTC-200)
 from openpyxl import Workbook
 from distutils.version import StrictVersion  # For version testing
 from datetime import datetime
-from labware import PipettingLocation
+from .labware import PipettingLocation
 
 
 class ITCProtocol(object):
@@ -632,8 +632,7 @@ class ITCExperimentSet(object):
 
         # Report expected waste
         print("Expected waste (3% of total):")
-        keys = self._tracked_quantities.keys()
-        keys.sort()
+        keys = sorted(self._tracked_quantities.keys())
         for key in keys:
             print("%32s %12.3f mL" % (key, 0.03 * self._tracked_quantities[key] / units.milliliters))
 
@@ -916,8 +915,8 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
         # Report expected waste
         print("Expected waste (5% of total):")
-        keys = self._tracked_quantities.keys()
-        keys.sort()
+        keys = sorted(self._tracked_quantities.keys())
+        
         for key in keys:
             print("%32s %12.3f mL" % (key, 0.05 * self._tracked_quantities[key] / units.milliliters))
 

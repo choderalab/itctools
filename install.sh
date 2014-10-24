@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-if [[ "$TRAVIS" = true ]]; then
+if [[ ! "$TRAVIS" = true ]]; then
   export python=2.7
   export CONDA_PY=27
 fi

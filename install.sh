@@ -23,6 +23,3 @@ conda create --yes -n ${python} python=${python} --file requirements-conda.txt
 source ${HOME}/miniconda/bin/activate ${python}
 
 pip install -r requirements-pip.txt
-
-#Run tests to verify installation
-behave

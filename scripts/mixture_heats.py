@@ -1,6 +1,8 @@
+#! /usr/bin/env python
 """
 Script for generation of mixture ITC titrations.
 """
+
 from simtk.unit import *
 from itctools.procedures import HeatOfMixingProtocol, HeatOfMixingExperimentSet, HeatOfMixingExperiment
 from itctools.materials import Compound, Solvent, SimpleSolution, PureLiquid, SimpleMixture

@@ -9,7 +9,7 @@ simtk
 numpy  
 openpyxl  
 itertools  
-nose  
+behave
 
 Contains
 --------
@@ -35,6 +35,6 @@ Some example scripts that use the library.
   - `mixture_heats.py`
     - Prepare a worklist and xlsx file for performing heat of mixing experiments.
     
-`tests.py`
+`features/`
 
-Test the integrity of the library. Run `nosetests` in order to make sure the script is functional.
+Test the integrity of the library. Run `behave` from top directory in order to make sure the scripts are functional.

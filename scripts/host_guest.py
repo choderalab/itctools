@@ -1,6 +1,8 @@
+#! /usr/bin/env python
 """
 Script for generation of binary mixture ITC titrations.
 """
+
 from simtk.unit import *
 from itctools.procedures import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
 from itctools.materials import Solvent, Compound, SimpleSolution
@@ -299,9 +301,9 @@ print "host", host_solution.concentration.in_units_of(millimolar)
 
 
 # Write Tecan EVO pipetting operations.
-worklist_filename = 'setup-itc.gwl'
+worklist_filename = 'host-guest-itc.gwl'
 itc_experiment_set.writeTecanWorklist(worklist_filename)
 
 # Write Auto iTC-200 experiment spreadsheet.
-excel_filename = 'run-itc.xlsx'
+excel_filename = 'host-guest-itc.xlsx'
 itc_experiment_set.writeAutoITCExcel(excel_filename)

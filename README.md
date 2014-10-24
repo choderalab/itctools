@@ -12,7 +12,7 @@ source ${HOME}/miniconda/bin/activate 2.7
 ```
 or extend your `${PATH}` variable with `${HOME}/miniconda/bin`:
 ```shell
-export PATH=${PATH}:${HOME}/minconda/bin
+export PATH=${PATH}:${HOME}/miniconda/bin
 ```
 To use the scripts within an existing environment, please look at the dependencies and install them accordingly.
 

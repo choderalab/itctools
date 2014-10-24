@@ -2,14 +2,28 @@ itctools
 =========
 Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200.
 
+New:
+---
+Run `bash install.sh` to set up a new python environment using miniconda at ${HOME}/miniconda. It should take care of all dependencies. 
+
+To access the new python enviroment you can type 
+```shell
+source ${HOME}/miniconda/bin/activate 2.7
+```
+or extend your `${PATH}` variable with `${HOME}/miniconda/bin`:
+```shell
+export PATH=${PATH}:${HOME}/minconda/bin
+```
+To use the scripts within an existing environment, please look at the dependencies and install them accordingly.
+
 Requires
 --------
-python 2.7 or above  
-simtk  
-numpy  
-openpyxl  
-itertools  
-behave
+`anaconda` or `miniconda` with `python` 2.7 or above  
+`simtk` (which is part of `openmm`.)  
+`numpy`  
+`openpyxl`  
+`pip` - to install:  
+`behave`
 
 Contains
 --------

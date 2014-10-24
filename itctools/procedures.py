@@ -343,8 +343,6 @@ class ITCExperimentSet(object):
         except:
             name = thing.RackLabel
 
-        # print name, volume
-
         if name in self._tracked_quantities:
             self._tracked_quantities[name] += volume
         else:
@@ -622,22 +620,22 @@ class ITCExperimentSet(object):
             experiment.tecandata = tecandata
             experiment.itcdata = itcdata
             if print_volumes:
-                print volume_report
+                print(volume_report)
         # Save Tecan worklist.
         self.worklist = worklist_script
 
         # Report tracked quantities.
-        print "Necessary volumes:"
+        print("Necessary volumes:")
         keys = sorted(self._tracked_quantities.keys())
         for key in keys:
-            print "%32s %12.3f mL" % (key, self._tracked_quantities[key] / units.milliliters)
+            print("%32s %12.3f mL" % (key, self._tracked_quantities[key] / units.milliliters))
 
         # Report expected waste
-        print "Expected waste (3% of total):"
+        print("Expected waste (3% of total):")
         keys = self._tracked_quantities.keys()
         keys.sort()
         for key in keys:
-            print "%32s %12.3f mL" % (key, 0.03 * self._tracked_quantities[key] / units.milliliters)
+            print("%32s %12.3f mL" % (key, 0.03 * self._tracked_quantities[key] / units.milliliters))
 
         # Set validated flag.
         self._validated = True
@@ -911,17 +909,17 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
     def report_quantities(self):
         # Report tracked quantities.
-        print "Necessary volumes:"
+        print("Necessary volumes:")
         keys = sorted(self._tracked_quantities.keys())
         for key in keys:
-            print "%32s %12.3f mL" % (key, self._tracked_quantities[key] / units.milliliters)
+            print("%32s %12.3f mL" % (key, self._tracked_quantities[key] / units.milliliters))
 
         # Report expected waste
-        print "Expected waste (5% of total):"
+        print("Expected waste (5% of total):")
         keys = self._tracked_quantities.keys()
         keys.sort()
         for key in keys:
-            print "%32s %12.3f mL" % (key, 0.05 * self._tracked_quantities[key] / units.milliliters)
+            print("%32s %12.3f mL" % (key, 0.05 * self._tracked_quantities[key] / units.milliliters))
 
     def validate(self, strict=True):
         """Make sure that necessary steps have been taken before writing to files."""
@@ -930,12 +928,12 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             if strict:
                 raise RuntimeError(message)
             else:
-                print "Warning: ", message
+                print("Warning: %s"% message)
         elif not self._worklist_complete:
             message = "Tecan worklist (.gwl) not yet populated!"
             if strict:
                 raise RuntimeError(message)
             else:
-                print "Warning: ", message
+                print("Warning: %s"% message)
         else:
             self._validated = True

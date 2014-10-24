@@ -295,9 +295,9 @@ itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
 # For convenience, concentrations
 for g, guest in enumerate(guest_solutions, start=1):
-    print "guest%02d" % g, guest.concentration.in_units_of(millimolar)
+    print("guest%02d" % g, guest.concentration.in_units_of(millimolar))
 
-print "host", host_solution.concentration.in_units_of(millimolar)
+print("host", host_solution.concentration.in_units_of(millimolar))
 
 
 # Write Tecan EVO pipetting operations.

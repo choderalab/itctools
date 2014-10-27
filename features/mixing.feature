@@ -8,7 +8,7 @@ Feature: Heat of mixing experiments
   Reasons for this are the large heats generated because of the large mismatch in concentrations
 
   Scenario: Running the script
-    Given that scripts are in the directory "scripts"
+    Given that scripts are in the directory "examples"
       And the module is in the current directory
       And the working directory is "mixture-itc"
      When the script "mixture_heats.py" is called successfully from the working directory

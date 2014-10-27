@@ -10,7 +10,6 @@ def before_all(context):
     :param context:
     :return:
     """
-    os.chdir('../..')
     shutil.rmtree('tmp', ignore_errors=True)
     os.makedirs('tmp')
     context.tmpdir = os.path.abspath('tmp')

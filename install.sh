@@ -25,7 +25,6 @@ source ${HOME}/miniconda/bin/activate ${python}
 pip install -r requirements-pip.txt
 
 if [[ ! "$TRAVIS" = true ]]; then
-    cd tests
     behave
 fi
 

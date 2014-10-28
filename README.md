@@ -1,11 +1,11 @@
-itctools
-=========
+# itctools
+
 [![Build Status](https://travis-ci.org/choderalab/itctools.svg)](https://travis-ci.org/choderalab/itctools)
 
 Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200.
 
-New:
----
+## New:
+
 Run `bash install.sh` to set up a new python environment using miniconda at ${HOME}/miniconda. It should take care of all dependencies. 
 
 To access the new python enviroment you can type 
@@ -18,8 +18,8 @@ export PATH=${PATH}:${HOME}/miniconda/bin
 ```
 To use the scripts within an existing environment, please look at the dependencies and install them accordingly. You can use the requirements files from the installer.
 
-Requires
---------
+## Requires
+-
 `anaconda` or `miniconda` with `python` 2.7 or 3.3  
 `simtk` (which is part of `openmm`.)  
 `numpy`  
@@ -27,9 +27,9 @@ Requires
 `pip` - to install:  
 `behave`
 
-Contains
---------
-`itctools/`
+## Contains
+
+### `itctools/`
 
 A library for setting up experiments
 
@@ -42,15 +42,29 @@ A library for setting up experiments
   - `itctools.py`
     - Contains useful functions that don't fall into any other category. 
 
-`scripts/`
+### `examples/`
 
 Some example scripts that use the library.
+ 
+#### `host_guest`
+   
+  - `host_guest.py` prepares a worklist and xlsx file for titrating a host compound into several guests.
 
-  - `host_guest.py`
-    - Prepares a worklist and xlsx file for titrating a host compound into several guests.
-  - `mixture_heats.py`
-    - Prepare a worklist and xlsx file for performing heat of mixing experiments.
+#### `mixture_heats`
+
+  -  `mixture_heats.py` prepares a worklist and xlsx file for performing heat of mixing experiments.
     
-`features/`
+### `tests/`
 
-Test the integrity of the library. Run `behave` from top directory in order to make sure the scripts are functional.
+Tests that are used to maintain the integrity of the library.
+
+#### `tests/behave`
+
+Tests that use `behave` to make sure the example scripts are functional. Run `behave` from the root directory of the repository to run these tests. See also the `.behaverc` file.
+
+##### `tests/behave/features`
+    - The feature files written in `Gherkin` that test the behavior of the example scripts.
+    - `environment.py` which sets up a temporary directory called `tmp` in your current directory to run tests in. Note that it automatically erases this directory before every run to ensure a clean working directory.
+    
+##### `tests/behave/features/steps`
+- `scripts.py` holds the step definitions that are run by behave when testing the features defined in the feature files.

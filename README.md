@@ -47,13 +47,13 @@ A library for setting up experiments
 Some example scripts that use the library.
  
 #### `examples/host_guest`
-   
+
   - `host_guest.py` prepares a worklist and xlsx file for titrating a host compound into several guests.
 
 #### `examples/mixture_heats`
 
   -  `mixture_heats.py` prepares a worklist and xlsx file for performing heat of mixing experiments.
-    
+
 ### `tests/`
 
 Tests that are used to maintain the integrity of the library.
@@ -64,8 +64,8 @@ Tests that use `behave` to make sure the example scripts are functional. Run `be
 
 ##### `tests/behave/features`
 
-    - The feature files written in `Gherkin` that test the behavior of the example scripts.
-    - `environment.py` which sets up a temporary directory called `tmp` in your current directory to run tests in. Note that it automatically erases this directory before every run to ensure a clean working directory.
+- The feature files written in `Gherkin` that test the behavior of the example scripts.
+- `environment.py` which sets up a temporary directory called `tmp` in your current directory to run tests in. Note that it automatically erases this directory before every run to ensure a clean working directory.
     
 ##### `tests/behave/features/steps`
 - `scripts.py` holds the step definitions that are run by behave when testing the features defined in the feature files.

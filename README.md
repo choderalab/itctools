@@ -63,6 +63,7 @@ Tests that are used to maintain the integrity of the library.
 Tests that use `behave` to make sure the example scripts are functional. Run `behave` from the root directory of the repository to run these tests. See also the `.behaverc` file.
 
 ##### `tests/behave/features`
+
     - The feature files written in `Gherkin` that test the behavior of the example scripts.
     - `environment.py` which sets up a temporary directory called `tmp` in your current directory to run tests in. Note that it automatically erases this directory before every run to ensure a clean working directory.
     

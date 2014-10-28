@@ -46,11 +46,11 @@ A library for setting up experiments
 
 Some example scripts that use the library.
  
-#### `host_guest`
+#### `examples/host_guest`
    
   - `host_guest.py` prepares a worklist and xlsx file for titrating a host compound into several guests.
 
-#### `mixture_heats`
+#### `examples/mixture_heats`
 
   -  `mixture_heats.py` prepares a worklist and xlsx file for performing heat of mixing experiments.
     

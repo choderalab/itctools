@@ -24,6 +24,8 @@ source ${HOME}/miniconda/bin/activate ${python}
 
 pip install -r requirements-pip.txt
 
+python setup.py install
+
 if [[ ! "$TRAVIS" = true ]]; then
     behave
 fi

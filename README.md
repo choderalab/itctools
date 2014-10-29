@@ -18,6 +18,11 @@ export PATH=${PATH}:${HOME}/miniconda/bin
 ```
 To use the scripts within an existing environment, please look at the dependencies and install them accordingly. You can use the requirements files from the installer.
 
+You can then install the library using: 
+```shell
+python setup.py install
+```
+
 ## Requires
 -
 `anaconda` or `miniconda` with `python` 2.7 or 3.3  

@@ -3,7 +3,7 @@ Feature: Host-Guest binding ITC experiment
     Also generates a worksheet (.xlsx) file containing instructions for the AutoITC200
 
     Scenario: Running the script
-      Given that scripts are in the directory "examples"
+      Given that the script is in the directory "examples/host_guest"
         And the module is in the current directory
         And the working directory is "host-guest-itc"
        When the script "host_guest.py" is called successfully from the working directory

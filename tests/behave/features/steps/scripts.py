@@ -19,7 +19,7 @@ def step_impl(context):
 @given(u'that scripts are in the directory "{directory}"')
 def step_impl(context, directory):
     """
-    Set the directory for running scripts, after making sure it exists.
+    Set the directory where scripts can be found, after making sure it exists.
 
     :param context:
     :param str directory:
@@ -27,7 +27,18 @@ def step_impl(context, directory):
     """
     import os
     assert os.path.isdir(directory) is True
-    context.scripts = os.path.abspath(directory)
+    context.scriptdir = os.path.abspath(directory)
+
+@given(u'that the script is in the directory "{directory}"')
+def step_impl(context, directory):
+    """
+    Set the directory where to find a script, after making sure it exists.
+
+    :param context:
+    :param str directory:
+    :return:
+    """
+    context.execute_steps('given that scripts are in the directory "%s"' % directory) 
 
 @given(u'the working directory is "{directory}"')
 def step_impl(context, directory):
@@ -62,7 +73,7 @@ def step_impl(context, scriptname):
     oldwd = os.getcwd()
     os.chdir(context.workdir)
     try:
-        script = Popen('%s/%s' % (context.scripts, scriptname), stdout=PIPE, stderr=PIPE)
+        script = Popen('%s/%s' % (context.scriptdir, scriptname), stdout=PIPE, stderr=PIPE)
         print(script.communicate())
 
         assert script.stderr

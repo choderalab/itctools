@@ -1,6 +1,7 @@
 # itctools
 
 [![Build Status](https://travis-ci.org/choderalab/itctools.svg)](https://travis-ci.org/choderalab/itctools)
+[![Coverage Status](https://coveralls.io/repos/choderalab/itctools/badge.png)](https://coveralls.io/r/choderalab/itctools)
 
 Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200.
 
@@ -21,11 +22,18 @@ To use the scripts within an existing environment, please look at the dependenci
 ## Requires
 -
 `anaconda` or `miniconda` with `python` 2.7 or 3.3  
+Using `conda`, install:  
+
 `simtk` (which is part of `openmm`.)  
 `numpy`  
 `openpyxl`  
-`pip` - to install:  
-`behave`
+`coverage`
+`pip` - to install further dependencies.  
+
+Using `pip`, install:
+
+`behave`  
+`coveralls`
 
 ## Contains
 

@@ -13,10 +13,12 @@ script:
   - source deactivate
   - source activate $python
   - conda list -e
-  - behave
-
+  - coverage run --source='.' -m behave
 env:
   matrix:
     - python=2.7  CONDA_PY=27
     - python=3.3  CONDA_PY=33
+
+after_success:
+  coveralls
 #    - python=3.4  CONDA_PY=34

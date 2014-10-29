@@ -2,3 +2,4 @@ numpy
 openmm
 openpyxl
 pip
+coverage

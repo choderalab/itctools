@@ -22,11 +22,16 @@ To use the scripts within an existing environment, please look at the dependenci
 ## Requires
 -
 `anaconda` or `miniconda` with `python` 2.7 or 3.3  
+Using `conda`, install:
 `simtk` (which is part of `openmm`.)  
 `numpy`  
 `openpyxl`  
-`pip` - to install:  
+`coverage`
+`pip` - to install further dependencies.  
+
+Using `pip`, install:
 `behave`
+`coveralls`
 
 ## Contains
 

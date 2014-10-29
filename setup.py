@@ -12,13 +12,9 @@ setup(
     test_suite='tests',
     classifiers=[
     'Development Status :: 2 - Pre-Alpha',
-    # Indicate who your project is intended for
     'Intended Audience :: Science/Research',
     'Topic :: Scientific/Engineering :: Chemistry',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.3',
     ],
-    extras_require = {
-    'test': ['coverage'],
-    },
 )

@@ -11,7 +11,7 @@ class TestLabware(unittest.TestCase):
         self.assertEqual([itcplate.RackLabel, itcplate.RackType, itcplate.RackID], ['DestinationPlate', 'ITC Plate', '123abc'])
 
     def test_pipettinglocation(self):
-        """Ensure that PipettingLocation has correct parameter asignment."""
+        """Ensure that PipettingLocation has correct parameter assignment."""
         pipettinglocation = labware.PipettingLocation('Buffer', 'Trough 100 ml', 1)
         self.assertEqual([pipettinglocation.RackLabel, pipettinglocation.RackType, pipettinglocation.Position], ['Buffer', 'Trough 100 ml', 1])
 

@@ -13,7 +13,8 @@ script:
   - source deactivate
   - source activate $python
   - conda list -e
-  - coverage run --source='.' -m behave
+  - coverage run --source='tests/behave/features' -m behave
+  - coverage run -a --source='tests' tests/runtests.py
 env:
   matrix:
     - python=2.7  CONDA_PY=27

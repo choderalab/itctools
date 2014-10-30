@@ -9,7 +9,7 @@ Feature: Heat of mixing experiments
 
   Scenario: Running the script
     Given that the script is in the directory "examples/mixture_heats"
-      And the module is in the current directory
+      And the module "itctools" is installed
       And the working directory is "mixture-itc"
      When the script "mixture_heats.py" is called successfully from the working directory
      Then a file called "mixing-itc.gwl" is created

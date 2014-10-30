@@ -1,8 +1,10 @@
 import unittest
 from itctools import labware
 
+
 class TestLabware(unittest.TestCase):
     """Validation of the labware submodule."""
+
     def test_labware(self):
         """Ensure that Labware has correct parameter assignment."""
         itcplate = labware.Labware('DestinationPlate', 'ITC Plate', '123abc')

@@ -13,7 +13,8 @@ script:
   - source deactivate
   - source activate $python
   - conda list -e
-  - coverage run --source='.' --omit=setup.py -m behave 
+  - nosetests --with-coverave -vv
+  - behave 
 env:
   matrix:
     - python=2.7  CONDA_PY=27

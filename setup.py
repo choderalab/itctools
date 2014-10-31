@@ -37,7 +37,7 @@ def get_version_info():
     FULLVERSION = VERSION
     if os.path.exists('.git'):
         GIT_REVISION = git_version()
-    elif os.path.exists('itctools/version.py'):
+    elif os.path.exists('src/version.py'):
         # must be a source distribution, use existing version file
         try:
             from itctools.version import git_revision as GIT_REVISION
@@ -51,7 +51,7 @@ def get_version_info():
     return FULLVERSION, GIT_REVISION
 
 
-def write_version_py(filename='itctools/version.py'):
+def write_version_py(filename='src/version.py'):
     # Modified from numpy/setup.py
     content = """
 # This file is generated from itctools setup.py
@@ -79,6 +79,7 @@ write_version_py()
 setup(
     name='itctools',
     version=__version__,
+    package_dir={'itctools': 'src'},
     packages=['itctools'],
     url='https://github.com/choderalab/itctools',
     license='',

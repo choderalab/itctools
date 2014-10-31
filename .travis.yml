@@ -13,7 +13,7 @@ script:
   - source deactivate
   - source activate $python
   - conda list -e
-  - nosetests --with-coverage -vv
+  - coverage run --source=itctools setup.py test
   - behave 
 env:
   matrix:

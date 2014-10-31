@@ -2,6 +2,13 @@ __author__ = 'Bas Rustenburg'
 
 from behave import *
 
+@given(u'the module "{modulename}" is installed')
+def step_impl(context, modulename):
+    """
+    Tries to import a module with a given name to make sure it is installed.
+    """
+    module = __import__(modulename)
+
 @given(u'the module is in the current directory')
 def step_impl(context):
     """

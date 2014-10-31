@@ -24,7 +24,10 @@ source ${HOME}/miniconda/bin/activate ${python}
 
 pip install -r requirements-pip.txt
 
+python setup.py install --record install.log
+
 if [[ ! "$TRAVIS" = true ]]; then
+    nosetests -vv
     behave
 fi
 

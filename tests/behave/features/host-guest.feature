@@ -4,7 +4,7 @@ Feature: Host-Guest binding ITC experiment
 
     Scenario: Running the script
       Given that the script is in the directory "examples/host_guest"
-        And the module is in the current directory
+        And the module "itctools" is installed 
         And the working directory is "host-guest-itc"
        When the script "host_guest.py" is called successfully from the working directory
        Then a file called "host-guest-itc.gwl" is created

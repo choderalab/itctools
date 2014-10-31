@@ -7,8 +7,11 @@ class TestITC(unittest.TestCase):
     """Validation of the itctools submodule."""
 
     def _check_uniques(self, n, seq):
+        """A set can't hold multiple copies of the same value.
+        If the list only has uniques, it has the same length as the set.
+        """
         compositions = itc.permutation_with_replacement(n, seq)
-        assert len(compositions) == len(set(compositions))
+        self.assertEqual(len(compositions), len(set(compositions)))
 
     def test_permutation_with_replacement_uniques(self):
         """Make sure that permutation_with_replacement only generates unique sequences (when given unique inputs)."""
@@ -17,9 +20,11 @@ class TestITC(unittest.TestCase):
             self._check_uniques(x, seq)
 
     def _check_length(self, n, seq):
+        """Makes sure that every sequence has the correct length.
+        """
         compositions = itc.permutation_with_replacement(n, seq)
         for comp in compositions:
-            assert len(comp) == n
+            self.assertEqual(len(comp), n)
 
     def test_permutation_with_replacement_length(self):
         """Make sure that permutation_with_replacement generates correct length."""

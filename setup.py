@@ -1,4 +1,8 @@
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+
 import subprocess
 import os
 
@@ -81,7 +85,7 @@ setup(
     author='Bas Rustenburg, John Chodera',
     author_email='bas.rustenburg@choderalab.org',
     description='Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200',
-    test_suite='tests',
+    test_suite='nose.collector',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Science/Research',

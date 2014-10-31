@@ -28,7 +28,7 @@ python setup.py install
 -
 `anaconda` or `miniconda` with `python` 2.7 or 3.3  
 Using `conda`, install:  
-
+`setuptools`
 `simtk` (which is part of `openmm`.)  
 `numpy`  
 `openpyxl`  

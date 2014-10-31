@@ -1,0 +1,9 @@
+[run]
+
+include =
+    *.egg/itctools*
+
+omit =
+    *test_*.py
+    *testing/*.py
+    itctools

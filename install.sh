@@ -28,7 +28,7 @@ python setup.py install --record install.log
 
 # On travis, tests are in travis.yml, otherwise test now
 if [[ ! "$TRAVIS" = true ]]; then
-    nosetests -vv
+    nosetests 
     behave
 fi
 

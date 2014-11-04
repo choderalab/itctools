@@ -109,13 +109,17 @@ class TestMaterials(unittest.TestCase):
             'volume': solvent_mass / mock_solvent.density,
             'location': mock_location,
             'compound': mock_compound,
+            'solution_mass': compound_mass + solvent_mass,
             'compound_moles': compound_mass / mock_compound.molecular_weight * mock_compound.purity,
             'solvent_mass': solvent_mass,
             'concentration': (compound_mass / mock_compound.molecular_weight * mock_compound.purity) / (solvent_mass / mock_solvent.density),
         }
-
-        self.assertDictContainsSubset(
-            expected_structure, simple_solution.__dict__)
+        try:  # python 3.2 +
+            self.assertCountEqual(
+                expected_structure, simple_solution.__dict__)
+        except AttributeError:
+            self.assertItemsEqual(
+                expected_structure, simple_solution.__dict__)
 
     def test_simple_solution_solvent_compatibility(self):
         """Ensure that SimpleSolution is compatible with Solvent"""
@@ -146,13 +150,18 @@ class TestMaterials(unittest.TestCase):
             'volume': solvent_mass / solvent.density,
             'location': mock_location,
             'compound': mock_compound,
+            'solution_mass': compound_mass + solvent_mass,
             'compound_moles': compound_mass / mock_compound.molecular_weight * mock_compound.purity,
             'solvent_mass': solvent_mass,
             'concentration': (compound_mass / mock_compound.molecular_weight * mock_compound.purity) / (solvent_mass / solvent.density),
         }
 
-        self.assertDictContainsSubset(
-            expected_structure, simple_solution.__dict__)
+        try:  # python 3.2 +
+            self.assertCountEqual(
+                expected_structure, simple_solution.__dict__)
+        except AttributeError:
+            self.assertItemsEqual(
+                expected_structure, simple_solution.__dict__)
 
     def test_simple_solution_compound_compatibility(self):
         """Ensure that SimpleSolution is compatible with Compound"""
@@ -183,10 +192,15 @@ class TestMaterials(unittest.TestCase):
             'volume': solvent_mass / mock_solvent.density,
             'location': mock_location,
             'compound': compound,
+            'solution_mass': compound_mass + solvent_mass,
             'compound_moles': compound_mass / compound.molecular_weight * compound.purity,
             'solvent_mass': solvent_mass,
             'concentration': (compound_mass / compound.molecular_weight * compound.purity) / (solvent_mass / mock_solvent.density),
         }
 
-        self.assertDictContainsSubset(
-            expected_structure, simple_solution.__dict__)
+        try:  # python 3.2+
+            self.assertCountEqual(
+                expected_structure, simple_solution.__dict__)
+        except AttributeError:
+            self.assertItemsEqual(
+                expected_structure, simple_solution.__dict__)

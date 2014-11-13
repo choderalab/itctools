@@ -228,38 +228,41 @@ class SimpleMixture(Solvent):
             if abs(1.0 - sum(self.molefractions)) > 0.0001:
                 raise ValueError("Total mole fractions out of bounds!")
 
-        # Mass of compound relative to total mass
-        self.massfractions = list()
-        # Volume of compound relative to total volume (ideal solution
-        # assumption)
-        self.volumefractions = list()
+        # Molar volumes are calculated so we can get the volume fractions
+        self.molarvolumes = [component.molecular_weight / component.density for component in self.components]
 
-        # Normalizing constant for molecular weight
-        normalweight = sum(
-            (comp.molecular_weight for comp in self.components),
-            0 *
-            units.grams /
-            units.mole)
-        # Normalizing constant for liquid density
-        normaldens = sum(
-            (comp.density for comp in self.components),
-            0 *
-            units.grams /
-            units.milliliter)
+        self.massfractions = self._calculate_mass_fractions()
 
-        # Derive fractional masses from molecular weight
-        for c, comp in enumerate(components):
-            self.massfractions.append(
-                self.molefractions[c] *
-                comp.molecular_weight /
-                normalweight)
+        self.volumefractions = self._calculate_volume_fractions()
 
-        # Derive fractional volumes from mass and density
-        for c, comp in enumerate(components):
-            self.volumefractions.append(
-                self.massfractions[c] *
-                comp.density /
-                normaldens)
+
+    def _calculate_mass_fractions(self):
+        # Average molecular weight  = sum(mole fraction * mole weight) over all components of the mixture
+        normalizing_mass = 0 * units.grams / units.mole
+        for i, component in enumerate(self.components):
+            normalizing_mass += component.molecular_weight * self.molefractions[i]
+
+        # Mass fraction per component = mole fraction * molecular weight / average molecular weight
+        massfractions = [
+            self.molefractions[i] *
+            component.molecular_weight /
+            normalizing_mass for i, component in enumerate(self.components)]
+
+        return massfractions
+
+    def _calculate_volume_fractions(self):
+        # Average Molar volume = sum( mole fraction * molar volume) over all components of the mixture
+        normalizing_volume = 0 * units.liter / units.mole
+        for i, volume in enumerate(self.molarvolumes):
+            normalizing_volume += self.molefractions[i] * volume
+
+        # Volume fraction per component = mole fraction * molar volume / average molar volume
+        volumefractions = [
+            self.molefractions[i] *
+            volume /
+            normalizing_volume for i, volume in enumerate(self.molarvolumes)]
+        return volumefractions
+
 
     def __str__(self):
         """Represent a mixture by its composition."""

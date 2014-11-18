@@ -6,8 +6,8 @@ from mock import Mock
 
 class TestMaterials(unittest.TestCase):
 
+    maxDiff = None
     """Validation of the materials submodule"""
-
     def _check_solvent(self, args):
         """Validate the structure of a single or two argument Solvent."""
         # [name, density=None]
@@ -189,6 +189,30 @@ class TestMaterials(unittest.TestCase):
 
         self.assertDictEqual(expected_structure, simple_solution.__dict__)
 
+    def _calculate_mass_fractions(self, fractions, liquids):
+        """Calculate mass fractions for a list of fractions and a list of corresponding PureLiquid's"""
+        normalizing_mass = 0 * unit.grams / unit.mole
+        for i, liq in enumerate(liquids):
+            normalizing_mass += liq.molecular_weight * fractions[i]
+        mass_fractions = [
+            fractions[i] *
+            liq.molecular_weight /
+            normalizing_mass for i,
+                                 liq in enumerate(liquids)]
+        return mass_fractions
+
+    def _calculate_volume_fractions(self, fractions, molar_volumes):
+        """Calculate volume fractions for a list of fractions and a list of corresponding molar_volume's"""
+        normalizing_volume = 0 * unit.liter / unit.mole
+        for i, volume in enumerate(molar_volumes):
+            normalizing_volume += fractions[i] * volume
+        volume_fractions = [
+            fractions[i] *
+            volume /
+            normalizing_volume for i,
+                                   volume in enumerate(molar_volumes)]
+        return volume_fractions
+
     def test_simple_mixture(self):
         """Ensure that SimpleMixture has correct parameter assignment"""
         mock_liquid1 = Mock(
@@ -219,26 +243,9 @@ class TestMaterials(unittest.TestCase):
         locations = [mock_location1, mock_location2]
         fractions = [0.6, 0.4]
         molar_volumes = [liq.molecular_weight / liq.density for liq in liquids]
+        mass_fractions = self._calculate_mass_fractions(fractions, liquids)
+        volume_fractions = self._calculate_volume_fractions(fractions, molar_volumes)
 
-        normalizing_mass = 0 * unit.grams / unit.mole
-        for i, liq in enumerate(liquids):
-            normalizing_mass += liq.molecular_weight * fractions[i]
-
-        mass_fractions = [
-            fractions[i] *
-            liq.molecular_weight /
-            normalizing_mass for i,
-            liq in enumerate(liquids)]
-
-        normalizing_volume = 0 * unit.liter / unit.mole
-        for i, volume in enumerate(molar_volumes):
-            normalizing_volume += fractions[i] * volume
-
-        volume_fractions = [
-            fractions[i] *
-            volume /
-            normalizing_volume for i,
-            volume in enumerate(molar_volumes)]
         simple_mixture = materials.SimpleMixture(liquids, fractions, locations)
 
         expected_structure = {
@@ -246,6 +253,7 @@ class TestMaterials(unittest.TestCase):
             'locations': [mock_location1, mock_location2],
             'massfractions': mass_fractions,
             'molefractions': fractions,
+            'molarvolumes': molar_volumes,
             'volumefractions': volume_fractions,
         }
         self.assertDictEqual(expected_structure, simple_mixture.__dict__)

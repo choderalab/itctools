@@ -777,7 +777,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
             # Calculate volumes per component for cell mixture
             cell_volumes = list()
-            for cellfrac in experiment.cell_mixture.molefractions:
+            for cellfrac in experiment.cell_mixture.volumefractions:
                 # Ensure units are correct
                 cell_volumes.append(
                     float(
@@ -787,7 +787,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
             # Calculate volumes per component for syringe mixture
             syr_volumes = list()
-            for syrfrac in experiment.syringe_mixture.molefractions:
+            for syrfrac in experiment.syringe_mixture.volumefractions:
                 # Ensure units are correct
                 syr_volumes.append(
                     float(

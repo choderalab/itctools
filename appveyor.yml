@@ -42,7 +42,7 @@ install:
   - pip install behave
 
 build_script:
- - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - python setup.py install
 
 test_script:

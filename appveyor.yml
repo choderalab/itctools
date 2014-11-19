@@ -38,7 +38,8 @@ install:
   # as well as pip, conda-build, and the binstar CLI
   - powershell .\\continuous-integration\\appveyor\\install.ps1
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - pip install -r requirements-pip.txt
+  # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
+  - pip install behave
 
 build_script:
   - python setup.py install
@@ -47,10 +48,11 @@ test_script:
   # Nosetests take care of unit tests
   # Behave runs the example scripts and tries to verify if it produces the right output
 
-  - nosetests --with-coverage -vv
+  - nosetests -vv
   - behave
 
 on_success:
   # Could run coveralls here but will leave that to travis tests
-  coverage report
+  # coverage report
   # coveralls
+  echo Build succesful!

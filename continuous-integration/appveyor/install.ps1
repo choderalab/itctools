@@ -74,7 +74,7 @@ function InstallMiniconda ($python_version, $architecture, $python_home) {
 function AddChannel ($python_home, $channel) {
     # Author: Bas Rustenburg
     $conda_path = $python_home + " \Scripts\conda.exe"
-    $args = "config --add channels " $channel
+    $args = "config --add channels " + $channel
     Write-Host ("conda " + $args)
     Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
 }

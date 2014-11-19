@@ -216,9 +216,8 @@ itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
 # For convenience, concentrations
 for drug_solution in drug_solutions:
-    print("%s %02f mM" % (drug_solution.name, drug_solution.concentration / millimolar ))
-
-print("hsa", hsa_solution.concentration.in_units_of(millimolar))
+    print("%s %.4f mM" % (drug_solution.name, drug_solution.concentration / millimolar ))
+    print("HSA", hsa_solution.concentration.in_units_of(millimolar))
 
 
 # Write Tecan EVO pipetting operations.

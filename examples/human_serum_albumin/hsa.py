@@ -17,20 +17,37 @@ hsa = Compound('HumanSerumAlbumin', molecular_weight=65000 * daltons, purity=.95
 aspirin = Compound('AcetylsalicylicAcid', molecular_weight=180.15742 * daltons, purity=.99)
 naproxen = Compound('Naproxen', molecular_weight=230.3 * daltons, purity=.98)
 
+#Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
+aspirin_ka = 547198.10 / molar # http://omicsonline.org/2157-7544/2157-7544-2-107.pdf first site estimate
+naproxen_ka = 1.7 / (10 * micromolar) # http://pubs.acs.org/doi/pdf/10.1021/jp062734p
 
-# Define troughs on the instrument.
-
+# Define troughs on the instrument
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
 buffer_trough = Labware(RackLabel='Buffer', RackType='Trough 100ml')
 
 # Define source labware.
-#source_plate = Labware(RackLabel='SourcePlate', RackType='12WellVialHolder')
 source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 
-# Define source solutions on the deck.one
+# Define source solutions in the vial holder
 # TODO : Define solutions once prepared with the Quantos
+hsa_solution = SimpleSolution(compound=hsa, compound_mass= 13.8 * milligram, solvent=buffer, solvent_mass=0.5 * grams, location=PipettingLocation(
+        source_plate.RackLabel,
+        source_plate.RackType,
+        1))
 
+aspirin_solution = SimpleSolution(compound=aspirin, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
+        source_plate.RackLabel,
+        source_plate.RackType,
+        2))
 
+naproxen_solution = SimpleSolution(compound=naproxen, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
+        source_plate.RackLabel,
+        source_plate.RackType,
+        3)) # NOTE Need 0.31 mM for the experiment
+
+drugs = [aspirin, naproxen]
+drug_solutions = [aspirin_solution, naproxen_solution]
+drug_kas = [aspirin_ka, naproxen_ka]
 
 # Define ITC protocol.
 
@@ -104,46 +121,47 @@ for replicate in range(1):
             cell_source=buffer_trough,
             protocol=control_protocol))
 
-# drug into buffer.
+# buffer into hsa
 for replicate in range(1):
-    name = 'host into buffer %d' % (replicate + 1)
+    name = 'buffer into HSA %d' % (replicate + 1)
     itc_experiment_set.addExperiment(
         ITCExperiment(
             name=name,
-            syringe_source=XXXXX, #TODO define drug solutions
-            cell_source=buffer_trough,
-            protocol=binding_protocol))
+            syringe_source=buffer_trough,
+            cell_source=hsa_solution,
+            protocol=control_protocol,
+            cell_concentration=0.045 * millimolar,
+            buffer_source=buffer_trough))
 
 # drugs/HSA
 # scale cell concentration to fix necessary syringe concentrations
 
-#TODO, make this loop run over the drugs
 cell_scaling = 1.
-for guest_index in range(nguests):
+for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
 
     # We need to store the experiments before adding them to the set
-    host_guest_experiments = list()
-    buff_guest_experiments = list()
+    drug_protein_experiments = list()
+    drug_buffer_experiments = list()
 
     # Scaling factors per replicate
     factors = list()
 
     # Define host into guest experiments.
     for replicate in range(1):
-        name = 'host into %s' % guests[guest_index].name
+        name = '%s into HSA %d' % (drug.name, replicate + 1 )
         experiment = ITCHeuristicExperiment(
             name=name,
-            syringe_source=host_solution,
-            cell_source=guest_solutions[guest_index],
+            syringe_source=drug_solution,
+            cell_source=hsa_solution,
             protocol=binding_protocol,
-            cell_concentration=0.2 *
+            cell_concentration=0.045 *
             millimolar *
             cell_scaling,
             buffer_source=buffer_trough)
         # optimize the syringe_concentration using heuristic equations and known binding constants
         # TODO extract m, v and V0 from protocol somehow?
         experiment.heuristic_syringe(
-            guest_compound_Ka[guest_index],
+            drug_ka,
             10,
             3. *
             microliters,
@@ -151,35 +169,34 @@ for guest_index in range(nguests):
             microliters)
         # rescale if syringe > stock. Store factor.
         factors.append(experiment.rescale())
-        host_guest_experiments.append(experiment)
+        drug_protein_experiments.append(experiment)
 
-    # Define buffer into guest experiments.
+    # Define drug into buffer
     for replicate in range(1):
-        name = 'buffer into %s' % guests[guest_index].name
+        name = '%s into buffer  %d' % (drug.name, replicate + 1)
         experiment = ITCHeuristicExperiment(
             name=name,
-            syringe_source=buffer_trough,
-            cell_source=guest_solutions[guest_index],
+            syringe_source=drug_solution,
+            cell_source=buffer_trough,
             protocol=blank_protocol,
-            cell_concentration=0.2 *
-            millimolar,
             buffer_source=buffer_trough)
         # rescale to match host into guest experiment concentrations.
         experiment.rescale(tfactor=factors[replicate])
-        buff_guest_experiments.append(experiment)
+        drug_buffer_experiments.append(experiment)
 
+    # TODO, since we are changing drugs, we'd have to wash the syringe.
     # Add buffer to guest experiment(s) to set
-    for buff_guest_experiment in buff_guest_experiments:
-        itc_experiment_set.addExperiment(buff_guest_experiment)
+    for drug_protein_experiment in drug_protein_experiments:
+        itc_experiment_set.addExperiment(drug_protein_experiment)
 
     # Add host to guest experiment(s) to set
-    for host_guest_experiment in host_guest_experiments:
-        itc_experiment_set.addExperiment(host_guest_experiment)
+    for drug_buffer_experiment in drug_buffer_experiments:
+        itc_experiment_set.addExperiment(drug_buffer_experiment)
 
 
 # Add cleaning experiment.
-#name = 'final cleaning water titration'
-#itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol) )
+name = 'final cleaning water titration'
+itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol) )
 
 # Water control titrations.
 nfinal = 2
@@ -198,10 +215,10 @@ for replicate in range(nfinal):
 itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
 # For convenience, concentrations
-for g, guest in enumerate(guest_solutions, start=1):
-    print("guest%02d" % g, guest.concentration.in_units_of(millimolar))
+for drug_solution in drug_solutions:
+    print("%s %02f mM" % (drug_solution.name, drug_solution.concentration / millimolar ))
 
-print("host", host_solution.concentration.in_units_of(millimolar))
+print("hsa", hsa_solution.concentration.in_units_of(millimolar))
 
 
 # Write Tecan EVO pipetting operations.

@@ -198,21 +198,28 @@ class ITCHeuristicExperiment(ITCExperiment):
 
         # Cell concentration scaling factor
         cfactor *= tfactor
+        try:
+            if self.cell_concentration > self.cell_source.concentration:
+                # Multiply original factor by the necessary rescaling
+                cfactor *= self.cell_source.concentration / self.cell_concentration
+            # scale down to stock
+            self.cell_concentration *= cfactor
+            # syringe is scaled by same factor
+            if self.syringe_concentration is not None:
+                self.syringe_concentration *= cfactor
+            #recompute dilution factor
+            self.cell_dilution_factor = self.cell_concentration / self.cell_source.concentration
 
-        if self.cell_concentration > self.cell_source.concentration:
-            # Multiply original factor by the necessary rescaling
-            cfactor *= self.cell_source.concentration / self.cell_concentration
-        # scale down to stock
+        except AttributeError, err:
+            # Labware has no concentration (buffer)
+            print ("WARNING, cell cannot be rescaled. This may still be desired if cell is not buffer or water.")
+            print ("Full error details: \n %s" % err)
 
-        self.cell_concentration *= cfactor
-        # syringe is scaled by same factor
-        if self.syringe_concentration is not None:
-            self.syringe_concentration *= cfactor
 
-        # recompute dilution factors
+
+        # recompute dilution factor
         if self.syringe_concentration is not None:
             self.syringe_dilution_factor = self.syringe_concentration / self.syringe_source.concentration
-        self.cell_dilution_factor = self.cell_concentration / self.cell_source.concentration
 
         return sfactor * cfactor
 

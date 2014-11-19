@@ -210,10 +210,10 @@ class ITCHeuristicExperiment(ITCExperiment):
             #recompute dilution factor
             self.cell_dilution_factor = self.cell_concentration / self.cell_source.concentration
 
-        except AttributeError, err:
+        except AttributeError as err:
             # Labware has no concentration (buffer)
-            print ("WARNING, cell cannot be rescaled. This may still be desired if cell is not buffer or water.")
-            print ("Full error details: \n %s" % err)
+            print("WARNING, cell cannot be rescaled. This may still be desired if cell is not buffer or water.")
+            print("Full error details: \n %s" % err)
 
 
 

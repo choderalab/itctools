@@ -39,7 +39,7 @@ install:
   - powershell .\\continuous-integration\\appveyor\\install.ps1
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
-  - activate %PYTHON_VERSION%
+  - activate %CONDA_PY%
   - pip install behave
 
 build_script:

@@ -79,10 +79,10 @@ function AddChannel ($python_home, $channel) {
     Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
 }
 
-function CondaCreateEnv ($python_home, $python, $packages) {
+function CondaCreateEnv ($python_home, $name, $python, $packages) {
     # Author: Bas Rustenburg
     $conda_path = $python_home + " \Scripts\conda.exe"
-    $args = "create -n " + $python + " python=" + $python + " --yes " + $packages
+    $args = "create -n " + $name + " python=" + $python + " --yes " + $packages
     Write-Host $conda_path $args
     Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
 }
@@ -107,7 +107,7 @@ function main () {
     InstallMiniconda $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     UpdateConda $env:PYTHON
     AddChannel $env:PYTHON "http://conda.binstar.org/omnia"
-    CondaCreateEnv $env:PYTHON $env:PYTHON_VERSION "setuptools nose numpy openmm openpyxl pip coverage"
+    CondaCreateEnv $env:PYTHON $env:CONDA_PY $env:PYTHON_VERSION "setuptools nose numpy openmm openpyxl pip coverage"
 }
 
 main

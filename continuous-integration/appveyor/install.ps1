@@ -84,7 +84,9 @@ function CondaCreateEnv ($python_home, $name, $python, $packages) {
     $conda_path = $python_home + " \Scripts\conda.exe"
     $args = "create -n " + $name + " python=" + $python + " --yes " + $packages
     Write-Host $conda_path $args
-    Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
+    # Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
+    $output = & $conda_path $args
+    Write-Host $output
 }
 
 function InstallCondaPackages ($python_home, $spec) {

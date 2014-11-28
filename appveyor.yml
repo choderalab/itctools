@@ -39,7 +39,7 @@ install:
   - powershell .\\continuous-integration\\appveyor\\install.ps1
   - "SET PATH=%PYTHON%;%PYTHON%\\envs\\%PYTHON_VERSION%\\Scripts;%PYTHON%\\%PYTHON_VERSION%\\Scripts;%PATH%"
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
-  - ps: Get-ChildItem -Path %PYTHON% –Recurse | Write-Host
+  - ps: write-host (Get-ChildItem -Path %PYTHON% –Recurse ) 
   - activate %PYTHON_VERSION%
   - pip install behave
 

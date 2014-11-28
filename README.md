@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/choderalab/itctools.svg)](https://travis-ci.org/choderalab/itctools)
 [![Coverage Status](https://coveralls.io/repos/choderalab/itctools/badge.png)](https://coveralls.io/r/choderalab/itctools)
+[![Code Health](https://landscape.io/github/choderalab/itctools/master/landscape.svg)](https://landscape.io/github/choderalab/itctools/master)
 
 Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200.
 

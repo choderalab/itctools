@@ -109,7 +109,7 @@ function main () {
     InstallMiniconda $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     UpdateConda $env:PYTHON
     AddChannel $env:PYTHON "http://conda.binstar.org/omnia"
-    CondaCreateEnv $env:PYTHON $env:CONDA_PY $env:PYTHON_VERSION "setuptools nose numpy openmm openpyxl pip coverage"
+    CondaCreateEnv $env:PYTHON $env:$PYTHON_VERSION $env:PYTHON_VERSION "setuptools nose numpy openmm openpyxl pip coverage"
 }
 
 main

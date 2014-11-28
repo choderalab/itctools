@@ -37,7 +37,7 @@ install:
   # this installs the appropriate Miniconda (Py2/Py3, 32/64 bit),
   # as well as pip, conda-build, and the binstar CLI
   - powershell .\\continuous-integration\\appveyor\\install.ps1
-  - "SET PATH=%PYTHON%;%PYTHON%\\envs\\%PYTHON_VERSION%\\Scripts;%PATH%"
+  - "SET PATH=%PYTHON%;%PYTHON%\\envs\\%PYTHON_VERSION%\\Scripts;%PYTHON%\\%PYTHON_VERSION%\\Scripts;%PATH%"
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
   - activate %PYTHON_VERSION%
   - pip install behave

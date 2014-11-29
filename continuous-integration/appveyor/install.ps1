@@ -73,7 +73,7 @@ function InstallMiniconda ($python_version, $architecture, $python_home) {
 
 function AddChannel ($python_home, $channel) {
     # Author: Bas Rustenburg
-    $conda_path = $python_home + " \Scripts\conda.exe"
+    $conda_path = $python_home + "\Scripts\conda.exe"
     $args = "config --add channels " + $channel
     Write-Host $conda_path $args
     Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
@@ -81,7 +81,7 @@ function AddChannel ($python_home, $channel) {
 
 function CondaCreateEnv ($python_home, $name, $python, $packages) {
     # Author: Bas Rustenburg
-    $conda_path = $python_home + " \Scripts\conda.exe"
+    $conda_path = $python_home + "\Scripts\conda.exe"
     $args = "create -n " + $name + " python=" + $python + " --yes " + $packages
     Write-Host $conda_path $args
     # Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru

@@ -14,12 +14,17 @@ buffer = Solvent('buffer', density=1.014 * grams / milliliter) # TODO is our den
 
 # Define compounds.
 hsa = Compound('HumanSerumAlbumin', molecular_weight=65000 * daltons, purity=.95)
+indoxylsulfate = Compound('Indoxylsulfate potassium', molecular_weight=251.30 * daltons, purity=x) # Wouldn't we need to use a potassium based buffer for this? We definitely need to do the drug into buffer titrations to make sense of this calculation.
+naproxen_sodium = Compound('Naproxen Sodium', molecular_weight=252.24 * daltons, purity=x)
+
+# These are insoluble in water without added DMSO
 aspirin = Compound('AcetylsalicylicAcid', molecular_weight=180.15742 * daltons, purity=.99)
 naproxen = Compound('Naproxen', molecular_weight=230.3 * daltons, purity=.98)
 
 #Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
 aspirin_ka = 547198.10 / molar # http://omicsonline.org/2157-7544/2157-7544-2-107.pdf first site estimate
 naproxen_ka = 1.7 / (10 * micromolar) # http://pubs.acs.org/doi/pdf/10.1021/jp062734p
+indoxylsulfate_ka =  9.1E5 / molar #    10.1023/A:1011014629551
 
 # Define troughs on the instrument
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
@@ -34,20 +39,29 @@ hsa_solution = SimpleSolution(compound=hsa, compound_mass= 13.8 * milligram, sol
         source_plate.RackLabel,
         source_plate.RackType,
         1))
-
-aspirin_solution = SimpleSolution(compound=aspirin, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
+indoxylsulfate_solution = SimpleSolution(compound=indoxylsulfate, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
         source_plate.RackLabel,
         source_plate.RackType,
         2))
 
-naproxen_solution = SimpleSolution(compound=naproxen, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
+naproxen_sodium_solution = SimpleSolution(compound=naproxen_sodium, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
         source_plate.RackLabel,
         source_plate.RackType,
-        3)) # NOTE Need 0.31 mM for the experiment
+        3))
 
-drugs = [aspirin, naproxen]
-drug_solutions = [aspirin_solution, naproxen_solution]
-drug_kas = [aspirin_ka, naproxen_ka]
+# aspirin_solution = SimpleSolution(compound=aspirin, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
+#         source_plate.RackLabel,
+#         source_plate.RackType,
+#         4))
+#
+# naproxen_solution = SimpleSolution(compound=naproxen, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
+#         source_plate.RackLabel,
+#         source_plate.RackType,
+#         5)) # NOTE Need 0.31 mM for the experiment
+
+drugs = [indoxylsulfate, naproxen_sodium]
+drug_solutions = [indoxylsulfate_solution, naproxen_sodium_solution]
+drug_kas = [indoxylsulfate_ka, naproxen_ka]
 
 # Define ITC protocol.
 
@@ -62,12 +76,12 @@ control_protocol = ITCProtocol(
 blank_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Chodera Load Cell Without Cleaning Cell After.setup',
-    itc_method='ChoderaHostGuest.inj',  #  TODO Define new protocol?
+    itc_method='ChoderaHostGuest.inj',  #  TODO Define new protocol with more injections?
     analysis_method='Onesite')
 binding_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Plates Quick.setup',
-    itc_method='ChoderaHostGuest.inj',  #  TODO Define new protocol?
+    itc_method='ChoderaHostGuest.inj',  #  TODO Define new protocol with more injections?
     analysis_method='Onesite')
 # Protocol for cleaning protocol
 cleaning_protocol = ITCProtocol(

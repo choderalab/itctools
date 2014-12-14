@@ -1,7 +1,9 @@
-setuptools
+coverage
+mock
+nose
 nose
 numpy
 openmm
 openpyxl
 pip
-coverage
+setuptools

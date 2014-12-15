@@ -79,11 +79,49 @@ function AddChannel ($python_home, $channel) {
     Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
 }
 
+function VerboseAddChannel ($python_home, $channel) {
+    #http://stackoverflow.com/questions/8761888
+    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+    $pinfo.FileName = $python_home + "\Scripts\conda.exe"
+    $pinfo.RedirectStandardError = $true
+    $pinfo.RedirectStandardOutput = $true
+    $pinfo.UseShellExecute = $false
+    $pinfo.Arguments = "config --add channels " + $channel
+    $p = New-Object System.Diagnostics.Process
+    $p.StartInfo = $pinfo
+    $p.Start() | Out-Null
+    $p.WaitForExit()
+    $stdout = $p.StandardOutput.ReadToEnd()
+    $stderr = $p.StandardError.ReadToEnd()
+    Write-Host "stdout: $stdout"
+    Write-Host "stderr: $stderr"
+    Write-Host "exit code: " + $p.ExitCode
+}
+
 function InstallCondaPackages ($python_home, $spec) {
     $conda_path = $python_home + "\Scripts\conda.exe"
     $args = "install --yes " + $spec
     Write-Host ("conda " + $args)
     Start-Process -FilePath "$conda_path" -ArgumentList $args -Wait -Passthru
+}
+
+function VerboseInstallCondaPackages ($python_home, $spec) {
+    #http://stackoverflow.com/questions/8761888
+    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+    $pinfo.FileName = $python_home + "\Scripts\conda.exe"
+    $pinfo.RedirectStandardError = $true
+    $pinfo.RedirectStandardOutput = $true
+    $pinfo.UseShellExecute = $false
+    $pinfo.Arguments = "install --yes " + $spec
+    $p = New-Object System.Diagnostics.Process
+    $p.StartInfo = $pinfo
+    $p.Start() | Out-Null
+    $p.WaitForExit()
+    $stdout = $p.StandardOutput.ReadToEnd()
+    $stderr = $p.StandardError.ReadToEnd()
+    Write-Host "stdout: $stdout"
+    Write-Host "stderr: $stderr"
+    Write-Host "exit code: " + $p.ExitCode
 }
 
 function UpdateConda ($python_home) {
@@ -98,8 +136,8 @@ function UpdateConda ($python_home) {
 function main () {
     InstallMiniconda $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     UpdateConda $env:PYTHON
-    AddChannel $env:PYTHON "http://conda.binstar.org/omnia"
-    InstallCondaPackages $env:PYTHON "setuptools nose numpy openmm openpyxl pip coverage"
+    VerboseAddChannel $env:PYTHON "http://conda.binstar.org/omnia"
+    VerboseInstallCondaPackages $env:PYTHON "setuptools nose numpy openmm openpyxl pip coverage"
 }
 
 main

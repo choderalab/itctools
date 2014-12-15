@@ -43,6 +43,8 @@ install:
   - pip install behave pint
   - python setup.py install
 
+build: false
+
 test_script:
   # Nosetests take care of unit tests
   # Behave runs the example scripts and tries to verify if it produces the right output

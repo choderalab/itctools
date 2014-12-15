@@ -1,5 +1,5 @@
 import numpy
-import simtk.unit as units
+from .itctools import ureg
 import openpyxl  # Excel spreadsheet I/O (for Auto iTC-200)
 from openpyxl import Workbook
 from distutils.version import StrictVersion  # For version testing
@@ -56,10 +56,10 @@ class ITCExperiment(object):
            Protocol to be used for ITC experiment and analysis.
         buffer_source : Labware
            Source for buffer.
-        syringe_concentration : simtk.unit.Quantity with units compatible with moles/liter, optional, default=None
+        syringe_concentration : pint Quantity with units compatible with moles/liter, optional, default=None
            If specified, syringe source will be diluted to specified concentration.
            Buffer source must be specified.
-        cell_concentration : simtk.unit.Quantity with units compatible with moles/liter, optional, default=None
+        cell_concentration : pint Quantity with units compatible with moles/liter, optional, default=None
            If specified, cell source will be diluted to specified concentration.
            Buffer source must be specified.
 
@@ -91,21 +91,21 @@ class ITCExperiment(object):
             self.cell_concentration = cell_concentration
 
         # If dilution is required, make sure buffer source is specified.
-        if (self.syringe_dilution_factor is not None):
-            if (buffer_source is None):
+        if self.syringe_dilution_factor is not None:
+            if buffer_source is None:
                 raise Exception(
                     "buffer must be specified if either syringe or cell concentrations are specified")
-            if (self.syringe_dilution_factor > 1.0):
+            if self.syringe_dilution_factor > 1.0:
                 raise Exception(
                     "Requested syringe concentration (%s) is greater than syringe source concentration (%s)." %
                     (str(syringe_concentration), str(
                         syringe_source.concentration)))
 
-        if (self.cell_dilution_factor is not None):
-            if (buffer_source is None):
+        if self.cell_dilution_factor is not None:
+            if buffer_source is None:
                 raise Exception(
                     "buffer must be specified if either syringe or cell concentrations are specified")
-            if (self.cell_dilution_factor > 1.0):
+            if self.cell_dilution_factor > 1.0:
                 raise Exception(
                     "Requested cell concentration (%s) is greater than cell source concentration (%s)." %
                     (str(cell_concentration), str(
@@ -120,13 +120,13 @@ class ITCHeuristicExperiment(ITCExperiment):
 
         Parameters
         ----------
-        Ka : simtk.unit.Quantity with units compatible with liters/moles
+        Ka : pint Quantity with units compatible with liters/moles
             Association constant of titrant from titrand
         m : int
             Number of injections in the protocol
-        v : simtk.unit.Quantity with units compatible with liter
+        v : pint Quantity with units compatible with liter
             Volume of single injection
-        v0 : simtk.unit.Quantity with units compatible with liter
+        v0 : pint Quantity with units compatible with liter
             Volume of cell
         approx: bool
             Use approximate equation [X]_s = R_m * [M]0 V/(m*v) if True
@@ -137,7 +137,7 @@ class ITCHeuristicExperiment(ITCExperiment):
         # c = [M]_0 * Ka
         c = self.cell_concentration * Ka
 
-        #R_m = 6.4/c^0.2 + 13/c
+        # R_m = 6.4/c^0.2 + 13/c
         rm = 6.4 / numpy.power(c, 0.2) + 13 / c
 
         if not approx:
@@ -423,7 +423,7 @@ class ITCExperimentSet(object):
             cell_volume = 400.0  # microliters
             transfer_volume = cell_volume
 
-            if (experiment.cell_dilution_factor is not None):
+            if experiment.cell_dilution_factor is not None:
                 # Compute buffer volume needed.
                 buffer_volume = cell_volume * (
                     1.0 - experiment.cell_dilution_factor)
@@ -463,7 +463,7 @@ class ITCExperimentSet(object):
                     self._trackQuantities(
                         experiment.buffer_source,
                         buffer_volume *
-                        units.microliters)
+                        ureg.microliters)
 
             # Schedule cell solution transfer.
             tipmask = 2
@@ -491,7 +491,7 @@ class ITCExperimentSet(object):
                 self._trackQuantities(
                     experiment.cell_source,
                     transfer_volume *
-                    units.microliters)
+                    ureg.microliters)
 
             # Find a place to put syringe contents.
             if len(self.destination_locations) == 0:
@@ -545,7 +545,7 @@ class ITCExperimentSet(object):
                     self._trackQuantities(
                         experiment.buffer_source,
                         buffer_volume *
-                        units.microliters)
+                        ureg.microliters)
 
             # Schedule syringe solution transfer.
             tipmask = 8
@@ -573,7 +573,7 @@ class ITCExperimentSet(object):
                 self._trackQuantities(
                     experiment.syringe_source,
                     transfer_volume *
-                    units.microliters)
+                    ureg.microliters)
 
             # volume logging
             sflag = ""
@@ -601,14 +601,13 @@ class ITCExperimentSet(object):
             itcdata.ItcMethod = experiment.protocol.itc_method
             itcdata.AnalysisMethod = experiment.protocol.analysis_method
 
-            millimolar = 0.001 * units.moles / units.liter
             try:
-                itcdata.CellConcentration = experiment.cell_concentration / millimolar
+                itcdata.CellConcentration = experiment.cell_concentration / (ureg.millimole / ureg.liter)
             except:
                 itcdata.CellConcentration = 0
 
             try:
-                itcdata.PipetteConcentration = experiment.syringe_concentration / millimolar
+                itcdata.PipetteConcentration = experiment.syringe_concentration / (ureg.millimole / ureg.liter)
             except:
                 itcdata.PipetteConcentration = 0
 
@@ -635,13 +634,13 @@ class ITCExperimentSet(object):
         print("Necessary volumes:")
         keys = sorted(self._tracked_quantities.keys())
         for key in keys:
-            print("%32s %12.3f mL" % (key, self._tracked_quantities[key] / units.milliliters))
+            print("%32s %12.3f mL" % (key, self._tracked_quantities[key] / ureg.milliliters))
 
         # Report expected waste
         print("Expected waste (3% of total):")
         keys = sorted(self._tracked_quantities.keys())
         for key in keys:
-            print("%32s %12.3f mL" % (key, 0.03 * self._tracked_quantities[key] / units.milliliters))
+            print("%32s %12.3f mL" % (key, 0.03 * self._tracked_quantities[key] / ureg.milliliters))
 
         # Set validated flag.
         self._validated = True
@@ -712,11 +711,16 @@ class ITCExperimentSet(object):
         for experiment in self.experiments:
             row += 1
             for (column, fieldname) in enumerate(fieldnames, start=start):
+                value = getattr(experiment.itcdata, fieldname)
+                try:
+                    if value.dimensionless:
+                        value = float(value)
+                except AttributeError:
+                    pass
+
                 ws.cell(
                     row=row,
-                    column=column).value = getattr(
-                    experiment.itcdata,
-                    fieldname)
+                    column=column).value = value
 
         # Write workbook.
         wb.save(filename)
@@ -746,17 +750,17 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
     def populate_worklist(
             self,
             cell_volume=400.0 *
-            units.microliters,
+            ureg.microliters,
             syringe_volume=120.0 *
-            units.microliters):
+            ureg.microliters):
         """
         Build the worklist for heat of mixing experiments
 
         Parameters
         ----------
-        cell_volume : simtk.unit.Quantity with units compatible with microliters
+        cell_volume : pint Quantity with units compatible with microliters
             Total volume to prepare for cell in microliters  (opt., default = 400.0 * microliters )
-        syringe_volume : simtk.unit.Quantity with units compatible with microliters
+        syringe_volume : pint Quantity with units compatible with microliters
             Total volume to prepare for syringe in microliters (default = 120.0 * microliters )
         """
 
@@ -790,7 +794,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                     float(
                         cell_volume *
                         cellfrac /
-                        units.microliters))
+                        ureg.microliters))
 
             # Calculate volumes per component for syringe mixture
             syr_volumes = list()
@@ -800,7 +804,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                     float(
                         syringe_volume *
                         syrfrac /
-                        units.microliters))
+                        ureg.microliters))
 
             allcomponents = experiment.cell_mixture.components + experiment.syringe_mixture.components
             allcomponents = list(set(allcomponents))
@@ -828,7 +832,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                 self._trackQuantities(
                     experiment.cell_mixture.components[i],
                     cell_volumes[i] *
-                    units.microliters)
+                    ureg.microliters)
 
             # Find a place to put syringe contents.
             if len(self.destination_locations) == 0:
@@ -856,7 +860,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                 self._trackQuantities(
                     experiment.syringe_mixture.components[i],
                     syr_volumes[i] *
-                    units.microliters)
+                    ureg.microliters)
 
             # Finish worklist section.
             worklist_script += 'B;\r\n'  # execute queued batch of commands
@@ -890,8 +894,6 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             itcdata.ItcMethod = experiment.protocol.itc_method
             itcdata.AnalysisMethod = experiment.protocol.analysis_method
 
-            millimolar = 0.001 * units.moles / units.liter
-
             # Not a binding experiment, set concentrations to 0
             itcdata.CellConcentration = 0
             itcdata.PipetteConcentration = 0
@@ -918,14 +920,14 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         print("Necessary volumes:")
         keys = sorted(self._tracked_quantities.keys())
         for key in keys:
-            print("%32s %12.3f mL" % (key, self._tracked_quantities[key] / units.milliliters))
+            print("%32s %12.3f mL" % (key, self._tracked_quantities[key] / ureg.milliliters))
 
         # Report expected waste
         print("Expected waste (5% of total):")
         keys = sorted(self._tracked_quantities.keys())
-        
+
         for key in keys:
-            print("%32s %12.3f mL" % (key, 0.05 * self._tracked_quantities[key] / units.milliliters))
+            print("%32s %12.3f mL" % (key, 0.05 * self._tracked_quantities[key] / ureg.milliliters))
 
     def validate(self, strict=True):
         """Make sure that necessary steps have been taken before writing to files."""

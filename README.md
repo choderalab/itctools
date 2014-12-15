@@ -2,14 +2,15 @@
 
 [![Build Status](https://travis-ci.org/choderalab/itctools.svg)](https://travis-ci.org/choderalab/itctools)
 [![Coverage Status](https://coveralls.io/repos/choderalab/itctools/badge.png)](https://coveralls.io/r/choderalab/itctools)
+[![Code Health](https://landscape.io/github/choderalab/itctools/master/landscape.svg)](https://landscape.io/github/choderalab/itctools/master)
 
 Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200.
 
 ## New:
 
-Run `bash install.sh` to set up a new python environment using miniconda at ${HOME}/miniconda. It should take care of all dependencies. 
+Run `bash install.sh` to set up a new python environment using miniconda at ${HOME}/miniconda. It should take care of all dependencies.
 
-To access the new python enviroment you can type 
+To access the new python enviroment you can type
 ```shell
 source ${HOME}/miniconda/bin/activate 2.7
 ```
@@ -19,25 +20,24 @@ export PATH=${PATH}:${HOME}/miniconda/bin
 ```
 To use the scripts within an existing environment, please look at the dependencies and install them accordingly. You can use the requirements files from the installer.
 
-You can then install the library using: 
+You can then install the library using:
 ```shell
 python setup.py install
 ```
 
 ## Requires
 -
-`anaconda` or `miniconda` with `python` 2.7 or 3.3  
-Using `conda`, install:  
+`anaconda` or `miniconda` with `python` 2.7 or 3.3
+Using `conda`, install:
 `setuptools`
-`simtk` (which is part of `openmm`.)  
-`numpy`  
-`openpyxl`  
+`numpy`
+`openpyxl`
 `coverage`
-`pip` - to install further dependencies.  
+`pip` - to install further dependencies.
 
 Using `pip`, install:
-
-`behave`  
+`pint`
+`behave`
 `coveralls`
 
 ## Contains
@@ -53,12 +53,12 @@ A library for setting up experiments
   - `labware.py`
     - Defines chemical containers and their locations on the EVO Deck.
   - `itctools.py`
-    - Contains useful functions that don't fall into any other category. 
+    - Contains useful functions that don't fall into any other category.
 
 ### `examples/`
 
 Some example scripts that use the library.
- 
+
 #### `examples/host_guest`
 
   - `host_guest.py` prepares a worklist and xlsx file for titrating a host compound into several guests.
@@ -79,6 +79,6 @@ Tests that use `behave` to make sure the example scripts are functional. Run `be
 
 - The feature files written in `Gherkin` that test the behavior of the example scripts.
 - `environment.py` which sets up a temporary directory called `tmp` in your current directory to run tests in. Note that it automatically erases this directory before every run to ensure a clean working directory.
-    
+
 ##### `tests/behave/features/steps`
 - `scripts.py` holds the step definitions that are run by behave when testing the features defined in the feature files.

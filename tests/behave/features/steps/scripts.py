@@ -3,14 +3,14 @@ __author__ = 'Bas Rustenburg'
 from behave import *
 
 @given(u'the module "{modulename}" is installed')
-def step_impl(context, modulename):
+def step_module_import(context, modulename):
     """
     Tries to import a module with a given name to make sure it is installed.
     """
     module = __import__(modulename)
 
 @given(u'the module is in the current directory')
-def step_impl(context):
+def step_module_directory(context):
     """
     Adds the current directory to the python path.
     :param context:
@@ -24,7 +24,7 @@ def step_impl(context):
         os.environ['PYTHONPATH'] = cwd
 
 @given(u'that scripts are in the directory "{directory}"')
-def step_impl(context, directory):
+def step_context_scriptdir_plural(context, directory):
     """
     Set the directory where scripts can be found, after making sure it exists.
 
@@ -37,7 +37,7 @@ def step_impl(context, directory):
     context.scriptdir = os.path.abspath(directory)
 
 @given(u'that the script is in the directory "{directory}"')
-def step_impl(context, directory):
+def step_context_scriptdir_singular(context, directory):
     """
     Set the directory where to find a script, after making sure it exists.
 
@@ -45,10 +45,10 @@ def step_impl(context, directory):
     :param str directory:
     :return:
     """
-    context.execute_steps('given that scripts are in the directory "%s"' % directory) 
+    context.execute_steps('given that scripts are in the directory "%s"' % directory)
 
 @given(u'the working directory is "{directory}"')
-def step_impl(context, directory):
+def step_context_workdir(context, directory):
     """
     Check whether a given directory exists.
     If it does not exists, create it in current directory.
@@ -66,7 +66,7 @@ def step_impl(context, directory):
 
 
 @when(u'the script "{scriptname}" is called successfully from the working directory')
-def step_impl(context, scriptname):
+def step_execute_script(context, scriptname):
     """
     Execute a script on the command line.
     Fails if script returns error code other than 0
@@ -89,7 +89,7 @@ def step_impl(context, scriptname):
         os.chdir(oldwd)
 
 @then(u'a file called "{filename}" is created')
-def step_impl(context, filename):
+def step_file_existance(context, filename):
     """
     Check for existence of a file.
 
@@ -101,7 +101,7 @@ def step_impl(context, filename):
     assert os.path.isfile('%s/%s' % (context.workdir, filename)) is True
 
 @then(u'"{filename}" is not an empty file')
-def step_impl(context, filename):
+def step_file_nonzero(context, filename):
     """
     Verify that the given file is not empty
     :param context:
@@ -115,7 +115,7 @@ def step_impl(context, filename):
     os.chdir(oldwd)
 
 @then(u'"{filename}" is a .{format} file')
-def step_impl(context, filename, format):
+def step_file_format(context, filename, format):
     """
     Verify format of given file
 

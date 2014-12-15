@@ -79,6 +79,7 @@ write_version_py()
 setup(
     name='itctools',
     version=__version__,
+    package_dir={'itctools': 'itctools'},
     packages=['itctools'],
     url='https://github.com/choderalab/itctools',
     license='',
@@ -93,4 +94,6 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
     ],
+    setup_requires=['nose>=1.0'],
+    tests_require=['nose', 'behave', 'rednose']
 )

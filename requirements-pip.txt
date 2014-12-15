@@ -1,2 +1,4 @@
 behave
-python-coveralls 
+pint
+python-coveralls
+rednose

@@ -39,7 +39,7 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
   - tree %PYTHON% /f
-  - pip install behave
+  - pip install behave pint
   - python setup.py install
 
 test_script:

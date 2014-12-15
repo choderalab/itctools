@@ -35,7 +35,7 @@ class TestITC(unittest.TestCase):
     def test_ureg(self):
         """Make sure that the units are working"""
         quantity = itc.Quantity(140.0, 'micromolar')
-        self.assertEqual(quantity / itc.ureg.standard_concentration, 1.4E-4)
+        self.assertAlmostEqual(quantity / itc.ureg.standard_concentration, 1.4E-4, places=7)
 
 if __name__ == '__main__':
     unittest.main()

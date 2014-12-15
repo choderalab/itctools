@@ -2,23 +2,22 @@
 """
 Script for generation of binary mixture ITC titrations.
 """
-
-from simtk.unit import *
+from itctools.itctools import ureg, Quantity
 from itctools.procedures import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
 from itctools.materials import Solvent, Compound, SimpleSolution
 from itctools.labware import Labware, PipettingLocation
 
 # Define solvents.
 # TODO command line specification of density and name
-water = Solvent('water', density=0.9970479 * grams / milliliter)
-buffer = Solvent('buffer', density=1.014 * grams / milliliter)
+water = Solvent('water', density=0.9970479 * ureg.gram / ureg.milliliter)
+buffer = Solvent('buffer', density=1.014 * ureg.gram / ureg.milliliter)
 
 # Define compounds.
 
 nguests = 6  # overnight from 5pm till 9am
 # nguests = 14 # number of guest compounds
 # nguests = 7 # number of guest compounds # DEBUG (one source plate only)
-host = Compound('host', molecular_weight=1162.9632 * daltons, purity=0.7133)
+host = Compound('host', molecular_weight=1162.9632 * ureg.gram / ureg.mole, purity=0.7133)
 guest_molecular_weights = [
     209.12,
     123.62,
@@ -48,14 +47,14 @@ guest_compound_Ka = Quantity([21024287.6408,
                               6869559660.36,
                               28356538311.4,
                               396415131.021],
-                             liters / mole)  # see dGtoKa.py
+                             ureg.liter / ureg.mole)  # see dGtoKa.py
 guests = [
     Compound(
         name='guest%02d' %
         (guest_index +
          1),
         molecular_weight=guest_molecular_weights[guest_index] *
-        daltons,
+        ureg.gram / ureg.mole,
         purity=0.975) for guest_index in range(nguests)]
 
 
@@ -75,10 +74,10 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 host_solution = SimpleSolution(
     compound=host,
     compound_mass=16.76 *
-    milligrams,
+    ureg.milligram,
     solvent=buffer,
     solvent_mass=10.2628 *
-    grams,
+    ureg.gram,
     location=PipettingLocation(
         source_plate.RackLabel,
         source_plate.RackType,
@@ -100,7 +99,7 @@ guest_compound_masses = Quantity([2.190,
                                   1.98,
                                   1.80,
                                   2.22],
-                                 milligrams)
+                                 ureg.milligram)
 guest_solvent_masses = Quantity([10.2082,
                                  16.7849,
                                  10.1190,
@@ -115,7 +114,7 @@ guest_solvent_masses = Quantity([10.2082,
                                  10.1732,
                                  10.1047,
                                  10.6252],
-                                grams)
+                                ureg.gram)
 
 
 for guest_index in range(nguests):
@@ -232,19 +231,15 @@ for guest_index in range(nguests):
             syringe_source=host_solution,
             cell_source=guest_solutions[guest_index],
             protocol=binding_protocol,
-            cell_concentration=0.2 *
-            millimolar *
-            cell_scaling,
+            cell_concentration=0.2 * (ureg.millimole / ureg.liter) * cell_scaling,
             buffer_source=buffer_trough)
         # optimize the syringe_concentration using heuristic equations and known binding constants
         # TODO extract m, v and V0 from protocol somehow?
         experiment.heuristic_syringe(
             guest_compound_Ka[guest_index],
             10,
-            3. *
-            microliters,
-            202.8 *
-            microliters)
+            3. * ureg.microliter,
+            202.8 * ureg.microliter)
         # rescale if syringe > stock. Store factor.
         factors.append(experiment.rescale())
         host_guest_experiments.append(experiment)
@@ -258,7 +253,7 @@ for guest_index in range(nguests):
             cell_source=guest_solutions[guest_index],
             protocol=blank_protocol,
             cell_concentration=0.2 *
-            millimolar,
+            ureg.millimole /ureg.liter,
             buffer_source=buffer_trough)
         # rescale to match host into guest experiment concentrations.
         experiment.rescale(tfactor=factors[replicate])
@@ -295,9 +290,9 @@ itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
 # For convenience, concentrations
 for g, guest in enumerate(guest_solutions, start=1):
-    print("guest%02d" % g, guest.concentration.in_units_of(millimolar))
+    print("guest%02d" % g, (guest.concentration / (ureg.millimole / ureg.liter).to('millimolar')))
 
-print("host", host_solution.concentration.in_units_of(millimolar))
+print("host", host_solution.concentration / (ureg.millimole / ureg.liter))
 
 
 # Write Tecan EVO pipetting operations.

@@ -1,6 +1,10 @@
-# Make all possible combinations using cartesian product
 import itertools
+from pint import UnitRegistry
 
+ureg = UnitRegistry()
+Quantity = ureg.Quantity
+ureg.define('molar = 1 * mole / liter = M')
+ureg.define('standard_concentration = 1 M')
 
 def permutation_with_replacement(n, seq):
     """
@@ -11,3 +15,4 @@ def permutation_with_replacement(n, seq):
     for p in itertools.product(seq, repeat=n):
         options.append(p)
     return options
+

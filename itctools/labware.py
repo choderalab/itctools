@@ -1,7 +1,3 @@
-
-import simtk.unit as units
-
-
 class Labware(object):
 
     def __init__(self, RackLabel, RackType, RackID=None):
@@ -22,10 +18,6 @@ class Labware(object):
         self.RackType = RackType
         self.RackID = RackID
 
-
-#==============================================================================
-# PIPETTING LOCATION
-#==============================================================================
 
 class PipettingLocation(object):
 

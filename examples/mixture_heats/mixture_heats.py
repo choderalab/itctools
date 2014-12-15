@@ -3,12 +3,11 @@
 Script for generation of mixture ITC titrations.
 """
 
-from simtk.unit import *
 from itctools.procedures import HeatOfMixingProtocol, HeatOfMixingExperimentSet, HeatOfMixingExperiment
 from itctools.materials import Compound, Solvent, SimpleSolution, PureLiquid, SimpleMixture
 from itctools.labware import Labware, PipettingLocation
 from itctools.itctools import permutation_with_replacement as perm
-#import itertools
+from itctools.itctools import ureg
 
 
 # TODO command line specification of density and name
@@ -24,13 +23,13 @@ final_cleaning = False
 
 # For every liquid that is to be mixted, define
 label1 = 'Water'  # identifier
-dens1 = 0.9970479 * grams / milliliter  # density at standard conditions
-mw1 = 18.01528 * gram / mole    # molecular weight
+dens1 = 0.9970479 * ureg.gram / ureg.milliliter  # density at standard conditions
+mw1 = 18.01528 * ureg.gram / ureg.mole    # molecular weight
 pur1 = 1.0  # purity ( TODO might make this optional)
 
 label2 = 'Dimethyl sulfoxide'
-dens2 = 1.092 * grams / milliliter
-mw2 = 78.13 * gram / mole
+dens2 = 1.092 * ureg.gram / ureg.milliliter
+mw2 = 78.13 * ureg.gram / ureg.mole
 pur2 = 1.0
 
 # Mole fractions to consider as initial starting conditions
@@ -44,8 +43,8 @@ sspace = [.0, 1.]
 control_index = 0
 
 # Volume sizes for individual experiment
-cell_volume = 400.0 * microliter
-syringe_volume = 120.0 * microliter
+cell_volume = 400.0 * ureg.microliter
+syringe_volume = 120.0 * ureg.microliter
 
 # Name for the Tecan gemini worklist file
 worklist_filename = 'mixing-itc.gwl'

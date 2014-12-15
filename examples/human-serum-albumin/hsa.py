@@ -3,28 +3,28 @@
 Script for generation of input files for Aspirin and Naproxen binding to HSA by ITC.
 """
 
-from simtk.unit import *
+from itctools.itctools import ureg
 from itctools.procedures import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
 from itctools.materials import Solvent, Compound, SimpleSolution
 from itctools.labware import Labware, PipettingLocation
 
 # Define solvents.
-water = Solvent('water', density=0.9970479 * grams / milliliter)
-buffer = Solvent('buffer', density=1.014 * grams / milliliter) # TODO is our density the same as the HOST-GUEST buffer?
+water = Solvent('water', density=0.9970479 * ureg.gram / ureg.milliliter)
+buffer = Solvent('buffer', density=1.014 * ureg.gram / ureg.milliliter) # TODO is our density the same as the HOST-GUEST buffer?
 
 # Define compounds.
-hsa = Compound('HumanSerumAlbumin', molecular_weight=65000 * daltons, purity=.95)
-indoxylsulfate = Compound('Indoxylsulfate potassium', molecular_weight=251.30 * daltons, purity=x) # Wouldn't we need to use a potassium based buffer for this? We definitely need to do the drug into buffer titrations to make sense of this calculation.
-naproxen_sodium = Compound('Naproxen Sodium', molecular_weight=252.24 * daltons, purity=x)
+hsa = Compound('HumanSerumAlbumin', molecular_weight=65000 * (ureg.gram / ureg.mole), purity=.95)
+indoxylsulfate = Compound('Indoxylsulfate potassium', molecular_weight=251.30 * (ureg.gram / ureg.mole), purity=1.)
+naproxen_sodium = Compound('Naproxen Sodium', molecular_weight=252.24 * (ureg.gram / ureg.mole), purity=1.)
 
 # These are insoluble in water without added DMSO
-aspirin = Compound('AcetylsalicylicAcid', molecular_weight=180.15742 * daltons, purity=.99)
-naproxen = Compound('Naproxen', molecular_weight=230.3 * daltons, purity=.98)
+aspirin = Compound('AcetylsalicylicAcid', molecular_weight=180.15742 * (ureg.gram / ureg.mole), purity=.99)
+naproxen = Compound('Naproxen', molecular_weight=230.3 * (ureg.gram / ureg.mole), purity=.98)
 
 #Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
-aspirin_ka = 547198.10 / molar # http://omicsonline.org/2157-7544/2157-7544-2-107.pdf first site estimate
-naproxen_ka = 1.7 / (10 * micromolar) # http://pubs.acs.org/doi/pdf/10.1021/jp062734p
-indoxylsulfate_ka =  9.1E5 / molar #    10.1023/A:1011014629551
+aspirin_ka = 547198.10 / ureg.molar  # http://omicsonline.org/2157-7544/2157-7544-2-107.pdf first site estimate
+naproxen_ka = 1.7 / (10 * ureg.micromolar)  # http://pubs.acs.org/doi/pdf/10.1021/jp062734p
+indoxylsulfate_ka =  9.1E5 / ureg.molar  # 10.1023/A:1011014629551
 
 # Define troughs on the instrument
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
@@ -35,26 +35,26 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 
 # Define source solutions in the vial holder
 # TODO : Define solutions once prepared with the Quantos
-hsa_solution = SimpleSolution(compound=hsa, compound_mass= 13.8 * milligram, solvent=buffer, solvent_mass=0.5 * grams, location=PipettingLocation(
-        source_plate.RackLabel,
-        source_plate.RackType,
-        1))
-indoxylsulfate_solution = SimpleSolution(compound=indoxylsulfate, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
-        source_plate.RackLabel,
-        source_plate.RackType,
-        2))
+hsa_solution = SimpleSolution(compound=hsa, compound_mass= 13.8 * ureg.milligram, solvent=buffer, solvent_mass=0.5 * ureg.gram, location=PipettingLocation(
+    source_plate.RackLabel,
+    source_plate.RackType,
+    1))
+indoxylsulfate_solution = SimpleSolution(compound=indoxylsulfate, compound_mass=15 * ureg.milligram, solvent=buffer, solvent_mass=10 * ureg.gram, location=PipettingLocation(
+    source_plate.RackLabel,
+    source_plate.RackType,
+    2))
 
-naproxen_sodium_solution = SimpleSolution(compound=naproxen_sodium, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
-        source_plate.RackLabel,
-        source_plate.RackType,
-        3))
+naproxen_sodium_solution = SimpleSolution(compound=naproxen_sodium, compound_mass=15 * ureg.milligram, solvent=buffer, solvent_mass=10 * ureg.gram, location=PipettingLocation(
+    source_plate.RackLabel,
+    source_plate.RackType,
+    3))
 
-# aspirin_solution = SimpleSolution(compound=aspirin, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
+# aspirin_solution = SimpleSolution(compound=aspirin, compound_mass=15 *ureg.milligram, solvent=buffer, solvent_mass= 15 * ureg.gram, location=PipettingLocation(
 #         source_plate.RackLabel,
 #         source_plate.RackType,
 #         4))
 #
-# naproxen_solution = SimpleSolution(compound=naproxen, compound_mass=15 * milligram, solvent=buffer, solvent_mass= 15 * grams, location=PipettingLocation(
+# naproxen_solution = SimpleSolution(compound=naproxen, compound_mass=15 *ureg.milligram, solvent=buffer, solvent_mass= 15 * ureg.gram, location=PipettingLocation(
 #         source_plate.RackLabel,
 #         source_plate.RackType,
 #         5)) # NOTE Need 0.31 mM for the experiment
@@ -144,7 +144,7 @@ for replicate in range(1):
             syringe_source=buffer_trough,
             cell_source=hsa_solution,
             protocol=control_protocol,
-            cell_concentration=0.045 * millimolar,
+            cell_concentration=0.045 * ureg.millimolar,
             buffer_source=buffer_trough))
 
 # drugs/HSA
@@ -169,7 +169,7 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             cell_source=hsa_solution,
             protocol=binding_protocol,
             cell_concentration=0.045 *
-            millimolar *
+            ureg.millimolar *
             cell_scaling,
             buffer_source=buffer_trough)
         # optimize the syringe_concentration using heuristic equations and known binding constants
@@ -178,9 +178,9 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             drug_ka,
             10,
             3. *
-            microliters,
+            ureg.microliter,
             202.8 *
-            microliters)
+            ureg.microliter)
         # rescale if syringe > stock. Store factor.
         factors.append(experiment.rescale())
         drug_protein_experiments.append(experiment)
@@ -230,8 +230,8 @@ itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
 # For convenience, concentrations
 for drug_solution in drug_solutions:
-    print("%s %.4f mM" % (drug_solution.name, drug_solution.concentration / millimolar ))
-    print("HSA", hsa_solution.concentration.in_units_of(millimolar))
+    print("%s %.4f mM" % (drug_solution.name, drug_solution.concentration / ureg.millimolar ))
+    print("HSA", hsa_solution.concentration.in_units_of(ureg.millimolar))
 
 
 # Write Tecan EVO pipetting operations.

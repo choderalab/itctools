@@ -144,7 +144,7 @@ for replicate in range(1):
             syringe_source=buffer_trough,
             cell_source=hsa_solution,
             protocol=control_protocol,
-            cell_concentration=0.045 * ureg.millimolar,
+            cell_concentration=0.040 * ureg.millimolar,
             buffer_source=buffer_trough))
 
 # drugs/HSA
@@ -168,7 +168,7 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             syringe_source=drug_solution,
             cell_source=hsa_solution,
             protocol=binding_protocol,
-            cell_concentration=0.045 *
+            cell_concentration=0.040 *
             ureg.millimolar *
             cell_scaling,
             buffer_source=buffer_trough)
@@ -231,7 +231,7 @@ itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 # For convenience, concentrations
 for drug_solution in drug_solutions:
     print("%s %.4f mM" % (drug_solution.name, drug_solution.concentration / ureg.millimolar ))
-    print("HSA", hsa_solution.concentration.in_units_of(ureg.millimolar))
+    print("HSA", hsa_solution.concentration.to(ureg.millimolar))
 
 
 # Write Tecan EVO pipetting operations.

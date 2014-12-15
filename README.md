@@ -1,6 +1,7 @@
 # itctools
 
 [![Build Status](https://travis-ci.org/choderalab/itctools.svg)](https://travis-ci.org/choderalab/itctools)
+[![Build status](https://ci.appveyor.com/api/projects/status/eexd1la2ghs518mc?svg=true)](https://ci.appveyor.com/project/bas-rustenburg/itctools)
 [![Coverage Status](https://coveralls.io/repos/choderalab/itctools/badge.png)](https://coveralls.io/r/choderalab/itctools)
 [![Code Health](https://landscape.io/github/choderalab/itctools/master/landscape.svg)](https://landscape.io/github/choderalab/itctools/master)
 

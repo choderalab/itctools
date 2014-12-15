@@ -1,6 +1,6 @@
 import unittest
 from itctools import materials
-from simtk import unit
+from itctools.itctools import ureg
 from mock import Mock
 
 
@@ -21,7 +21,7 @@ class TestMaterials(unittest.TestCase):
         """Ensure Solvent has correct parameter assignment"""
         arguments = [
             ['water'],
-            ['water', 0.9970479 * unit.grams / unit.milliliter],
+            ['water', 0.9970479 * ureg.grams / ureg.milliliter],
         ]
         for args in arguments:
             self._check_solvent(args)
@@ -40,8 +40,8 @@ class TestMaterials(unittest.TestCase):
     def test_compound(self):
         """Ensure Compound has correct parameter assignment"""
         arguments = [['nacl'],
-                     ['imatinib mesylate', 589.7 * unit.grams / unit.mole],
-                     ['compound1', 209.12 * unit.grams / unit.mole, 0.975]
+                     ['imatinib mesylate', 589.7 * ureg.grams / ureg.mole],
+                     ['compound1', 209.12 * ureg.grams / ureg.mole, 0.975]
                      ]
 
         for args in arguments:
@@ -64,14 +64,14 @@ class TestMaterials(unittest.TestCase):
     def test_pure_liquid(self):
         """Ensure PureLiquid has correct parameter assignment"""
         arguments = [['water', 0.9970479 *
-                      unit.grams /
-                      unit.milliliter, 18.01528 *
-                      unit.gram /
-                      unit.mole], ['ethanol', 0.789 *
-                                   unit.grams /
-                                   unit.milliliter, 46.07 *
-                                   unit.gram /
-                                   unit.mole, 99.8 /
+                      ureg.grams /
+                      ureg.milliliter, 18.01528 *
+                      ureg.gram /
+                      ureg.mole], ['ethanol', 0.789 *
+                                   ureg.grams /
+                                   ureg.milliliter, 46.07 *
+                                   ureg.gram /
+                                   ureg.mole, 99.8 /
                                    100.]]
         for args in arguments:
             self._check_pureliquid(args)
@@ -84,13 +84,13 @@ class TestMaterials(unittest.TestCase):
         mock_compound = Mock(
             name='imatinib',
             molecular_weight=589.7 *
-            unit.grams /
-            unit.mole,
+            ureg.grams /
+            ureg.mole,
             purity=1.0)
-        compound_mass = 1.0 * unit.milligram
+        compound_mass = 1.0 * ureg.milligram
         mock_solvent = Mock(
-            name='water', density=0.9970479 * unit.grams / unit.milliliter)
-        solvent_mass = 10.0 * unit.grams
+            name='water', density=0.9970479 * ureg.grams / ureg.milliliter)
+        solvent_mass = 10.0 * ureg.grams
         mock_location = Mock(
             RackLabel='DestinationPlate', RackType='ITCPlate', Position=1)
 
@@ -124,13 +124,13 @@ class TestMaterials(unittest.TestCase):
         mock_compound = Mock(
             name='imatinib',
             molecular_weight=589.7 *
-            unit.grams /
-            unit.mole,
+            ureg.grams /
+            ureg.mole,
             purity=1.0)
-        compound_mass = 1.0 * unit.milligram
+        compound_mass = 1.0 * ureg.milligram
         solvent = materials.Solvent(
-            'water', density=0.9970479 * unit.grams / unit.milliliter)
-        solvent_mass = 10.0 * unit.grams
+            'water', density=0.9970479 * ureg.grams / ureg.milliliter)
+        solvent_mass = 10.0 * ureg.grams
         mock_location = Mock(
             RackLabel='DestinationPlate', RackType='ITCPlate', Position=1)
 
@@ -160,13 +160,13 @@ class TestMaterials(unittest.TestCase):
         compound = materials.Compound(
             'imatinib',
             molecular_weight=589.7 *
-            unit.grams /
-            unit.mole,
+            ureg.grams /
+            ureg.mole,
             purity=1.0)
-        compound_mass = 1.0 * unit.milligram
+        compound_mass = 1.0 * ureg.milligram
         mock_solvent = Mock(
-            name='water', density=0.9970479 * unit.grams / unit.milliliter)
-        solvent_mass = 10.0 * unit.grams
+            name='water', density=0.9970479 * ureg.grams / ureg.milliliter)
+        solvent_mass = 10.0 * ureg.grams
         mock_location = Mock(
             RackLabel='DestinationPlate', RackType='ITCPlate', Position=1)
 
@@ -191,7 +191,7 @@ class TestMaterials(unittest.TestCase):
 
     def _calculate_mass_fractions(self, fractions, liquids):
         """Calculate mass fractions for a list of fractions and a list of corresponding PureLiquid's"""
-        normalizing_mass = 0 * unit.grams / unit.mole
+        normalizing_mass = 0 * ureg.grams / ureg.mole
         for i, liq in enumerate(liquids):
             normalizing_mass += liq.molecular_weight * fractions[i]
         mass_fractions = [
@@ -203,7 +203,7 @@ class TestMaterials(unittest.TestCase):
 
     def _calculate_volume_fractions(self, fractions, molar_volumes):
         """Calculate volume fractions for a list of fractions and a list of corresponding molar_volume's"""
-        normalizing_volume = 0 * unit.liter / unit.mole
+        normalizing_volume = 0 * ureg.liter / ureg.mole
         for i, volume in enumerate(molar_volumes):
             normalizing_volume += fractions[i] * volume
         volume_fractions = [
@@ -218,19 +218,19 @@ class TestMaterials(unittest.TestCase):
         mock_liquid1 = Mock(
             name='water',
             density=0.9970479 *
-            unit.grams /
-            unit.milliliter,
+            ureg.grams /
+            ureg.milliliter,
             molecular_weight=18.01528 *
-            unit.gram /
-            unit.mole)
+            ureg.gram /
+            ureg.mole)
         mock_liquid2 = Mock(
             name='ethanol',
             density=0.789 *
-            unit.grams /
-            unit.milliliter,
+            ureg.grams /
+            ureg.milliliter,
             molecular_weight=46.07 *
-            unit.gram /
-            unit.mole)
+            ureg.gram /
+            ureg.mole)
         liquids = [mock_liquid1, mock_liquid2]
         mock_location1 = Mock(
             RackLabel='SourcePlate',

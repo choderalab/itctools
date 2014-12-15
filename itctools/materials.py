@@ -2,8 +2,7 @@
 # GLOBAL IMPORTS
 #==============================================================================
 
-import simtk.unit as units
-
+from .itctools import ureg
 #==============================================================================
 # SOLVENT
 #==============================================================================
@@ -22,7 +21,7 @@ class Solvent(object):
         ----------
         name : str
            The name of the solvent to create.
-        density : simtk.unit.Quantity with units compatible with grams/milliliter, optional, default=None
+        density : pint Quantity with units compatible with grams/milliliter, optional, default=None
            The density of the solvent.
 
         Examples
@@ -30,11 +29,11 @@ class Solvent(object):
 
         Register a solvent.
 
-        >>> water = Solvent('water', density=0.9970479*units.grams/units.centimeter**3)
+        >>> water = Solvent('water', density=0.9970479*ureg.gram/ureg.centimeter**3)
 
         Register a solvent with density information.
 
-        >>> dmso = Solvent('dmso', density=1.1004*units.grams/units.centimeter**3)
+        >>> dmso = Solvent('dmso', density=1.1004*ureg.grams/ureg.centimeter**3)
 
         """
         self.name = name
@@ -58,7 +57,7 @@ class Compound(object):
         ----------
         name : str
            The name of the compound to create.
-        molecular_weight : simtk.unit.Quantity with units compatible with grams/mole, optional, default=None
+        molecular_weight : pint Quantity with units compatible with grams/mole, optional, default=None
            The molecular weight of the compound.
         purity : float, optional, default=1.0
            The mass purity used for computing actual quantity of compound.
@@ -72,11 +71,11 @@ class Compound(object):
 
         Register a compound with molecular weight.
 
-        >>> imatinib = Compound('imatinib mesylate', molecular_weight=589.7*units.grams/units.mole)
+        >>> imatinib = Compound('imatinib mesylate', molecular_weight=589.7*ureg.grams/ureg.mole)
 
         Use a non-unit purity.
 
-        >>> compound1 = Compound('compound1', molecular_weight=209.12*units.grams/units.mole, purity=0.975)
+        >>> compound1 = Compound('compound1', molecular_weight=209.12*ureg.grams/ureg.mole, purity=0.975)
 
         """
         self.name = name
@@ -92,9 +91,9 @@ class PureLiquid(Compound):
         """
         name : str
             name of the liquid
-        density : simtk.unit.Quantity with units compatible with grams/milliliter
+        density : pint Quantity with units compatible with grams/milliliter
             density of the pure liquid
-        molecular weight : simtk.unit.Quantity with units compatible with grams/mole
+        molecular weight : pint Quantity with units compatible with grams/mole
             molecular weight of pure liquid
         purity : float, optional, default = 1.0
             fraction of liquid that is pure
@@ -131,11 +130,11 @@ class SimpleSolution(Solvent):
         """
         compound : Compound
            The compound added to the solution.
-        compound_mass : simtk.unit.Quantity compatible with grams
+        compound_mass : pint Quantity compatible with grams
            The mass of compound added to the solution.
         solvent : Solvent
            The solvent used for the solution.
-        solvent_mass : simtk.unit.Quantity compatible with grams
+        solvent_mass : pint Quantity compatible with grams
            The mass of solvent used for the solution.
         location : PipettingLocation
            The pipetting location holding the solution.
@@ -145,10 +144,10 @@ class SimpleSolution(Solvent):
 
         Create a simple salt solution.
 
-        >>> salt = Compound('sodium chloride', molecular_weight=58.44277*units.grams/units.mole)
-        >>> water = Solvent('water', density=0.9970479*units.grams/units.centimeter**3)
+        >>> salt = Compound('sodium chloride', molecular_weight=58.44277*ureg.grams/ureg.mole)
+        >>> water = Solvent('water', density=0.9970479*ureg.grams/ureg.centimeter**3)
         >>> location = PipettingLocation('BufferTrough', 'Trough 100ml', 1)
-        >>> solution = SimpleSolution(compound=salt, compound_mass=1.0*units.milligrams, solvent=water, solvent_mass=10.0*units.grams, location=location)
+        >>> solution = SimpleSolution(compound=salt, compound_mass=1.0*ureg.milligrams, solvent=water, solvent_mass=10.0*ureg.grams, location=location)
 
         TODO
         ----
@@ -238,7 +237,7 @@ class SimpleMixture(Solvent):
 
     def _calculate_mass_fractions(self):
         # Average molecular weight  = sum(mole fraction * mole weight) over all components of the mixture
-        normalizing_mass = 0 * units.grams / units.mole
+        normalizing_mass = 0 * ureg.grams / ureg.mole
         for i, component in enumerate(self.components):
             normalizing_mass += component.molecular_weight * self.molefractions[i]
 
@@ -252,7 +251,7 @@ class SimpleMixture(Solvent):
 
     def _calculate_volume_fractions(self):
         # Average Molar volume = sum( mole fraction * molar volume) over all components of the mixture
-        normalizing_volume = 0 * units.liter / units.mole
+        normalizing_volume = 0 * ureg.liter / ureg.mole
         for i, volume in enumerate(self.molarvolumes):
             normalizing_volume += self.molefractions[i] * volume
 

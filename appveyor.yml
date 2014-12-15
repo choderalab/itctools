@@ -2,7 +2,6 @@
 # Based on https://github.com/rmcgibbo/python-appveyor-conda-example
 
 environment:
-  # See README for information on the token
 
 #  global:
     # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
@@ -37,12 +36,10 @@ install:
   # this installs the appropriate Miniconda (Py2/Py3, 32/64 bit),
   # as well as pip, conda-build, and the binstar CLI
   - powershell .\\continuous-integration\\appveyor\\install.ps1
-  - "SET PATH=%PYTHON%;%PYTHON%\\envs\\%PYTHON_VERSION%\\Scripts;%PYTHON%\\%PYTHON_VERSION%\\Scripts;%PATH%"
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
   - tree %PYTHON% /f
   - pip install behave
-
-build_script:
   - python setup.py install
 
 test_script:

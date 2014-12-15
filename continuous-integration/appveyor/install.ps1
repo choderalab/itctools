@@ -136,7 +136,7 @@ function UpdateConda ($python_home) {
 function main () {
     InstallMiniconda $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     UpdateConda $env:PYTHON
-    VerboseInstallCondaPackages $env:PYTHON "setuptools nose numpy openpyxl pip coverage"
+    #VerboseInstallCondaPackages $env:PYTHON "setuptools nose numpy openpyxl pip coverage"
 }
 
 main

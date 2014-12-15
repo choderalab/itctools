@@ -80,7 +80,7 @@ def step_execute_script(context, scriptname):
     oldwd = os.getcwd()
     os.chdir(context.workdir)
     try:
-        script = Popen('%s/%s' % (context.scriptdir, scriptname), stdout=PIPE, stderr=PIPE)
+        script = Popen(['python', '%s/%s' % (context.scriptdir, scriptname)], stdout=PIPE, stderr=PIPE)
         print(script.communicate())
 
         assert script.stderr

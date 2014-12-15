@@ -1,7 +1,6 @@
 coverage
 mock
 nose
-nose
 numpy
 openpyxl
 pip

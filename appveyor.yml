@@ -40,7 +40,6 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\envs\\%PYTHON_VERSION%\\Scripts;%PYTHON%\\%PYTHON_VERSION%\\Scripts;%PATH%"
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
   - tree %PYTHON% /f
-  - activate.bat %PYTHON_VERSION%
   - pip install behave
 
 build_script:

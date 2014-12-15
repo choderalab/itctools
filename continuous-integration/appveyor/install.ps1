@@ -1,7 +1,7 @@
 # Sample script to install Miniconda under Windows
 # Authors: Olivier Grisel, Jonathan Helmus and Kyle Kastner, Robert McGibbon
 # License: CC0 1.0 Universal: http://creativecommons.org/publicdomain/zero/1.0/
-# With minor modifications from Bas Rustenburg
+# With additions from Bas Rustenburg
 
 $MINICONDA_URL = "http://repo.continuum.io/miniconda/"
 
@@ -109,7 +109,7 @@ function main () {
     InstallMiniconda $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     UpdateConda $env:PYTHON
     AddChannel $env:PYTHON "http://conda.binstar.org/omnia"
-    CondaCreateEnv $env:PYTHON $env:PYTHON_VERSION $env:PYTHON_VERSION "setuptools nose numpy openmm openpyxl pip coverage"
+    InstallCondaPackages $env:PYTHON setuptools nose numpy openmm openpyxl pip coverage
 }
 
 main

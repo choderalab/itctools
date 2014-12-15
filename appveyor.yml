@@ -40,7 +40,7 @@ install:
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
   - tree %PYTHON% /f
   - conda install --yes setuptools nose numpy openpyxl pip coverage
-  - pip install behave pint
+  - pip install behave pint rednose
   - python setup.py install
 
 build: false

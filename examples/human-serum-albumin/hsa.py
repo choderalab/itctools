@@ -7,6 +7,7 @@ from itctools.itctools import ureg
 from itctools.procedures import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
 from itctools.materials import Solvent, Compound, SimpleSolution
 from itctools.labware import Labware, PipettingLocation
+import pprint
 
 # Define solvents.
 water = Solvent('water', density=0.9970479 * ureg.gram / ureg.milliliter)
@@ -24,7 +25,7 @@ naproxen = Compound('Naproxen', molecular_weight=230.3 * (ureg.gram / ureg.mole)
 #Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
 aspirin_ka = 547198.10 / ureg.molar  # http://omicsonline.org/2157-7544/2157-7544-2-107.pdf first site estimate
 naproxen_ka = 1.7 / (10 * ureg.micromolar)  # http://pubs.acs.org/doi/pdf/10.1021/jp062734p
-indoxylsulfate_ka =  9.1E5 / ureg.molar  # 10.1023/A:1011014629551
+indoxylsulfate_ka = 9.1E5 / ureg.molar  # 10.1023/A:1011014629551
 
 # Define troughs on the instrument
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
@@ -35,7 +36,7 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 
 # Define source solutions in the vial holder
 # TODO : Define solutions once prepared with the Quantos
-hsa_solution = SimpleSolution(compound=hsa, compound_mass= 13.8 * ureg.milligram, solvent=buffer, solvent_mass=0.5 * ureg.gram, location=PipettingLocation(
+hsa_solution = SimpleSolution(compound=hsa, compound_mass=13.8 * ureg.milligram, solvent=buffer, solvent_mass=0.5 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     1))
@@ -48,16 +49,6 @@ naproxen_sodium_solution = SimpleSolution(compound=naproxen_sodium, compound_mas
     source_plate.RackLabel,
     source_plate.RackType,
     3))
-
-# aspirin_solution = SimpleSolution(compound=aspirin, compound_mass=15 *ureg.milligram, solvent=buffer, solvent_mass= 15 * ureg.gram, location=PipettingLocation(
-#         source_plate.RackLabel,
-#         source_plate.RackType,
-#         4))
-#
-# naproxen_solution = SimpleSolution(compound=naproxen, compound_mass=15 *ureg.milligram, solvent=buffer, solvent_mass= 15 * ureg.gram, location=PipettingLocation(
-#         source_plate.RackLabel,
-#         source_plate.RackType,
-#         5)) # NOTE Need 0.31 mM for the experiment
 
 drugs = [indoxylsulfate, naproxen_sodium]
 drug_solutions = [indoxylsulfate_solution, naproxen_sodium_solution]
@@ -76,12 +67,12 @@ control_protocol = ITCProtocol(
 blank_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Chodera Load Cell Without Cleaning Cell After.setup',
-    itc_method='ChoderaHostGuest.inj',  #  TODO Define new protocol with more injections?
+    itc_method='ChoderaHostGuest.inj',  # TODO Define new protocol with more injections?
     analysis_method='Onesite')
 binding_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Plates Quick.setup',
-    itc_method='ChoderaHostGuest.inj',  #  TODO Define new protocol with more injections?
+    itc_method='ChoderaHostGuest.inj',  # TODO Define new protocol with more injections?
     analysis_method='Onesite')
 # Protocol for cleaning protocol
 cleaning_protocol = ITCProtocol(
@@ -144,7 +135,7 @@ for replicate in range(1):
             syringe_source=buffer_trough,
             cell_source=hsa_solution,
             protocol=control_protocol,
-            cell_concentration=0.040 * ureg.millimolar,
+            cell_concentration=0.045 * ureg.millimolar,
             buffer_source=buffer_trough))
 
 # drugs/HSA
@@ -160,7 +151,7 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
     # Scaling factors per replicate
     factors = list()
 
-    # Define host into guest experiments.
+    # Define drug to protein experiments.
     for replicate in range(1):
         name = '%s into HSA %d' % (drug.name, replicate + 1 )
         experiment = ITCHeuristicExperiment(
@@ -168,7 +159,7 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             syringe_source=drug_solution,
             cell_source=hsa_solution,
             protocol=binding_protocol,
-            cell_concentration=0.040 *
+            cell_concentration=0.045 *
             ureg.millimolar *
             cell_scaling,
             buffer_source=buffer_trough)
@@ -194,18 +185,20 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             cell_source=buffer_trough,
             protocol=blank_protocol,
             buffer_source=buffer_trough)
-        # rescale to match host into guest experiment concentrations.
+        # rescale to match drug to protein experiment concentrations.
         experiment.rescale(tfactor=factors[replicate])
         drug_buffer_experiments.append(experiment)
 
     # TODO, since we are changing drugs, we'd have to wash the syringe.
-    # Add buffer to guest experiment(s) to set
+    # Add drug to protein experiment(s) to set
     for drug_protein_experiment in drug_protein_experiments:
         itc_experiment_set.addExperiment(drug_protein_experiment)
+        pprint.pprint(drug_protein_experiment.__dict__)
 
-    # Add host to guest experiment(s) to set
+    # Add drug_to_buffer experiment(s) to set
     for drug_buffer_experiment in drug_buffer_experiments:
         itc_experiment_set.addExperiment(drug_buffer_experiment)
+        pprint.pprint(drug_buffer_experiment.__dict__)
 
 
 # Add cleaning experiment.

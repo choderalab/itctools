@@ -14,7 +14,7 @@ water = Solvent('water', density=0.9970479 * ureg.gram / ureg.milliliter)
 buffer = Solvent('buffer', density=1.014 * ureg.gram / ureg.milliliter) # TODO is our density the same as the HOST-GUEST buffer?
 
 # Define compounds.
-hsa = Compound('HumanSerumAlbumin', molecular_weight=65000 * (ureg.gram / ureg.mole), purity=.95)
+hsa = Compound('HumanSerumAlbumin', molecular_weight=66500 * (ureg.gram / ureg.mole), purity=.95)
 indoxylsulfate = Compound('Indoxylsulfate potassium', molecular_weight=251.30 * (ureg.gram / ureg.mole), purity=1.)
 naproxen_sodium = Compound('Naproxen Sodium', molecular_weight=252.24 * (ureg.gram / ureg.mole), purity=1.)
 
@@ -36,16 +36,16 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 
 # Define source solutions in the vial holder
 # TODO : Define solutions once prepared with the Quantos
-hsa_solution = SimpleSolution(compound=hsa, compound_mass=13.8 * ureg.milligram, solvent=buffer, solvent_mass=0.5 * ureg.gram, location=PipettingLocation(
+hsa_solution = SimpleSolution(compound=hsa, compound_mass=10.05014 * ureg.milligram, solvent=buffer, solvent_mass=3.4245 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
-    1))
-indoxylsulfate_solution = SimpleSolution(compound=indoxylsulfate, compound_mass=15 * ureg.milligram, solvent=buffer, solvent_mass=10 * ureg.gram, location=PipettingLocation(
+    1))  # 10, where we expected 15. Is it the quantos, the dialysis, or the HSA powder that is the problem?
+indoxylsulfate_solution = SimpleSolution(compound=indoxylsulfate, compound_mass=10.4 * ureg.milligram, solvent=buffer, solvent_mass=10.3894 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     2))
 
-naproxen_sodium_solution = SimpleSolution(compound=naproxen_sodium, compound_mass=15 * ureg.milligram, solvent=buffer, solvent_mass=10 * ureg.gram, location=PipettingLocation(
+naproxen_sodium_solution = SimpleSolution(compound=naproxen_sodium, compound_mass=25.245 * ureg.milligram, solvent=buffer, solvent_mass=10.0728 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     3))
@@ -67,7 +67,7 @@ control_protocol = ITCProtocol(
 blank_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Chodera Load Cell Without Cleaning Cell After.setup',
-    itc_method='ChoderaHostGuest.inj',  # TODO Define new protocol with more injections?
+    itc_method='ChoderaHSA.inj',  # TODO Define new protocol with more injections?
     analysis_method='Onesite')  # TODO better default analysis present?
 binding_protocol = ITCProtocol(
     '1:1 binding protocol',
@@ -79,7 +79,7 @@ binding_cleaning_protocol = ITCProtocol(
     'cleaning protocol',
     sample_prep_method='Plates Clean.setup',
     itc_method='Chodera_HSA.inj',
-    analysis_method='Control')
+    analysis_method='Onesite')
 
 # Define ITC Experiment.
 
@@ -157,7 +157,7 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             syringe_source=drug_solution,
             cell_source=hsa_solution,
             protocol=protocol,
-            cell_concentration=0.045 *
+            cell_concentration=0.040 *
             ureg.millimolar *
             cell_scaling,
             buffer_source=buffer_trough)

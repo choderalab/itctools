@@ -190,7 +190,7 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
     # Add drug_to_buffer experiment(s) to set
     for drug_buffer_experiment in drug_buffer_experiments:
         itc_experiment_set.addExperiment(drug_buffer_experiment)
-        pprint.pprint(drug_buffer_experiment.__dict__)
+        #pprint.pprint(drug_buffer_experiment.__dict__)
 
     # TODO, since we are changing drugs, we'd have to wash the syringe.
     # Add drug to protein experiment(s) to set
@@ -203,7 +203,7 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
 
 # Add cleaning experiment.
 name = 'final cleaning water titration'
-itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=control_protocol))
+itc_experiment_set.addExperiment(ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=control_protocol))
 
 # Check that the experiment can be carried out using available solutions
 # and plates.

@@ -6,3 +6,4 @@ openpyxl
 pip
 setuptools
 conda-build
+jinja2

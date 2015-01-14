@@ -5,3 +5,4 @@ numpy
 openpyxl
 pip
 setuptools
+conda-build

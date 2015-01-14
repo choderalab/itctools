@@ -94,7 +94,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
     ],
-    install_requires=['nose>=1.0', 'pint', 'rednose', 'behave', 'mock', 'coverage'],
+    install_requires=['nose>=1.0', 'pint', 'rednose', 'behave', 'mock', 'coverage', 'openpyxl'],
     setup_requires=['nose>=1.0', 'pint'],
     tests_require=['nose', 'behave', 'rednose', 'pint', 'mock', 'coverage']
 )

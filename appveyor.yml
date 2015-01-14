@@ -31,14 +31,15 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
-  - conda install --yes setuptools nose numpy openpyxl pip coverage mock
+  - conda config --add channels http://conda.binstar.org/omnia
+  - conda install --yes setuptools nose numpy openpyxl pip coverage mock conda-build jinja2
   - pip install behave pint rednose
   - python setup.py install
 
 build: false
 
 test_script:
-  - "%CMD_IN_ENV% conda build conda-recipe --quiet"
+  - "%CMD_IN_ENV% conda build devtools\\conda-recipe --quiet"
   
 on_success:
   # Could run coveralls here but will leave that to travis tests

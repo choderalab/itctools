@@ -20,11 +20,11 @@ else
     exit 1
 fi
 
-bash Miniconda_installer.sh -b
+bash Miniconda_installer.sh -b -p $HOME/miniconda
 PIP_ARGS="-U"
 export PATH=$HOME/miniconda/bin:$PATH
 conda update --yes conda
-conda install --file devtools/ci/travis/requirements-conda.txt
+conda install --yes --file devtools/ci/travis/requirements-conda.txt
 
 pip install -r devtools/ci/travis/requirements-pip.txt
 

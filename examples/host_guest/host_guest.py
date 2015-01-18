@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 """
-Script for generation of binary mixture ITC titrations.
+Script for generation of input files for host to guest ITC titrations.
 """
 from itctools.itctools import ureg, Quantity
 from itctools.procedures import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment

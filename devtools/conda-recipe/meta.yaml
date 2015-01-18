@@ -1,0 +1,41 @@
+package:
+  name: itctools
+  version: !!str
+
+build:
+  preserve_egg_dir: True
+  number: 0
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - numpy
+    - openpyxl
+    - pint
+
+  run: 
+    - python
+    - setuptools
+    - numpy
+    - openpyxl
+    - pint
+
+test:
+  requires:
+    - mock
+    - setuptools 
+    - coverage
+    - nose
+    - behave
+    - python-coveralls
+    - rednose
+  imports:
+    - itctools
+  commands:
+    - nosetests -vv
+    - behave
+
+about: 
+  home: https://github.com/choderalab/itctools
+

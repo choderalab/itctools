@@ -94,6 +94,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
     ],
-    setup_requires=['nose>=1.0'],
-    tests_require=['nose', 'behave', 'rednose']
+# Removed in favor of conda 
+#    setup_requires=['nose>=1.0'],
+#    tests_require=['nose', 'behave', 'rednose']
 )

@@ -24,7 +24,6 @@ requirements:
 test:
   requires:
     - mock
-    - setuptools 
     - coverage
     - nose
     - behave

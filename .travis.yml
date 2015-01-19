@@ -11,6 +11,9 @@ install:
 script:
   - conda config --add channels http://conda.binstar.org/omnia
   - conda build devtools/conda-recipe --quiet
+  - nosetests -v
+  - behave
+  
 env:
   matrix:
     - python=2.7  CONDA_PY=27

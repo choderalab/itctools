@@ -1,6 +1,6 @@
 package:
   name: itctools
-  version: !!str
+  version: 0.0.1 
 
 build:
   preserve_egg_dir: True

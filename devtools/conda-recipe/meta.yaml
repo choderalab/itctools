@@ -30,9 +30,6 @@ test:
     - python-coveralls
   imports:
     - itctools
-  commands:
-    - nosetests -vv
-    - behave
 
 about: 
   home: https://github.com/choderalab/itctools

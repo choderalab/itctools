@@ -28,7 +28,6 @@ test:
     - nose
     - behave
     - python-coveralls
-    - rednose
   imports:
     - itctools
   commands:

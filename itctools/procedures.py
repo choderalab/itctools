@@ -140,6 +140,9 @@ class ITCHeuristicExperiment(ITCExperiment):
 
         rm = compute_rm(c)
 
+        if rm < 1.0:
+            raise ValueError("Value of Rm should be greater than 1: %s" % rm)
+
         if not approx:
             # Use exact equation [X]_s = R_m * [M]_0 (1- exp(-mv/V0))^-1
             self.syringe_concentration = rm * self.cell_concentration * \

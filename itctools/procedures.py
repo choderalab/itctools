@@ -758,7 +758,8 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         self._autoitc_complete = False
         self._validated = False
 
-    def _worklist_line(self, operation, tipmask, labware, index, volume, worklist_script):
+    @staticmethod
+    def _worklist_line(operation, tipmask, labware, index, volume, worklist_script):
         """
         Write an aspirate or dispense operation to the worklist.
 

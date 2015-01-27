@@ -33,7 +33,8 @@ HeatOfMixingProtocol = ITCProtocol
 
 
 class ITCExperiment(object):
-
+    """ A single ITC experiment, containing all experimental parameters.
+    """
     def __init__(
             self,
             name,
@@ -113,6 +114,16 @@ class ITCExperiment(object):
 
 
 class ITCHeuristicExperiment(ITCExperiment):
+    """
+    A single ITC experiment, containing all experimental parameters.
+
+    Implements the heuristic equation from
+
+    Optimizing Experimental Parameters in Isothermal Titration Calorimetry
+    Joel Tellinghuisen
+    The Journal of Physical Chemistry B 2005 109 (42), 20027-20035
+
+    """
 
     def heuristic_syringe(self, Ka, m, v, V0, approx=False):
         """
@@ -133,11 +144,10 @@ class ITCHeuristicExperiment(ITCExperiment):
             else, use exact equation [X]_s = R_m * [M]_0 (1- exp(-mv/V0))^-1
 
         """
-
         # c = [M]_0 * Ka
         c = self.cell_concentration * Ka
-        # R_m = 6.4/c^0.2 + 13/c
 
+        # R_m = 6.4/c^0.2 + 13/c
         rm = compute_rm(c)
 
         if rm < 1.0:
@@ -504,7 +514,7 @@ class ITCExperimentSet(object):
             syringe_volume = 120.0  # microliters
             transfer_volume = cell_volume
 
-            if (experiment.syringe_dilution_factor is not None):
+            if experiment.syringe_dilution_factor is not None:
                 # Compute buffer volume needed.
                 buffer_volume = syringe_volume * (
                     1.0 - experiment.syringe_dilution_factor)
@@ -748,6 +758,43 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         self._autoitc_complete = False
         self._validated = False
 
+    def _worklist_line(self, operation, tipmask, labware, index, volume, worklist_script):
+        """
+        Write an "aspirate" operation to the worklist.
+
+        :param operation: Type of operation (A, D)
+        :type operation: str
+        :param tipmask: Dictionary containing the tip masks per solution
+        :type tipmask:  dict
+        :param labware: Target location that contains RackLabel, RackType and Position
+        :type labware: PipettingLocation
+        :param index: Index of the mixture component
+        :type index: int
+        :param volume: volume to be dispensed
+        :type volume: pint.Quantity
+        :param worklist_script: String containing the worklist
+        :type worklist_script:  str
+        :return: The worklist line
+        :rtype: str
+        """
+        assert operation in "AD"
+
+        # Aspire operation, look for the mixture component based on index and extract its location
+        if operation == "A":
+            location = labware.locations[index]
+        # Dispense operation, location is given
+        elif operation == "D":
+            location = labware
+
+        worklist_script += '%s;%s;;%s;%d;;%f;;;%d\r\n' % (operation,
+                                                          location.RackLabel,
+                                                          location.RackType,
+                                                          location.Position,
+                                                          volume[index],
+                                                          tipmask)
+
+        return worklist_script
+
     def populate_worklist(
             self,
             cell_volume=400.0 *
@@ -817,19 +864,12 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
             # Start mixing up our cell volume
             for i in range(len(experiment.cell_mixture.components)):
-                worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                    experiment.cell_mixture.locations[i].RackLabel, experiment.
-                    cell_mixture.locations[i].RackType, experiment.
-                    cell_mixture.locations[i].Position, cell_volumes[i],
-                    dictips[experiment.cell_mixture.components[i]])
+                worklist_script = self._worklist_line('A', dictips[experiment.cell_mixture.components[i]], experiment.cell_mixture, i, cell_volumes, worklist_script)
 
-                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
-                    tecandata.cell_destination.RackLabel, tecandata.
-                    cell_destination.RackType, tecandata.cell_destination.
-                    Position, cell_volumes[i],
-                    dictips[experiment.cell_mixture.components[i]])
+                worklist_script = self._worklist_line('D', dictips[experiment.cell_mixture.components[i]], tecandata.cell_destination, i, cell_volumes, worklist_script)
 
                 worklist_script += 'W;\r\n'  # queue wash tips
+
                 self._trackQuantities(
                     experiment.cell_mixture.components[i],
                     cell_volumes[i] *
@@ -844,20 +884,12 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
             # Start mixing up our syringe volume
             for i in range(len(experiment.syringe_mixture.components)):
-                worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                    experiment.syringe_mixture.locations[i].RackLabel,
-                    experiment.syringe_mixture.locations[i].RackType,
-                    experiment.syringe_mixture.locations[i].Position,
-                    syr_volumes[i],
-                    dictips[experiment.syringe_mixture.components[i]])
+                worklist_script = self._worklist_line('A', dictips[experiment.syringe_mixture.components[i]], experiment.syringe_mixture, i, syr_volumes, worklist_script)
 
-                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
-                    tecandata.syringe_destination.RackLabel, tecandata.
-                    syringe_destination.RackType, tecandata.
-                    syringe_destination.Position, syr_volumes[i],
-                    dictips[experiment.syringe_mixture.components[i]])
+                worklist_script = self._worklist_line('D', dictips[experiment.syringe_mixture.components[i]], tecandata.syringe_destination, i, syr_volumes, worklist_script)
 
                 worklist_script += 'W;\r\n'  # queue wash tips
+
                 self._trackQuantities(
                     experiment.syringe_mixture.components[i],
                     syr_volumes[i] *

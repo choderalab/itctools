@@ -19,5 +19,9 @@ def permutation_with_replacement(n, seq):
 
 @ureg.wraps(ureg.dimensionless, ureg.dimensionless, strict=False)
 def compute_rm(c):
+    """Calculate the ratio Rm of titrant to titrand.
+        c = [M]_0 * Ka
+        R_m = 6.4/c^0.2 + 13/c
+    """
     rm = 6.4 / numpy.power(c, 0.2) + 13 / c
     return rm

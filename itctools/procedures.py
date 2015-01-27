@@ -760,7 +760,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
     def _worklist_line(self, operation, tipmask, labware, index, volume, worklist_script):
         """
-        Write an "aspirate" operation to the worklist.
+        Write an aspirate or dispense operation to the worklist.
 
         :param operation: Type of operation (A, D)
         :type operation: str

@@ -1,5 +1,6 @@
 import itertools
 from pint import UnitRegistry
+import numpy
 
 ureg = UnitRegistry()
 Quantity = ureg.Quantity
@@ -16,3 +17,7 @@ def permutation_with_replacement(n, seq):
         options.append(p)
     return options
 
+@ureg.wraps(ureg.dimensionless, ureg.dimensionless, strict=False)
+def compute_rm(c):
+    rm = 6.4 / numpy.power(c, 0.2) + 13 / c
+    return rm

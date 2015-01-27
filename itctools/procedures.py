@@ -1,5 +1,5 @@
 import numpy
-from .itctools import ureg
+from .itctools import ureg, compute_rm
 import openpyxl  # Excel spreadsheet I/O (for Auto iTC-200)
 from openpyxl import Workbook
 from distutils.version import StrictVersion  # For version testing
@@ -136,9 +136,12 @@ class ITCHeuristicExperiment(ITCExperiment):
 
         # c = [M]_0 * Ka
         c = self.cell_concentration * Ka
-
         # R_m = 6.4/c^0.2 + 13/c
-        rm = 6.4 / numpy.power(c, 0.2) + 13 / c
+
+        rm = compute_rm(c)
+
+        if rm < 1.0:
+            raise ValueError("Value of Rm should be greater than 1: %s" % rm)
 
         if not approx:
             # Use exact equation [X]_s = R_m * [M]_0 (1- exp(-mv/V0))^-1
@@ -207,15 +210,13 @@ class ITCHeuristicExperiment(ITCExperiment):
             # syringe is scaled by same factor
             if self.syringe_concentration is not None:
                 self.syringe_concentration *= cfactor
-            #recompute dilution factor
+            # recompute dilution factor
             self.cell_dilution_factor = self.cell_concentration / self.cell_source.concentration
 
         except AttributeError as err:
             # Labware has no concentration (buffer)
             print("WARNING, cell cannot be rescaled. This may still be desired if cell is not buffer or water.")
             print("Full error details: \n %s" % err)
-
-
 
         # recompute dilution factor
         if self.syringe_concentration is not None:

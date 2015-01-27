@@ -4,7 +4,7 @@ from itctools import itctools as itc
 
 class TestPermutation(unittest.TestCase):
 
-    """Validation of the itctools submodule."""
+    """Validation of the itctools.permutation_without_replacement function."""
 
     def _check_uniques(self, n, seq):
         """A set can't hold multiple copies of the same value.
@@ -14,7 +14,7 @@ class TestPermutation(unittest.TestCase):
         self.assertEqual(len(compositions), len(set(compositions)))
 
     def test_permutation_with_replacement_uniques(self):
-        """Make sure that permutation_with_replacement only generates unique sequences (when given unique inputs)."""
+        """Ensure that permutation_with_replacement only generates unique sequences (when given unique inputs)."""
         seq = ['So test', 'Much robust', 'Very unit', 'Wow']
         for x in range(0, 7):
             self._check_uniques(x, seq)
@@ -27,19 +27,19 @@ class TestPermutation(unittest.TestCase):
             self.assertEqual(len(comp), n)
 
     def test_permutation_with_replacement_length(self):
-        """Make sure that permutation_with_replacement generates correct length."""
+        """Ensure that permutation_with_replacement generates correct length."""
         seq = ['Did', 'you', 'mean', '"dog"?']
         for x in range(0, 7):
             self._check_length(x, seq)
 
     def test_ureg(self):
-        """Make sure that the units are working"""
+        """Ensure that the units are working"""
         quantity = itc.Quantity(140.0, 'micromolar')
         self.assertAlmostEqual(quantity / itc.ureg.standard_concentration, 1.4E-4, places=7)
 
 
 class TestRm(unittest.TestCase):
-    """Validation of the Rm calculations"""
+    """Validation of t"""
 
     def test_Rm_over_1(self):
         """Ensure that Rm return values greater than 1 with strange pint units."""

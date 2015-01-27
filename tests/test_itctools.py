@@ -39,7 +39,7 @@ class TestPermutation(unittest.TestCase):
 
 
 class TestRm(unittest.TestCase):
-    """Validation of t"""
+    """Validation of the itctools.compute_rm function"""
 
     def test_Rm_over_1(self):
         """Ensure that Rm return values greater than 1 with strange pint units."""

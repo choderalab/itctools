@@ -2,7 +2,7 @@ import unittest
 from itctools import itctools as itc
 
 
-class TestITC(unittest.TestCase):
+class TestPermutation(unittest.TestCase):
 
     """Validation of the itctools submodule."""
 
@@ -36,6 +36,17 @@ class TestITC(unittest.TestCase):
         """Make sure that the units are working"""
         quantity = itc.Quantity(140.0, 'micromolar')
         self.assertAlmostEqual(quantity / itc.ureg.standard_concentration, 1.4E-4, places=7)
+
+
+class TestRm(unittest.TestCase):
+    """Validation of the Rm calculations"""
+
+    def test_Rm_over_1(self):
+        """Ensure that Rm return values greater than 1 with strange pint units."""
+        for value in [1000, 1000000., 5000000, 10000000]:
+            c = itc.ureg.Quantity(value, 'millimole/mole')
+            rm = itc.compute_rm(c)
+            self.assertGreaterEqual(itc.compute_rm(c), 1.0)
 
 if __name__ == '__main__':
     unittest.main()

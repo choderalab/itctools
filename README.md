@@ -7,9 +7,7 @@
 
 Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200.
 
-## New:
-
-Run `bash install.sh` to set up a new python environment using miniconda at ${HOME}/miniconda. It should take care of all dependencies.
+Run `bash devtools\ci\travis\install.sh` to set up a new python environment using miniconda at ${HOME}/miniconda. It should take care of all dependencies.
 
 To access the new python enviroment you can type
 ```shell
@@ -27,19 +25,19 @@ python setup.py install
 ```
 
 ## Requires
--
-`anaconda` or `miniconda` with `python` 2.7 or 3.3
-Using `conda`, install:
-`setuptools`
-`numpy`
-`openpyxl`
-`coverage`
-`pip` - to install further dependencies.
 
-Using `pip`, install:
-`pint`
-`behave`
-`coveralls`
+`anaconda` or `miniconda` with `python` 2.7 or 3.3  
+Using `conda`, install:  
+`setuptools`  
+`numpy`  
+`openpyxl`  
+`coverage`  
+`pip` - to install further dependencies.  
+
+Using `pip`, install: 
+`pint`  
+`behave`  
+`coveralls`  
 
 ## Contains
 

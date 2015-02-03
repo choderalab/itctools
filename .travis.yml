@@ -5,16 +5,15 @@ language: c
 #  - osx
 
 install:
-  - source install.sh
+  - source devtools/ci/travis/install.sh
   - export PYTHONUNBUFFERED=true
 
 script:
-  - export CC="gcc -std=c89"
-  - source deactivate
-  - source activate $python
-  - conda list -e
-  - nosetests
-  - behave 
+  - conda config --add channels http://conda.binstar.org/omnia
+  - conda build devtools/conda-recipe --quiet
+  - nosetests -v
+  - behave
+  
 env:
   matrix:
     - python=2.7  CONDA_PY=27

@@ -167,8 +167,8 @@ cleaning_protocol = ITCProtocol(
     sample_prep_method='Plates Clean.setup',
     itc_method='water5inj.inj',
     analysis_method='Control',
-    num_inj=10,
-    v_inj=Quantity('3 microliter'),
+    num_inj=5,
+    v_inj=Quantity('10 microliter'),
     v_cell=Quantity('202.8 microliter'),
 )
 

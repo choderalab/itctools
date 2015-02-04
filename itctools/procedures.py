@@ -9,7 +9,7 @@ from .labware import PipettingLocation
 
 class ITCProtocol(object):
 
-    def __init__(self, name, sample_prep_method, itc_method, analysis_method):
+    def __init__(self, name, sample_prep_method, itc_method, analysis_method, num_inj, v_inj, v_cell):
         """
         Parameters
         ----------
@@ -21,15 +21,32 @@ class ITCProtocol(object):
            The name of the 'ItcMethod' to be written to the Excel file for the Auto iTC-200.
         analysis_method : str
            The name of the 'AnalysisMethod' to be written to the Excel file for the Auto iTC-200.
+        num_inj : int
+           The number of injections in the protocol
+        v_inj : pint Quantity compatible with microliters
+           The volume of a single injection
+        v_cell : pint Quantity compatible with microliters
+           The volume of the cell
 
         """
         self.name = name
         self.sample_prep_method = sample_prep_method
         self.itc_method = itc_method
         self.analysis_method = analysis_method
+        self.num_inj = num_inj
+        self.v_inj = v_inj
+        self.v_cell = v_cell
+
+    def export_inj_file(self):
+        """Export the ITC protocol as an origin .inj protocol file"""
+        raise NotImplementedError("This feature is not currently supported")
+
+
 
 # In case these will diverge at some point, declare alias for Mixture usage.
 HeatOfMixingProtocol = ITCProtocol
+
+
 
 
 class ITCExperiment(object):
@@ -112,6 +129,14 @@ class ITCExperiment(object):
                     (str(cell_concentration), str(
                         cell_source.concentration)))
 
+    def simulate_experiment(self, plot=True):
+        """Perform a simulation of the experiment"""
+        raise NotImplementedError("Feature not yet implemented")
+
+    def _plot_simulation(self):
+        """Plot the heats from a simulated experiment"""
+        raise NotImplementedError("Feature not yet implemented")
+
 
 class ITCHeuristicExperiment(ITCExperiment):
     """
@@ -125,7 +150,7 @@ class ITCHeuristicExperiment(ITCExperiment):
 
     """
 
-    def heuristic_syringe(self, Ka, m, v, V0, approx=False):
+    def heuristic_syringe(self, Ka, approx=False):
         """
         Optimize syringe concentration using heuristic equation.
 
@@ -133,17 +158,16 @@ class ITCHeuristicExperiment(ITCExperiment):
         ----------
         Ka : pint Quantity with units compatible with liters/moles
             Association constant of titrant from titrand
-        m : int
-            Number of injections in the protocol
-        v : pint Quantity with units compatible with liter
-            Volume of single injection
-        v0 : pint Quantity with units compatible with liter
-            Volume of cell
+
         approx: bool
             Use approximate equation [X]_s = R_m * [M]0 V/(m*v) if True
             else, use exact equation [X]_s = R_m * [M]_0 (1- exp(-mv/V0))^-1
 
         """
+        m = self.protocol.num_inj
+        v = self.protocol.v_inj
+        V0 = self.protocol.v_cell
+
         # c = [M]_0 * Ka
         c = self.cell_concentration * Ka
 

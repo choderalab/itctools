@@ -12,11 +12,14 @@ from itctools.labware import Labware, PipettingLocation
 water = Solvent('water', density=0.9970479 * ureg.gram / ureg.milliliter)
 buffer = Solvent('buffer', density=1.014 * ureg.gram / ureg.milliliter)
 
+# The sample cell volume in microliters
+cell_volume = 202.8
+
 # Define compounds.
 
 nguests = 6  # overnight from 5pm till 9am
-# nguests = 14 # number of guest compounds
-# nguests = 7 # number of guest compounds # DEBUG (one source plate only)
+
+
 host = Compound('host', molecular_weight=1162.9632 * ureg.gram / ureg.mole, purity=0.7133)
 guest_molecular_weights = [
     209.12,
@@ -64,7 +67,6 @@ water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
 buffer_trough = Labware(RackLabel='Buffer', RackType='Trough 100ml')
 
 # Define source labware.
-#source_plate = Labware(RackLabel='SourcePlate', RackType='12WellVialHolder')
 source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 
 # Define source solutions on the deck.one
@@ -84,7 +86,6 @@ host_solution = SimpleSolution(
         1))
 guest_solutions = list()
 
-#guest_compound_masses = Quantity([2.145, 1.268, 1.576, 1.940, 1.919, 1.555, 1.391, 1.535, 1.679, 2.447, 1.514, 1.946, 1.781, 2.089], milligrams)
 guest_compound_masses = Quantity([2.190,
                                   2.115,
                                   1.595,
@@ -138,9 +139,9 @@ control_protocol = ITCProtocol(
     sample_prep_method='Plates Quick.setup',
     itc_method='ChoderaWaterWater.inj',
     analysis_method='Control',
-    num_inj=5,
-    v_inj=Quantity('10 microliter'),
-    v_cell = Quantity('202.8 microliter'),
+    experimental_conditions=dict(target_temperature=25, equilibration_time=60, stir_rate=1000, reference_power=5),
+    injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
+        10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
     )
 # Protocol for 1:1 binding analyis
 blank_protocol = ITCProtocol(
@@ -148,18 +149,18 @@ blank_protocol = ITCProtocol(
     sample_prep_method='Chodera Load Cell Without Cleaning Cell After.setup',
     itc_method='ChoderaHostGuest.inj',
     analysis_method='Onesite',
-    num_inj=10,
-    v_inj=Quantity('3 microliter'),
-    v_cell=Quantity('202.8 microliter'),
+    experimental_conditions=dict(target_temperature=25, equilibration_time=300, stir_rate=1000, reference_power=5),
+    injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
+        10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
     )
 binding_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Plates Quick.setup',
     itc_method='ChoderaHostGuest.inj',
     analysis_method='Onesite',
-    num_inj=10,
-    v_inj=Quantity('3 microliter'),
-    v_cell=Quantity('202.8 microliter'),
+    experimental_conditions=dict(target_temperature=25, equilibration_time=300, stir_rate=1000, reference_power=5),
+    injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
+        10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
     )
 # Protocol for cleaning protocol
 cleaning_protocol = ITCProtocol(
@@ -167,10 +168,9 @@ cleaning_protocol = ITCProtocol(
     sample_prep_method='Plates Clean.setup',
     itc_method='water5inj.inj',
     analysis_method='Control',
-    num_inj=5,
-    v_inj=Quantity('10 microliter'),
-    v_cell=Quantity('202.8 microliter'),
-)
+    experimental_conditions=dict(target_temperature=25, equilibration_time=60, stir_rate=1000, reference_power=5),
+    injections=5 * [dict(volume_inj=7.5, duration_inj=15, spacing=150, filter_period=5)],
+    )
 
 
 # Define ITC Experiment.
@@ -196,7 +196,8 @@ itc_experiment_set.addExperiment(
         name=name,
         syringe_source=water_trough,
         cell_source=water_trough,
-        protocol=cleaning_protocol))
+        protocol=cleaning_protocol,
+        cell_volume=cell_volume,))
 
 # Add water control titrations.
 for replicate in range(1):
@@ -206,7 +207,8 @@ for replicate in range(1):
             name=name,
             syringe_source=water_trough,
             cell_source=water_trough,
-            protocol=control_protocol))
+            protocol=control_protocol,
+            cell_volume=cell_volume,))
 
 # Add buffer control titrations.
 for replicate in range(1):
@@ -216,7 +218,8 @@ for replicate in range(1):
             name=name,
             syringe_source=buffer_trough,
             cell_source=buffer_trough,
-            protocol=control_protocol))
+            protocol=control_protocol,
+            cell_volume=cell_volume,))
 
 # Host into buffer.
 for replicate in range(1):
@@ -226,7 +229,8 @@ for replicate in range(1):
             name=name,
             syringe_source=host_solution,
             cell_source=buffer_trough,
-            protocol=binding_protocol))
+            protocol=binding_protocol,
+            cell_volume=cell_volume,))
 
 # Host/guests.
 # scale cell concentration to fix necessary syringe concentrations
@@ -248,6 +252,7 @@ for guest_index in range(nguests):
             syringe_source=host_solution,
             cell_source=guest_solutions[guest_index],
             protocol=binding_protocol,
+            cell_volume=cell_volume,
             cell_concentration=0.2 * (ureg.millimole / ureg.liter) * cell_scaling,
             buffer_source=buffer_trough)
         # optimize the syringe_concentration using heuristic equations and known binding constants
@@ -266,6 +271,7 @@ for guest_index in range(nguests):
             syringe_source=buffer_trough,
             cell_source=guest_solutions[guest_index],
             protocol=blank_protocol,
+            cell_volume=cell_volume,
             cell_concentration=0.2 *
             ureg.millimole /ureg.liter,
             buffer_source=buffer_trough)
@@ -295,7 +301,8 @@ for replicate in range(nfinal):
             name=name,
             syringe_source=water_trough,
             cell_source=water_trough,
-            protocol=control_protocol))
+            protocol=control_protocol,
+            cell_volume=cell_volume,))
 
 # Check that the experiment can be carried out using available solutions
 # and plates.

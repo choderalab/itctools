@@ -1,15 +1,17 @@
-import numpy
-from .itctools import ureg, compute_rm
-import openpyxl  # Excel spreadsheet I/O (for Auto iTC-200)
-from openpyxl import Workbook
 from distutils.version import StrictVersion  # For version testing
 from datetime import datetime
+import re
+import numpy
+import openpyxl  # Excel spreadsheet I/O (for Auto iTC-200)
+from openpyxl import Workbook
+
+from .itctools import ureg, compute_rm
 from .labware import PipettingLocation
 
 
 class ITCProtocol(object):
 
-    def __init__(self, name, sample_prep_method, itc_method, analysis_method, num_inj, v_inj, v_cell):
+    def __init__(self, name, sample_prep_method, itc_method, analysis_method, experimental_conditions, injections):
         """
         Parameters
         ----------
@@ -21,25 +23,75 @@ class ITCProtocol(object):
            The name of the 'ItcMethod' to be written to the Excel file for the Auto iTC-200.
         analysis_method : str
            The name of the 'AnalysisMethod' to be written to the Excel file for the Auto iTC-200.
-        num_inj : int
-           The number of injections in the protocol
-        v_inj : pint Quantity compatible with microliters
-           The volume of a single injection
-        v_cell : pint Quantity compatible with microliters
-           The volume of the cell
+        experimental_conditions : dict
+            Dictionary containing the experimental conditions
+                target_temperature : int in degrees celsius
+                equilibration_time : int in seconds
+                stir_rate : int in rpm
+                reference_power: int in microcalories / second
+        injections : list of dict
+            list of injections
+            With each injection : dict
+            volume_inj : float  in microliters
+                total volume to be injected
+            duration_inj : float in seconds
+                duration of the injection phase
+            spacing : int in seconds
+                time to the next injection
+            filter_period : float
+                typically 0.5
+
 
         """
-        self.name = name
+        # Input validation by type assertion
+        assert isinstance(name, str)
+        assert isinstance(sample_prep_method, str)
+        assert isinstance(itc_method, str)
+        assert isinstance(analysis_method, str)
+        assert isinstance(experimental_conditions, dict)
+        for exp_con in experimental_conditions.values():
+            assert isinstance(exp_con, int)
+        assert isinstance(injections, list)
+        for inj in injections:
+            assert isinstance(inj, dict)
+
+        # Strip extension from string if added by user
+        self.name = re.sub('\.inj$', '', name)
         self.sample_prep_method = sample_prep_method
         self.itc_method = itc_method
         self.analysis_method = analysis_method
-        self.num_inj = num_inj
-        self.v_inj = v_inj
-        self.v_cell = v_cell
+        self.experimental_conditions = experimental_conditions
+        self.injections = injections
+        self.num_inj = len(injections)
 
     def export_inj_file(self):
-        """Export the ITC protocol as an origin .inj protocol file"""
-        raise NotImplementedError("This feature is not currently supported")
+        """Export the ITC protocol as an origin .inj protocol file
+        """
+        header="""\
+        ITC
+        {num_inj}
+        NOT
+        {target_temperature}
+        {equilibration_time}
+        {stir_rate}
+        {reference_power}
+        2
+        False,True,True
+        """
+
+        injection_line = "{volume_inj,duration_inj,spacing,filter_period}"
+
+        with open(self.name + '.inj', 'w') as inj_file:
+            # Fill in the details
+            inj_file.write(header.format(self.__dict__))
+
+            for injection in self.injections:
+                inj_file.write(injection_line.format(injection))
+
+
+
+
+
 
 
 
@@ -58,9 +110,11 @@ class ITCExperiment(object):
             syringe_source,
             cell_source,
             protocol,
+            cell_volume,
             buffer_source=None,
             syringe_concentration=None,
-            cell_concentration=None):
+            cell_concentration=None,
+            ):
         """
         Parameters
         ----------
@@ -72,6 +126,8 @@ class ITCExperiment(object):
            Source for cell solution.
         protocol : ITCProtocol
            Protocol to be used for ITC experiment and analysis.
+        cell_volume : float
+           The volume of the sample cell in microliters
         buffer_source : Labware
            Source for buffer.
         syringe_concentration : pint Quantity with units compatible with moles/liter, optional, default=None
@@ -90,6 +146,7 @@ class ITCExperiment(object):
         self.syringe_source = syringe_source
         self.cell_source = cell_source
         self.protocol = protocol
+        self.cell_volume = cell_volume
 
         # Store data.
         self.buffer_source = buffer_source
@@ -129,8 +186,10 @@ class ITCExperiment(object):
                     (str(cell_concentration), str(
                         cell_source.concentration)))
 
-    def simulate_experiment(self, plot=True):
+    def simulate_experiment(self, Ka, plot=True):
         """Perform a simulation of the experiment"""
+
+
         raise NotImplementedError("Feature not yet implemented")
 
     def _plot_simulation(self):
@@ -150,26 +209,33 @@ class ITCHeuristicExperiment(ITCExperiment):
 
     """
 
-    def heuristic_syringe(self, Ka, approx=False):
+    def heuristic_syringe(self, association_constant, throw_away=1, approx=False):
         """
         Optimize syringe concentration using heuristic equation.
 
         Parameters
         ----------
-        Ka : pint Quantity with units compatible with liters/moles
+        association_constant : pint Quantity with units compatible with liters/moles
             Association constant of titrant from titrand
-
+        throw_away: int
+           Number of injections to consider as throw_away injections
         approx: bool
             Use approximate equation [X]_s = R_m * [M]0 V/(m*v) if True
             else, use exact equation [X]_s = R_m * [M]_0 (1- exp(-mv/V0))^-1
 
         """
+        assert isinstance(throw_away, int)
         m = self.protocol.num_inj
-        v = self.protocol.v_inj
-        V0 = self.protocol.v_cell
+        if throw_away:
+            injections = self.protocol.injections[throw_away:]
+        else:
+            injections = self.protocol.injections
+
+        v = sum(injection['volume_inj'] for injection in injections) / len(injections)
+        v0 = self.cell_volume
 
         # c = [M]_0 * Ka
-        c = self.cell_concentration * Ka
+        c = self.cell_concentration * association_constant
 
         # R_m = 6.4/c^0.2 + 13/c
         rm = compute_rm(c)
@@ -180,11 +246,11 @@ class ITCHeuristicExperiment(ITCExperiment):
         if not approx:
             # Use exact equation [X]_s = R_m * [M]_0 (1- exp(-mv/V0))^-1
             self.syringe_concentration = rm * self.cell_concentration * \
-                numpy.power(1 - (numpy.exp(-1 * m * v / V0)), -1)
+                numpy.power(1 - (numpy.exp(-1 * m * v / v0)), -1)
         else:
             # Use approximate equation [X]_s = R_m * [M]0 V/(m*v)
             self.syringe_concentration = rm * \
-                self.cell_concentration * V0 / (m * v)
+                self.cell_concentration * v0 / (m * v)
 
         # compute the dilution factors
         self.syringe_dilution_factor = numpy.float(

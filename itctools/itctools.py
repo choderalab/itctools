@@ -7,6 +7,7 @@ Quantity = ureg.Quantity
 ureg.define('molar = 1 * mole / liter = M')
 ureg.define('standard_concentration = 1 M')
 
+
 def permutation_with_replacement(n, seq):
     """
     Returns a list of all possible combinations of elements in seq, with length n.

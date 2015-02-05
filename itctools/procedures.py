@@ -62,12 +62,14 @@ class ITCProtocol(object):
         self.analysis_method = analysis_method
         self.experimental_conditions = experimental_conditions
         self.injections = injections
-        self.num_inj = len(injections)
+        self.experimental_conditions['num_inj'] = len(injections)
 
     def export_inj_file(self):
         """Export the ITC protocol as an origin .inj protocol file
         """
-        header="""\
+        import textwrap
+
+        header=textwrap.dedent("""\
         ITC
         {num_inj}
         NOT
@@ -77,16 +79,16 @@ class ITCProtocol(object):
         {reference_power}
         2
         False,True,True
-        """
+        """)
 
-        injection_line = "{volume_inj,duration_inj,spacing,filter_period}"
+        injection_line = "{volume_inj},{duration_inj},{spacing},{filter_period}"
 
         with open(self.name + '.inj', 'w') as inj_file:
             # Fill in the details
-            inj_file.write(header.format(self.__dict__))
+            inj_file.write(header.format(**self.experimental_conditions))
 
             for injection in self.injections:
-                inj_file.write(injection_line.format(injection))
+                inj_file.write(injection_line.format(**injection))
 
 
 
@@ -225,7 +227,7 @@ class ITCHeuristicExperiment(ITCExperiment):
 
         """
         assert isinstance(throw_away, int)
-        m = self.protocol.num_inj
+        m = self.protocol.experimental_conditions['num_inj']
         if throw_away:
             injections = self.protocol.injections[throw_away:]
         else:

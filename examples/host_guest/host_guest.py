@@ -135,7 +135,7 @@ for guest_index in range(nguests):
 # Protocol for 'control' titrations (water-water, buffer-buffer,
 # titrations into buffer, etc.)
 control_protocol = ITCProtocol(
-    'control protocol',
+    'control_protocol',
     sample_prep_method='Plates Quick.setup',
     itc_method='ChoderaWaterWater.inj',
     analysis_method='Control',
@@ -143,6 +143,7 @@ control_protocol = ITCProtocol(
     injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
         10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
     )
+control_protocol.export_inj_file()
 # Protocol for 1:1 binding analyis
 blank_protocol = ITCProtocol(
     '1:1 binding protocol',

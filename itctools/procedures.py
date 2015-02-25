@@ -4,6 +4,7 @@ import re
 import numpy
 import openpyxl  # Excel spreadsheet I/O (for Auto iTC-200)
 from openpyxl import Workbook
+import logging
 
 from .itctools import ureg, Quantity, compute_rm
 from .labware import PipettingLocation
@@ -200,7 +201,8 @@ class ITCExperiment(object):
         from scipy.optimize import minimize_scalar
 
         def _guess_concentration(complex_estimate, total_M, total_L, Ka):
-            return Ka - ((complex_estimate) / ((total_M - complex_estimate) * (total_L - complex_estimate)))
+            Ka_estimate = ((complex_estimate) / ((total_M - complex_estimate) * (total_L - complex_estimate)))
+            return abs(Ka - Ka_estimate)
 
         bounds = tuple([0, min([total_L, total_M])])
 
@@ -211,7 +213,7 @@ class ITCExperiment(object):
 
         return result.x
 
-    def simulate(self, Ka, plot=True, plot_complex=True, macromol_titrant=False, filename=''):
+    def simulate(self, Ka, plot=True, plot_complex=True, macromol_titrant=False, logscale=False, filename=''):
         """Perform a simulation of the experiment"""
 
         ninj = self.protocol.experimental_conditions['num_inj']
@@ -253,7 +255,7 @@ class ITCExperiment(object):
             ligand_ratios[index], macro_ratios[index] = [complex_conc/ (lig_conc - complex_conc) , complex_conc / (macromol_conc - complex_conc)]
 
         if plot and plot_complex:
-            self._plot_simulation(molar_ratios, list(zip(ligand_ratios, macro_ratios)), filename=filename)
+            self._plot_simulation(molar_ratios, list(zip(ligand_ratios, macro_ratios)), logscale=logscale, filename=filename)
         elif plot:
             self._plot_simulation(molar_ratios, filename=filename)
 
@@ -261,7 +263,7 @@ class ITCExperiment(object):
 
 
 
-    def _plot_simulation(self, molar_ratios, complex_ratios=None, filename=''):
+    def _plot_simulation(self, molar_ratios, complex_ratios=None, logscale=False, filename=''):
         """Plot the heats from a simulated experiment"""
 
         import matplotlib.pyplot as plt
@@ -274,30 +276,38 @@ class ITCExperiment(object):
 
 
         fig = plt.figure()
-        ax1 = plt.subplot(111)
-
+        axtotal = plt.subplot(111)
 
         graphs = list()
+        axcomplex = axtotal.twinx()
+        graphs.append(axtotal.plot(range(len(molar_ratios)), [ratio.to('dimensionless') for ratio in molar_ratios],
+                                   label='Total Macromolecule/Ligand ratio', c='dimgray'))
+
+        axtotal.set_ylabel('Ratio of Totals')
+
         if complex_ratios is not None:
             ligand_ratios, macromol_ratios = list(zip(*complex_ratios))
-            graphs.append(ax1.plot(range(len(complex_ratios)), [ ratio.to('dimensionless') for ratio in ligand_ratios], label='Complex/Ligand ratio', c='r'))
-            graphs.append(ax1.plot(range(len(complex_ratios)), [ratio.to('dimensionless') for ratio in macromol_ratios],
-                     label='Complex/ Macromolecule ratio', c='b'))
 
-        ax2 = ax1.twinx()
-        graphs.append(ax2.plot(range(len(molar_ratios)), [ratio.to('dimensionless') for ratio in molar_ratios],
-                 label='Total Macromolecule/Ligand ratio', c='k'))
+            #Plot complex / free ligand ratio per inj
+            graphs.append(axcomplex.plot(range(len(complex_ratios)),
+                          [ratio.to('dimensionless') for ratio in ligand_ratios],
+                          label='Complex/Ligand ratio', c='crimson'))
 
+            # Plot complex / free macromolecule ratio per inj
+            graphs.append(axcomplex.plot(range(len(complex_ratios)),
+                          [ratio.to('dimensionless') for ratio in macromol_ratios],
+                          label='Complex/Macromolecule ratio', c='lightskyblue'))
+
+            axcomplex.set_xlabel('Injection')
+            axcomplex.set_ylabel('Complex/Free ratio')
+            if logscale:
+                axcomplex.set_yscale('log')
         # flatten graphs
         graphs = [item for sublist in graphs for item in sublist]
-
         plotlabels = [g.get_label() for g in graphs]
-        ax1.set_ylabel('Complex/Free ratio')
-        ax1.set_yscale('log')
-        ax2.set_ylabel('Ratio of Totals')
-        ax1.set_xlabel('Injection')
 
-        ax1.legend(graphs,plotlabels, loc=0)
+        axtotal.legend(graphs,plotlabels, loc=0)
+
         if filename:
             plt.savefig(filename, dpi=300)
         else:
@@ -332,8 +342,13 @@ class ITCHeuristicExperiment(ITCExperiment):
             Use approximate equation [X]_s = R_m * [M]0 V/(m*v) if True
             else, use exact equation [X]_s = R_m * [M]_0 (1- exp(-mv/V0))^-1
 
+        Reference
+        ---------
+        http://dx.doi.org/10.1016/j.ab.2011.03.024
         """
         assert isinstance(throw_away, int)
+        assert throw_away >= 0
+
         m = self.protocol.experimental_conditions['num_inj']
         if throw_away:
             injections = self.protocol.injections[throw_away:]
@@ -349,8 +364,11 @@ class ITCHeuristicExperiment(ITCExperiment):
         # R_m = 6.4/c^0.2 + 13/c
         rm = compute_rm(c)
 
-        if rm < 1.0 and strict:
+        if strict and rm < 1.1:
             raise ValueError("Value of Rm should be greater than 1: %s" % rm)
+        elif (not strict) and rm < 1.1:
+            logging.warning("High affinity or high cell concentration: Rm = %f. Using 1.1." % rm)
+            rm = 1.1
 
         if not approx:
             # Use exact equation [X]_s = R_m * [M]_0 (1- exp(-mv/V0))^-1

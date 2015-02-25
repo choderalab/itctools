@@ -17,7 +17,8 @@ cell_volume = 202.8
 
 # Define compounds.
 
-nguests = 8  # overnight from 5pm till 9am
+# each experiment takes about 50 mins, cleaning takes 2.5
+nguests = 14
 
 
 host = Compound('host', molecular_weight=1162.9632 * ureg.gram / ureg.mole, purity=0.7133)
@@ -96,6 +97,12 @@ guest_compound_masses = Quantity([2.210,
                                   1.635,
                                   1.700,
                                   1.640,
+                                  1.725,
+                                  2.480,
+                                  1.560,
+                                  2.080,
+                                  1.875,
+                                  2.195,
                                  ],
                                  ureg.milligram)
 # Dispensed by quantos
@@ -107,8 +114,15 @@ guest_solvent_masses = Quantity([11.0478,
                                  10.8984,
                                  13.0758,
                                  10.9321,
+                                 10.7799,
+                                 10.7802,
+                                 11.1413,
+                                 11.5536,
+                                 11.0276,
+                                 10.9729,
                                 ],
                                 ureg.gram)
+
 
 for guest_index in range(nguests):
     guest_solutions.append(
@@ -135,7 +149,7 @@ control_protocol = ITCProtocol(
     injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
         10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
     )
-control_protocol.export_inj_file()
+
 # Protocol for 1:1 binding analyis
 blank_protocol = ITCProtocol(
     '1:1 binding protocol',
@@ -228,6 +242,7 @@ for replicate in range(1):
 # Host/guests.
 # scale cell concentration to fix necessary syringe concentrations
 cell_scaling = 1.
+cell_concentration = 0.3 * ureg.millimole / ureg.liter * cell_scaling
 optimal_rm = list()
 
 for guest_index in range(nguests):
@@ -247,7 +262,7 @@ for guest_index in range(nguests):
             cell_source=guest_solutions[guest_index],
             protocol=binding_protocol,
             cell_volume=cell_volume,
-            cell_concentration=0.3 * (ureg.millimole / ureg.liter) * cell_scaling,
+            cell_concentration=cell_concentration,
             buffer_source=buffer_trough)
         # optimize the syringe_concentration using heuristic equations and known binding constants
         optimal_rm.append(experiment.heuristic_syringe(
@@ -266,8 +281,7 @@ for guest_index in range(nguests):
             cell_source=guest_solutions[guest_index],
             protocol=blank_protocol,
             cell_volume=cell_volume,
-            cell_concentration=0.3 *
-            ureg.millimole /ureg.liter,
+            cell_concentration=cell_concentration,
             buffer_source=buffer_trough)
         # rescale to match host into guest experiment concentrations.
         experiment.rescale(tfactor=factors[replicate])

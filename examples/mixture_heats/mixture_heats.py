@@ -7,7 +7,7 @@ from itctools.procedures import HeatOfMixingProtocol, HeatOfMixingExperimentSet,
 from itctools.materials import Compound, Solvent, SimpleSolution, PureLiquid, SimpleMixture
 from itctools.labware import Labware, PipettingLocation
 from itctools.itctools import permutation_with_replacement as perm
-from itctools.itctools import ureg
+from itctools.itctools import ureg, Quantity
 
 
 # TODO command line specification of density and name
@@ -132,22 +132,35 @@ control_protocol = HeatOfMixingProtocol(
     'control protocol',
     sample_prep_method='Plates Quick.setup',
     itc_method='ChoderaWaterWater.inj',
-    analysis_method='Control')
+    analysis_method='Control',
+    num_inj=5,
+    v_inj=Quantity('10 microliter'),
+    v_cell=Quantity('202.8 microliter'),
+    )
 
 # Protocol for a titration with increasing mole fraction
 # TODO Define the mixing protocol at the ITC machine
+# TODO protocol may not match what is set up in te machine
 mixing_protocol = HeatOfMixingProtocol(
     'mixture protocol',
     sample_prep_method='Plates Quick.setup',
     itc_method='ChoderaHeatofMixing.inj',
-    analysis_method='Control')
+    analysis_method='Control',
+    num_inj=5,
+    v_inj=Quantity('10 microliter'),
+    v_cell=Quantity('202.8 microliter'),
+    )
 
 # Protocol for cleaning protocol
 cleaning_protocol = HeatOfMixingProtocol(
     'cleaning protocol',
     sample_prep_method='Plates Clean.setup',
     itc_method='water5inj.inj',
-    analysis_method='Control')
+    analysis_method='Control',
+    num_inj=5,
+    v_inj=Quantity('10 microliter'),
+    v_cell=Quantity('202.8 microliter'),
+    )
 
 # Define the experiment set.
 mixing_experiment_set = HeatOfMixingExperimentSet(

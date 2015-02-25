@@ -5,3 +5,5 @@ numpy
 openpyxl
 pip
 setuptools
+matplotlib
+seaborn

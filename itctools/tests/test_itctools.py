@@ -46,6 +46,7 @@ class TestRm(unittest.TestCase):
         for value in [1000, 1000000., 5000000, 10000000]:
             c = itc.ureg.Quantity(value, 'millimole/mole')
             rm = itc.compute_rm(c)
+            # if this fails, we are using weird "milli" units again
             self.assertGreaterEqual(itc.compute_rm(c), 1.0)
 
 if __name__ == '__main__':

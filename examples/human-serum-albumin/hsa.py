@@ -3,7 +3,7 @@
 Script for generation of input files for Aspirin and Naproxen binding to HSA by ITC.
 """
 
-from itctools.itctools import ureg
+from itctools.itctools import ureg, Quantity
 from itctools.procedures import ITCProtocol, ITCExperimentSet, ITCExperiment, ITCHeuristicExperiment
 from itctools.materials import Solvent, Compound, SimpleSolution
 from itctools.labware import Labware, PipettingLocation
@@ -62,24 +62,42 @@ control_protocol = ITCProtocol(
     'control protocol',
     sample_prep_method='Plates Quick.setup',
     itc_method='ChoderaWaterWater.inj',
-    analysis_method='Control')
+    analysis_method='Control',
+    num_inj=5,
+    v_inj=Quantity('10 microliter'),
+    v_cell = Quantity('202.8 microliter'),
+    )
 # Protocol for 1:1 binding analyis
 blank_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Chodera Load Cell Without Cleaning Cell After.setup',
     itc_method='ChoderaHostGuest.inj',  # TODO Define new protocol with more injections?
-    analysis_method='Onesite')
+    analysis_method='Onesite',
+    num_inj=10,
+    v_inj=Quantity('3 microliter'),
+    v_cell=Quantity('202.8 microliter'),
+)
+
 binding_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Plates Quick.setup',
     itc_method='ChoderaHostGuest.inj',  # TODO Define new protocol with more injections?
-    analysis_method='Onesite')
+    analysis_method='Onesite',
+    num_inj=10,
+    v_inj=Quantity('3 microliter'),
+    v_cell=Quantity('202.8 microliter'),
+)
+
 # Protocol for cleaning protocol
 cleaning_protocol = ITCProtocol(
     'cleaning protocol',
     sample_prep_method='Plates Clean.setup',
     itc_method='water5inj.inj',
-    analysis_method='Control')
+    analysis_method='Control',
+    num_inj=5,
+    v_inj=Quantity('10 microliter'),
+    v_cell=Quantity('202.8 microliter'),
+    )
 
 # Define ITC Experiment.
 
@@ -165,13 +183,7 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             buffer_source=buffer_trough)
         # optimize the syringe_concentration using heuristic equations and known binding constants
         # TODO extract m, v and V0 from protocol somehow?
-        experiment.heuristic_syringe(
-            drug_ka,
-            10,
-            3. *
-            ureg.microliter,
-            202.8 *
-            ureg.microliter)
+        experiment.heuristic_syringe(drug_ka, 10)
         # rescale if syringe > stock. Store factor.
         factors.append(experiment.rescale())
         drug_protein_experiments.append(experiment)

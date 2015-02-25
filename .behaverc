@@ -1,2 +1,2 @@
 [behave]
-paths=tests/behave/features
+paths=itctools/tests/behave/features

@@ -4,6 +4,11 @@ language: c
 #  - linux
 #  - osx
 
+before_install:
+  # Fix plotting scripts
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
 install:
   - source install.sh
   - export PYTHONUNBUFFERED=true
@@ -14,7 +19,7 @@ script:
   - source activate $python
   - conda list -e
   - nosetests
-  - behave 
+  - behave --tags ~@skip  # Everything without the tag @skip
 env:
   matrix:
     - python=2.7  CONDA_PY=27

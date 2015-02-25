@@ -324,7 +324,7 @@ actual_Rm = list()
 for experiment in itc_experiment_set.experiments:
     try:
         total_dilution_factor = 1.0
-        for index, injection in enumerate(experiment.protocol.injections):
+        for index, injection in enumerate(experiment.protocol.injections[1:]):
             total_dilution_factor *= 1 - (injection['volume_inj'] / experiment.cell_volume)
 
         # Using the perfusion model from http://dx.doi.org/10.1021/jp053550y
@@ -333,7 +333,7 @@ for experiment in itc_experiment_set.experiments:
         # [X]0,i = [X]0*(1-d^i)
         titrant_concentration = experiment.syringe_concentration * (1 - total_dilution_factor)
 
-        Rm = titrand_concentration.to('mole per liter')/titrant_concentration.to('mole per liter')
+        Rm = titrant_concentration.to('mole per liter')/ titrand_concentration.to('mole per liter')
         actual_Rm.append(Rm)
 
     except (AttributeError, TypeError):

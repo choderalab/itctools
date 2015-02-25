@@ -7,6 +7,7 @@ Feature: Heat of mixing experiments
   The current version uses DMSO and water as examples, but is known not to produce good results
   Reasons for this are the large heats generated because of the large mismatch in concentrations
 
+  @skip
   Scenario: Running the script
     Given that the script is in the directory "examples/mixture_heats"
       And the module "itctools" is installed

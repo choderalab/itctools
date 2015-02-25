@@ -5,7 +5,7 @@ import numpy
 import openpyxl  # Excel spreadsheet I/O (for Auto iTC-200)
 from openpyxl import Workbook
 
-from .itctools import ureg, compute_rm
+from .itctools import ureg, Quantity, compute_rm
 from .labware import PipettingLocation
 
 
@@ -66,6 +66,9 @@ class ITCProtocol(object):
 
     def export_inj_file(self):
         """Export the ITC protocol as an origin .inj protocol file
+
+        Note:
+        The file format supports some extra options, which currently aren't supported in this library.
         """
         import textwrap
 
@@ -81,7 +84,7 @@ class ITCProtocol(object):
         False,True,True
         """)
 
-        injection_line = "{volume_inj},{duration_inj},{spacing},{filter_period}"
+        injection_line = "{volume_inj},{duration_inj},{spacing},{filter_period}\n"
 
         with open(self.name + '.inj', 'w') as inj_file:
             # Fill in the details
@@ -91,16 +94,8 @@ class ITCProtocol(object):
                 inj_file.write(injection_line.format(**injection))
 
 
-
-
-
-
-
-
 # In case these will diverge at some point, declare alias for Mixture usage.
 HeatOfMixingProtocol = ITCProtocol
-
-
 
 
 class ITCExperiment(object):
@@ -188,15 +183,121 @@ class ITCExperiment(object):
                     (str(cell_concentration), str(
                         cell_source.concentration)))
 
-    def simulate_experiment(self, Ka, plot=True):
+    @staticmethod
+    @ureg.wraps(ret=ureg.millimole / ureg.liter, args=[ureg.liter/ureg.millimole, ureg.millimole/ureg.liter, ureg.millimole/ureg.liter, None])
+    def _complex_concentration(Ka, total_M, total_L, bound_guess=0.5):
+        """
+        Compute the equilibrium concentrations of each complex species for N ligands competitively binding to a receptor.
+        ARGUMENTS
+        Ka Quantity - Ka is the association constant for receptor and ligand species n (1/M)
+        M - the concentration of the macromolecule
+        L - the concentration of ligand
+        bound_guess - guess for the initial bound fraction
+
+        Returns
+        concentration of the complex
+        """
+        from scipy.optimize import minimize_scalar
+
+        def _guess_concentration(complex_estimate, total_M, total_L, Ka):
+            return Ka - ((complex_estimate) / ((total_M - complex_estimate) * (total_L - complex_estimate)))
+
+        bounds = tuple([0, min([total_L, total_M])])
+
+        result = minimize_scalar(_guess_concentration, bounds=bounds, args=tuple([total_M, total_L, Ka]), method='Bounded', options=dict(disp=True))
+
+        if not result.success:
+            raise RuntimeError("Failed to converge equilibrium concentration.")
+
+        return result.x
+
+    def simulate(self, Ka, plot=True, plot_complex=True, macromol_titrant=False, filename=''):
         """Perform a simulation of the experiment"""
 
+        ninj = self.protocol.experimental_conditions['num_inj']
+        molar_ratios = Quantity(numpy.zeros(ninj), 'dimensionless')
+        ligand_ratios = Quantity(numpy.zeros(ninj), 'dimensionless')
+        macro_ratios = Quantity(numpy.zeros(ninj), 'dimensionless')
+        complex_concentrations = Quantity(numpy.zeros(ninj), 'millimole / liter')
 
-        raise NotImplementedError("Feature not yet implemented")
+        macromolecule_concentrations = Quantity(numpy.zeros(ninj), 'millimole / liter')
+        titrant_concentration = Quantity('0.0 mole / liter')
+        titrand_concentration = self.cell_concentration
 
-    def _plot_simulation(self):
+
+        # Calculate the new concentrations after each injection and store the ratios
+        for index, injection in enumerate(self.protocol.injections):
+
+            titrand_amount = titrand_concentration * self.cell_volume
+            titrant_amount = titrant_concentration * self.cell_volume + self.syringe_concentration * injection['volume_inj']
+            new_volume = self.cell_volume + injection['volume_inj']
+
+            # instantaneous mixing assumed, part of both wasted with each injection
+            titrant_concentration = titrant_amount / new_volume
+            titrand_concentration = titrand_amount / new_volume
+
+            # If the macromolecule is actually the titrant or not.
+            if macromol_titrant:
+                macromol_conc = titrant_concentration
+                lig_conc = titrand_concentration
+            else:
+                macromol_conc = titrand_concentration
+                lig_conc = titrant_concentration
+
+            ratio = macromol_conc / lig_conc
+
+            molar_ratios[index]= ratio
+            complex_conc = self._complex_concentration(Ka,macromol_conc, lig_conc)
+            complex_concentrations[index] = complex_conc
+            macromolecule_concentrations[index] = macromol_conc - complex_conc
+            ligand_ratios[index], macro_ratios[index] = [complex_conc/ (lig_conc - complex_conc) , complex_conc / (macromol_conc - complex_conc)]
+
+        if plot and plot_complex:
+            self._plot_simulation(molar_ratios, zip(ligand_ratios, macro_ratios), filename=filename)
+        elif plot:
+            self._plot_simulation(molar_ratios, filename=filename)
+
+        return molar_ratios
+
+
+
+    def _plot_simulation(self, molar_ratios, complex_ratios=None, filename=''):
         """Plot the heats from a simulated experiment"""
-        raise NotImplementedError("Feature not yet implemented")
+
+        import matplotlib.pyplot as plt
+        import seaborn
+
+        fig = plt.figure()
+        ax1 = plt.subplot(111)
+
+
+        graphs = list()
+        if complex_ratios is not None:
+            ligand_ratios, macromol_ratios = zip(*complex_ratios)
+            graphs.append(ax1.plot(range(len(complex_ratios)), [ ratio.to('dimensionless') for ratio in ligand_ratios], label='Complex/Ligand ratio', c='r'))
+            graphs.append(ax1.plot(range(len(complex_ratios)), [ratio.to('dimensionless') for ratio in macromol_ratios],
+                     label='Complex/ Macromolecule ratio', c='b'))
+
+        ax2 = ax1.twinx()
+        graphs.append(ax2.plot(range(len(molar_ratios)), [ratio.to('dimensionless') for ratio in molar_ratios],
+                 label='Total Macromolecule/Ligand ratio', c='k'))
+
+        # flatten graphs
+        graphs = [item for sublist in graphs for item in sublist]
+
+        plotlabels = [g.get_label() for g in graphs]
+        ax1.set_ylabel('Complex/Free ratio')
+        ax1.set_yscale('log')
+        ax2.set_ylabel('Ratio of Totals')
+        ax1.set_xlabel('Injection')
+
+        ax1.legend(graphs,plotlabels, loc=0)
+        if filename:
+            plt.savefig(filename, dpi=300)
+        else:
+            plt.show()
+
+        plt.close()
 
 
 class ITCHeuristicExperiment(ITCExperiment):
@@ -211,7 +312,7 @@ class ITCHeuristicExperiment(ITCExperiment):
 
     """
 
-    def heuristic_syringe(self, association_constant, throw_away=1, approx=False):
+    def heuristic_syringe(self, association_constant, throw_away=1, approx=False, strict=True):
         """
         Optimize syringe concentration using heuristic equation.
 
@@ -242,7 +343,7 @@ class ITCHeuristicExperiment(ITCExperiment):
         # R_m = 6.4/c^0.2 + 13/c
         rm = compute_rm(c)
 
-        if rm < 1.0:
+        if rm < 1.0 and strict:
             raise ValueError("Value of Rm should be greater than 1: %s" % rm)
 
         if not approx:
@@ -258,6 +359,8 @@ class ITCHeuristicExperiment(ITCExperiment):
         self.syringe_dilution_factor = numpy.float(
             self.syringe_concentration /
             self.syringe_source.concentration)
+
+        return rm
 
     def rescale(self, sfactor=None, cfactor=None, tfactor=None):
         """Rescale the concentrations while keeping same ratios, adjust in case they are larger than the source.

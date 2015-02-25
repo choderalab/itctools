@@ -14,7 +14,7 @@ script:
   - source activate $python
   - conda list -e
   - nosetests
-  - behave 
+  - behave --tags ~@skip  # Everything without the tag @skip 
 env:
   matrix:
     - python=2.7  CONDA_PY=27

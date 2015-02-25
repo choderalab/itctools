@@ -17,7 +17,7 @@ cell_volume = 202.8
 
 # Define compounds.
 
-nguests = 6  # overnight from 5pm till 9am
+nguests = 8  # overnight from 5pm till 9am
 
 
 host = Compound('host', molecular_weight=1162.9632 * ureg.gram / ureg.mole, purity=0.7133)
@@ -73,12 +73,13 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 # TODO : Use actual compound and solvent masses.
 # NOTE: Host solution is diluted by 10x.
 
+
 host_solution = SimpleSolution(
     compound=host,
-    compound_mass=16.76 *
+    compound_mass=33.490 *
     ureg.milligram,
     solvent=buffer,
-    solvent_mass=10.2628 *
+    solvent_mass=10.1151 *
     ureg.gram,
     location=PipettingLocation(
         source_plate.RackLabel,
@@ -86,37 +87,28 @@ host_solution = SimpleSolution(
         1))
 guest_solutions = list()
 
-guest_compound_masses = Quantity([2.190,
-                                  2.115,
-                                  1.595,
-                                  1.930,
-                                  2.160,
-                                  1.580,
-                                  1.610,
-                                  1.660,
-                                  1.520,
-                                  2.750,
-                                  2.07,
-                                  1.98,
-                                  1.80,
-                                  2.22],
+# Dispensed by quantos
+guest_compound_masses = Quantity([2.210,
+                                  1.400,
+                                  1.705,
+                                  1.945,
+                                  1.975,
+                                  1.635,
+                                  1.700,
+                                  1.640,
+                                 ],
                                  ureg.milligram)
-guest_solvent_masses = Quantity([10.2082,
-                                 16.7849,
-                                 10.1190,
-                                 9.9465,
-                                 11.2541,
-                                 10.1593,
-                                 11.5725,
-                                 10.8128,
-                                 9.0517,
-                                 11.2354,
-                                 13.6704,
-                                 10.1732,
-                                 10.1047,
-                                 10.6252],
+# Dispensed by quantos
+guest_solvent_masses = Quantity([11.0478,
+                                 11.6656,
+                                 11.3653,
+                                 10.8034,
+                                 10.9705,
+                                 10.8984,
+                                 13.0758,
+                                 10.9321,
+                                ],
                                 ureg.gram)
-
 
 for guest_index in range(nguests):
     guest_solutions.append(
@@ -236,6 +228,8 @@ for replicate in range(1):
 # Host/guests.
 # scale cell concentration to fix necessary syringe concentrations
 cell_scaling = 1.
+optimal_rm = list()
+
 for guest_index in range(nguests):
 
     # We need to store the experiments before adding them to the set
@@ -244,7 +238,6 @@ for guest_index in range(nguests):
 
     # Scaling factors per replicate
     factors = list()
-
     # Define host into guest experiments.
     for replicate in range(1):
         name = 'host into %s' % guests[guest_index].name
@@ -254,12 +247,12 @@ for guest_index in range(nguests):
             cell_source=guest_solutions[guest_index],
             protocol=binding_protocol,
             cell_volume=cell_volume,
-            cell_concentration=0.2 * (ureg.millimole / ureg.liter) * cell_scaling,
+            cell_concentration=0.3 * (ureg.millimole / ureg.liter) * cell_scaling,
             buffer_source=buffer_trough)
         # optimize the syringe_concentration using heuristic equations and known binding constants
-        experiment.heuristic_syringe(
+        optimal_rm.append(experiment.heuristic_syringe(
             guest_compound_Ka[guest_index],
-            )
+            strict=False))
         # rescale if syringe > stock. Store factor.
         factors.append(experiment.rescale())
         host_guest_experiments.append(experiment)
@@ -273,7 +266,7 @@ for guest_index in range(nguests):
             cell_source=guest_solutions[guest_index],
             protocol=blank_protocol,
             cell_volume=cell_volume,
-            cell_concentration=0.2 *
+            cell_concentration=0.3 *
             ureg.millimole /ureg.liter,
             buffer_source=buffer_trough)
         # rescale to match host into guest experiment concentrations.
@@ -287,6 +280,8 @@ for guest_index in range(nguests):
     # Add host to guest experiment(s) to set
     for host_guest_experiment in host_guest_experiments:
         itc_experiment_set.addExperiment(host_guest_experiment)
+        host_guest_experiment.simulate(guest_compound_Ka[guest_index], macromol_titrant=True,
+                        filename='guest%d_ratio.png' % guest_index)
 
 
 # Add cleaning experiment.
@@ -310,11 +305,22 @@ for replicate in range(nfinal):
 
 itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
-# For convenience, concentrations
-for g, guest in enumerate(guest_solutions, start=1):
-    print("guest%02d" % g, (guest.concentration / (ureg.millimole / ureg.liter).to('millimolar')))
+# Get effective Rm
+actual_Rm = list()
+for experiment in itc_experiment_set.experiments:
+    try:
+        guest_mol = ((experiment.cell_concentration * 202.8 * Quantity('microliter')).to('millimole'))
+        host_mol = ((experiment.syringe_concentration * 30 * Quantity('microliter')).to('millimole'))
+        Rm = host_mol/guest_mol
+        actual_Rm.append(Rm)
 
-print("host", host_solution.concentration / (ureg.millimole / ureg.liter))
+    except (AttributeError, TypeError):
+        continue
+
+with open("host-guest-itc-Rm.txt", 'w') as ratio_file:
+    ratio_file.write("#, Optimal, Actual\n")
+    for idx,(opt,act) in enumerate(zip(optimal_rm, actual_Rm), start=1):
+        ratio_file.write("%d, %.5f, %.5f\n" % (idx, opt, act))
 
 
 # Write Tecan EVO pipetting operations.

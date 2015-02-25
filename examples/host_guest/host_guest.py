@@ -281,7 +281,7 @@ for guest_index in range(nguests):
     for host_guest_experiment in host_guest_experiments:
         itc_experiment_set.addExperiment(host_guest_experiment)
         host_guest_experiment.simulate(guest_compound_Ka[guest_index], macromol_titrant=True,
-                        filename='guest%d_ratio.png' % guest_index)
+                        filename='%s-simulation.png' % guests[guest_index].name)
 
 
 # Add cleaning experiment.

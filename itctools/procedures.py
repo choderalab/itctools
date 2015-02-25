@@ -265,7 +265,13 @@ class ITCExperiment(object):
         """Plot the heats from a simulated experiment"""
 
         import matplotlib.pyplot as plt
-        import seaborn
+
+        # Only import seaborn if available
+        try:
+            import seaborn
+        except ImportError:
+            pass
+
 
         fig = plt.figure()
         ax1 = plt.subplot(111)

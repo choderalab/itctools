@@ -31,7 +31,7 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # Don't install from requirements-pip.txt, python-coveralls has broken dependencies on windows it seems.
-  - conda install --yes setuptools nose numpy openpyxl pip coverage mock
+  - conda install --yes setuptools matplotlib seaborn nose numpy openpyxl pip coverage mock
   - pip install behave pint rednose
   - python setup.py install
 

@@ -253,7 +253,7 @@ class ITCExperiment(object):
             ligand_ratios[index], macro_ratios[index] = [complex_conc/ (lig_conc - complex_conc) , complex_conc / (macromol_conc - complex_conc)]
 
         if plot and plot_complex:
-            self._plot_simulation(molar_ratios, zip(ligand_ratios, macro_ratios), filename=filename)
+            self._plot_simulation(molar_ratios, list(zip(ligand_ratios, macro_ratios)), filename=filename)
         elif plot:
             self._plot_simulation(molar_ratios, filename=filename)
 
@@ -279,7 +279,7 @@ class ITCExperiment(object):
 
         graphs = list()
         if complex_ratios is not None:
-            ligand_ratios, macromol_ratios = zip(*complex_ratios)
+            ligand_ratios, macromol_ratios = list(zip(*complex_ratios))
             graphs.append(ax1.plot(range(len(complex_ratios)), [ ratio.to('dimensionless') for ratio in ligand_ratios], label='Complex/Ligand ratio', c='r'))
             graphs.append(ax1.plot(range(len(complex_ratios)), [ratio.to('dimensionless') for ratio in macromol_ratios],
                      label='Complex/ Macromolecule ratio', c='b'))

@@ -155,7 +155,7 @@ blank_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Chodera Load Cell Without Cleaning Cell After.setup',
     itc_method='ChoderaHostGuest.inj',
-    analysis_method='Onesite',
+    analysis_method='Control',
     experimental_conditions=dict(target_temperature=25, equilibration_time=300, stir_rate=1000, reference_power=5),
     injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
         10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],

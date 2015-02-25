@@ -222,21 +222,15 @@ class ITCExperiment(object):
         macro_ratios = Quantity(numpy.zeros(ninj), 'dimensionless')
         complex_concentrations = Quantity(numpy.zeros(ninj), 'millimole / liter')
 
-        macromolecule_concentrations = Quantity(numpy.zeros(ninj), 'millimole / liter')
-        titrant_concentration = Quantity('0.0 mole / liter')
-        titrand_concentration = self.cell_concentration
-
-
         # Calculate the new concentrations after each injection and store the ratios
         for index, injection in enumerate(self.protocol.injections):
 
-            titrand_amount = titrand_concentration * self.cell_volume
-            titrant_amount = titrant_concentration * self.cell_volume + self.syringe_concentration * injection['volume_inj']
-            new_volume = self.cell_volume + injection['volume_inj']
-
-            # instantaneous mixing assumed, part of both wasted with each injection
-            titrant_concentration = titrant_amount / new_volume
-            titrand_concentration = titrand_amount / new_volume
+            # Using the perfusion model from http://dx.doi.org/10.1021/jp053550y
+            dilution_factor = 1. - injection['volume_inj'] / self.cell_volume
+            # [M]0,i = [M]0*d^i
+            titrand_concentration = self.cell_concentration * dilution_factor**index
+            # [X]0,i = [X]0*(1-d^i)
+            titrant_concentration = self.syringe_concentration * (1 - dilution_factor**index)
 
             # If the macromolecule is actually the titrant or not.
             if macromol_titrant:
@@ -249,10 +243,10 @@ class ITCExperiment(object):
             ratio = macromol_conc / lig_conc
 
             molar_ratios[index]= ratio
-            complex_conc = self._complex_concentration(Ka,macromol_conc, lig_conc)
+            complex_conc = self._complex_concentration(Ka, macromol_conc, lig_conc)
             complex_concentrations[index] = complex_conc
-            macromolecule_concentrations[index] = macromol_conc - complex_conc
-            ligand_ratios[index], macro_ratios[index] = [complex_conc/ (lig_conc - complex_conc) , complex_conc / (macromol_conc - complex_conc)]
+
+            ligand_ratios[index], macro_ratios[index] = [complex_conc / lig_conc, complex_conc / macromol_conc]
 
         if plot and plot_complex:
             self._plot_simulation(molar_ratios, list(zip(ligand_ratios, macro_ratios)), logscale=logscale, filename=filename)
@@ -281,27 +275,28 @@ class ITCExperiment(object):
         graphs = list()
         axcomplex = axtotal.twinx()
         graphs.append(axtotal.plot(range(len(molar_ratios)), [ratio.to('dimensionless') for ratio in molar_ratios],
-                                   label='Total Macromolecule/Ligand ratio', c='dimgray'))
+                                   label='Total Macromolecule/Ligand ratio', marker='o', c='dimgray'))
 
         axtotal.set_ylabel('Ratio of Totals')
 
         if complex_ratios is not None:
             ligand_ratios, macromol_ratios = list(zip(*complex_ratios))
 
-            #Plot complex / free ligand ratio per inj
+            #Plot complex / total ligand ratio per inj
             graphs.append(axcomplex.plot(range(len(complex_ratios)),
                           [ratio.to('dimensionless') for ratio in ligand_ratios],
-                          label='Complex/Ligand ratio', c='crimson'))
+                          label='Fraction bound ligand', c='crimson'))
 
             # Plot complex / free macromolecule ratio per inj
             graphs.append(axcomplex.plot(range(len(complex_ratios)),
                           [ratio.to('dimensionless') for ratio in macromol_ratios],
-                          label='Complex/Macromolecule ratio', c='lightskyblue'))
+                          label='Fraction bound macromolecule', c='lightskyblue'))
 
             axcomplex.set_xlabel('Injection')
             axcomplex.set_ylabel('Complex/Free ratio')
             if logscale:
                 axcomplex.set_yscale('log')
+
         # flatten graphs
         graphs = [item for sublist in graphs for item in sublist]
         plotlabels = [g.get_label() for g in graphs]

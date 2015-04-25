@@ -213,7 +213,42 @@ class ITCExperiment(object):
 
         return result.x
 
-    def simulate(self, Ka, plot=True, plot_complex=True, macromol_titrant=False, logscale=False, filename=''):
+    def simulate_heats(self, Ka):
+
+        from bitc.models import TwoComponentBindingModel
+        from bitc.units import ureg, Quantity
+
+        beta = 1. / (Quantity(self.protocol.experimental_conditions['target_temperature'], 'celsius').to('kelvin') * ureg.molar_gas_constant.to('kcal/mole/kelvin')  )
+        dG = (numpy.log(Ka.to('liter per mole').magnitude) / beta ) / (ureg.kilocalorie / ureg.mole)
+        dH=10.
+        dH0=0.
+
+        ninj = self.protocol.experimental_conditions['num_inj']
+        cell_volume = self.cell_volume * ureg.microliter
+        injections_volume = Quantity([injection['volume_inj'] for injection in self.protocol.injections], 'microliter')
+        cell_conc = self.cell_concentration.to('millimole / liter').magnitude
+        syr_conc = self.syringe_concentration.to('millimole/liter').magnitude
+        heats = TwoComponentBindingModel.expected_injection_heats(cell_volume, injections_volume,
+                                                                  cell_conc, syr_conc, dG, dH, dH0, beta,ninj)
+
+        self.plot_heats(heats)
+
+    @staticmethod
+    def plot_heats(heats):
+
+        from matplotlib import pyplot as plt
+        from bitc.units import ureg, Quantity
+        xval = range(len(heats))
+        ymin = [min(0.,heat/ureg.microcalorie) for heat in heats]
+        ymax = [max(0.,heat/ureg.microcalorie) for heat in heats]
+
+        plt.vlines(range(len(heats)), ymin=ymin,ymax=ymax)
+
+        plt.show()
+
+
+
+    def simulate_concentrations(self, Ka, plot=True, plot_complex=True, macromol_titrant=False, logscale=False, filename=''):
         """Perform a simulation of the experiment"""
 
         ninj = self.protocol.experimental_conditions['num_inj']

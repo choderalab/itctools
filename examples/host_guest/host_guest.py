@@ -294,9 +294,9 @@ for guest_index in range(nguests):
     # Add host to guest experiment(s) to set
     for host_guest_experiment in host_guest_experiments:
         itc_experiment_set.addExperiment(host_guest_experiment)
-        host_guest_experiment.simulate(guest_compound_Ka[guest_index], macromol_titrant=True,
-                        filename='%s-simulation.png' % guests[guest_index].name)
-
+        # host_guest_experiment.simulate_concentrations(guest_compound_Ka[guest_index], macromol_titrant=True,
+        #                 filename='%s-simulation.png' % guests[guest_index].name)
+        host_guest_experiment.simulate_heats(guest_compound_Ka[guest_index])
 
 # Add cleaning experiment.
 #name = 'final cleaning water titration'

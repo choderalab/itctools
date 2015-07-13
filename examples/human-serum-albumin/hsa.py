@@ -9,6 +9,10 @@ from itctools.materials import Solvent, Compound, SimpleSolution
 from itctools.labware import Labware, PipettingLocation
 import pprint
 
+
+# The sample cell volume in microliters
+cell_volume = 202.8
+
 # Define solvents.
 water = Solvent('water', density=0.9970479 * ureg.gram / ureg.milliliter)
 buffer = Solvent('buffer', density=1.014 * ureg.gram / ureg.milliliter) # TODO is our density the same as the HOST-GUEST buffer?
@@ -58,45 +62,46 @@ drug_kas = [indoxylsulfate_ka, naproxen_ka]
 
 # Protocol for 'control' titrations (water-water, buffer-buffer,
 # titrations into buffer, etc.)
+
 control_protocol = ITCProtocol(
-    'control protocol',
+    'control_protocol',
     sample_prep_method='Plates Quick.setup',
     itc_method='ChoderaWaterWater.inj',
     analysis_method='Control',
-    num_inj=5,
-    v_inj=Quantity('10 microliter'),
-    v_cell = Quantity('202.8 microliter'),
+    experimental_conditions=dict(target_temperature=25, equilibration_time=60, stir_rate=1000, reference_power=5),
+    injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
+        10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
     )
-# Protocol for 1:1 binding analyis
+
+# Protocol for 1:1 binding analysis
 blank_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Chodera Load Cell Without Cleaning Cell After.setup',
-    itc_method='ChoderaHostGuest.inj',  # TODO Define new protocol with more injections?
-    analysis_method='Onesite',
-    num_inj=10,
-    v_inj=Quantity('3 microliter'),
-    v_cell=Quantity('202.8 microliter'),
-)
+    itc_method='ChoderaHSABlank.inj',
+    analysis_method='Control',
+    experimental_conditions=dict(target_temperature=25, equilibration_time=300, stir_rate=1000, reference_power=5),
+    injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
+        10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
+    )
+
 
 binding_protocol = ITCProtocol(
     '1:1 binding protocol',
     sample_prep_method='Plates Quick.setup',
-    itc_method='ChoderaHostGuest.inj',  # TODO Define new protocol with more injections?
+    itc_method='ChoderaHSA.inj',
     analysis_method='Onesite',
-    num_inj=10,
-    v_inj=Quantity('3 microliter'),
-    v_cell=Quantity('202.8 microliter'),
-)
-
+    experimental_conditions=dict(target_temperature=25, equilibration_time=300, stir_rate=1000, reference_power=5),
+    injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
+        10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
+    )
 # Protocol for cleaning protocol
 cleaning_protocol = ITCProtocol(
     'cleaning protocol',
     sample_prep_method='Plates Clean.setup',
     itc_method='water5inj.inj',
     analysis_method='Control',
-    num_inj=5,
-    v_inj=Quantity('10 microliter'),
-    v_cell=Quantity('202.8 microliter'),
+    experimental_conditions=dict(target_temperature=25, equilibration_time=60, stir_rate=1000, reference_power=5),
+    injections=5 * [dict(volume_inj=7.5, duration_inj=15, spacing=150, filter_period=5)],
     )
 
 # Define ITC Experiment.
@@ -122,7 +127,8 @@ itc_experiment_set.addExperiment(
         name=name,
         syringe_source=water_trough,
         cell_source=water_trough,
-        protocol=cleaning_protocol))
+        protocol=cleaning_protocol,
+        cell_volume=cell_volume))
 
 # Add water control titrations.
 for replicate in range(1):
@@ -132,7 +138,8 @@ for replicate in range(1):
             name=name,
             syringe_source=water_trough,
             cell_source=water_trough,
-            protocol=control_protocol))
+            protocol=control_protocol,
+            cell_volume=cell_volume))
 
 # Add buffer control titrations.
 for replicate in range(1):
@@ -142,7 +149,8 @@ for replicate in range(1):
             name=name,
             syringe_source=buffer_trough,
             cell_source=buffer_trough,
-            protocol=control_protocol))
+            protocol=control_protocol,
+            cell_volume=cell_volume))
 
 # buffer into hsa
 for replicate in range(1):
@@ -154,7 +162,8 @@ for replicate in range(1):
             cell_source=hsa_solution,
             protocol=control_protocol,
             cell_concentration=0.045 * ureg.millimolar,
-            buffer_source=buffer_trough))
+            buffer_source=buffer_trough,
+            cell_volume=cell_volume))
 
 # drugs/HSA
 # scale cell concentration to fix necessary syringe concentrations
@@ -180,10 +189,13 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             cell_concentration=0.045 *
             ureg.millimolar *
             cell_scaling,
-            buffer_source=buffer_trough)
+            buffer_source=buffer_trough,
+            cell_volume=cell_volume)
         # optimize the syringe_concentration using heuristic equations and known binding constants
         # TODO extract m, v and V0 from protocol somehow?
-        experiment.heuristic_syringe(drug_ka, 10)
+
+        # Warning, you're possibly not getting the setup you want. Consider not using the Heuristic Experiment
+        experiment.heuristic_syringe(drug_ka, 10, strict=False)
         # rescale if syringe > stock. Store factor.
         factors.append(experiment.rescale())
         drug_protein_experiments.append(experiment)
@@ -196,7 +208,8 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
             syringe_source=drug_solution,
             cell_source=buffer_trough,
             protocol=blank_protocol,
-            buffer_source=buffer_trough)
+            buffer_source=buffer_trough,
+            cell_volume=cell_volume)
         # rescale to match drug to protein experiment concentrations.
         experiment.rescale(tfactor=factors[replicate])
         drug_buffer_experiments.append(experiment)
@@ -205,17 +218,17 @@ for drug, drug_solution, drug_ka in zip(drugs, drug_solutions, drug_kas):
     # Add drug to protein experiment(s) to set
     for drug_protein_experiment in drug_protein_experiments:
         itc_experiment_set.addExperiment(drug_protein_experiment)
-        pprint.pprint(drug_protein_experiment.__dict__)
+        # pprint.pprint(drug_protein_experiment.__dict__)
 
     # Add drug_to_buffer experiment(s) to set
     for drug_buffer_experiment in drug_buffer_experiments:
         itc_experiment_set.addExperiment(drug_buffer_experiment)
-        pprint.pprint(drug_buffer_experiment.__dict__)
+        # pprint.pprint(drug_buffer_experiment.__dict__)
 
 
 # Add cleaning experiment.
 name = 'final cleaning water titration'
-itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol) )
+itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol, cell_volume=cell_volume) )
 
 # Water control titrations.
 nfinal = 2
@@ -226,7 +239,8 @@ for replicate in range(nfinal):
             name=name,
             syringe_source=water_trough,
             cell_source=water_trough,
-            protocol=control_protocol))
+            protocol=control_protocol,
+            cell_volume=cell_volume))
 
 # Check that the experiment can be carried out using available solutions
 # and plates.

@@ -7,6 +7,7 @@
 [![Coverage Status](https://coveralls.io/repos/choderalab/itctools/badge.png)](https://coveralls.io/r/choderalab/itctools)
 [![Code Health](https://landscape.io/github/choderalab/itctools/master/landscape.svg)](https://landscape.io/github/choderalab/itctools/master)
 [![Dependency Status](https://gemnasium.com/choderalab/itctools.svg)](https://gemnasium.com/choderalab/itctools)
+[![Codacy Badge](https://api.codacy.com/project/badge/grade/31435871aed64e0dabdd797b2f8d1269)](https://www.codacy.com/app/bas-rustenburg/itctools)
 
 Tools for setting up ITC experiments in an automated fashion using the Tecan EVO and Auto-iTC 200.
 

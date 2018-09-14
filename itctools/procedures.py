@@ -5,6 +5,7 @@ import numpy
 import openpyxl  # Excel spreadsheet I/O (for Auto iTC-200)
 from openpyxl import Workbook
 import logging
+import copy
 
 from .itctools import ureg, Quantity, compute_rm
 from .labware import PipettingLocation
@@ -477,7 +478,7 @@ class HeatOfMixingExperiment(object):
 
 class ITCExperimentSet(object):
 
-    def __init__(self, name):
+    def __init__(self, name, **kwargs):
         """
         Parameters
         ----------
@@ -489,8 +490,15 @@ class ITCExperimentSet(object):
         self.experiments = list()  # list of experiments to set up
         # ITC plates available for use in experiment
         self.destination_plates = list()
-
         self._validated = False
+        self.hdr = False
+
+        if kwargs != None:
+            try:
+                hdr = kwargs['hdr']
+                self.hdr = hdr
+            except:
+                pass
 
     def addDestinationPlate(self, plate):
         """
@@ -630,6 +638,9 @@ class ITCExperimentSet(object):
         # Reset tracked quantities.
         self._resetTrackedQuantities()
 
+
+        self.vial_pos = None # Initialize the position of the vial.
+
         for (experiment_number, experiment) in enumerate(self.experiments):
             # volume logging
             volume_report = str()
@@ -697,18 +708,42 @@ class ITCExperimentSet(object):
 
             # Schedule cell solution transfer.
             tipmask = 2
-            try:
-                # Assume source is Solution.
-                if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        experiment.cell_source.location.RackLabel, experiment.
-                        cell_source.location.RackType, experiment.cell_source.
-                        location.Position, transfer_volume, tipmask)
-            except:
-                # Assume source is Labware.
-                if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        experiment.cell_source.RackLabel, experiment.cell_source.RackType, 2, transfer_volume, tipmask)
+
+            if self.hdr == False:
+                try:
+                    # Assume source is Solution.
+                    if transfer_volume > 0.01 or not omit_zeroes:
+                        worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                            experiment.cell_source.location.RackLabel, experiment.
+                            cell_source.location.RackType, experiment.cell_source.
+                            location.Position, transfer_volume, tipmask)
+                except:
+                    # Assume source is Labware.
+                    if transfer_volume > 0.01 or not omit_zeroes:
+                        worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                            experiment.cell_source.RackLabel, experiment.cell_source.RackType, 2, transfer_volume, tipmask)
+
+            if self.hdr == True:
+
+                if 'Solution' in str(type(experiment.cell_source)):
+                    if self.vial_pos == None:
+                        self.vial_pos = experiment.cell_source.location.Position
+
+                    if transfer_volume > 0.01 or not omit_zeroes:
+                        print(type(experiment.cell_source))
+                        worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                            experiment.cell_source.location.RackLabel, experiment.
+                            cell_source.location.RackType,
+                            self.vial_pos,
+                            transfer_volume, tipmask)
+
+
+                else:
+                    # Assume source is Labware.
+                    if transfer_volume > 0.01 or not omit_zeroes:
+                        worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                            experiment.cell_source.RackLabel, experiment.cell_source.RackType, 2, transfer_volume, tipmask)
+
 
             if transfer_volume > 0.01 or not omit_zeroes:
                 worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
@@ -955,6 +990,56 @@ class ITCExperimentSet(object):
         # Write workbook.
         wb.save(filename)
 
+    def writeAutoITCCSV(self, filename):
+
+        """
+        Write the Excel file for the specified experiment set to be loaded into the Auto iTC-200.
+
+        Parameters
+        ----------
+        filename : str
+           The name of the Excel file to write.
+
+        """
+        import pandas as pd
+        row = 0
+        start = 0
+
+        # Create header.
+        fieldnames = [
+            'DataFile',
+            'SampleName',
+            'SamplePrepMethod',
+            'ItcMethod',
+            'AnalysisMethod',
+            'CellConcentration',
+            'PipetteConcentration',
+            'CellSource',
+            'PipetteSource',
+            'PreRinseSource',
+            'SaveSampleDestination']
+
+        df = pd.DataFrame(columns = fieldnames)
+
+        # Create experiments.
+        for experiment in self.experiments:
+
+            for (column, fieldname) in enumerate(fieldnames, start=start):
+                value = getattr(experiment.itcdata, fieldname)
+                try:
+                    if value.dimensionless:
+                        value = float(value)
+                except AttributeError:
+                    pass
+
+                df.set_value(row, fieldname, value)
+
+            row += 1
+        # Write workbook.
+
+        df.to_csv(filename, sep = ',', index = False)
+
+
 
 class HeatOfMixingExperimentSet(ITCExperimentSet):
 
@@ -1141,7 +1226,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             datecode = now.strftime("%Y%m%d")
             seriescode = 'a'  # TODO: Use intelligent coding?
             indexcode = '%d' % (experiment_number + 1)
-            itcdata.DataFile = datecode + seriescode + indexcode
+            itcdata.DataFile = datecode + seriescode + indexcode + '.itc'
             itcdata.SampleName = experiment.name
             itcdata.SamplePrepMethod = experiment.protocol.sample_prep_method
             itcdata.ItcMethod = experiment.protocol.itc_method

@@ -8,6 +8,7 @@ from itctools.procedures import ITCProtocol, ITCExperimentSet, ITCExperiment, IT
 from itctools.materials import Solvent, Compound, SimpleSolution
 from itctools.labware import Labware, PipettingLocation
 import pprint
+import copy
 
 
 # The sample cell volume in microliters
@@ -158,7 +159,6 @@ for replicate in range(1):
 # ligands/CAII
 # scale cell concentration to fix necessary syringe concentrations
 
-cell_scaling = 1.
 for ligand, ligand_solution, ligand_ka in zip(ligands, ligand_solutions, ligand_kas):
 
     # We need to store the experiments before adding them to the set
@@ -169,37 +169,31 @@ for ligand, ligand_solution, ligand_ka in zip(ligands, ligand_solutions, ligand_
     factors = list()
 
     # Define ligand to protein experiments
-    for replicate in range(2):
-        name = '%s into CAII %d' % (ligand.name, replicate + 1 )
-        experiment = ITCHeuristicExperiment(
-            name=name,
-            syringe_source=ligand_solution,
-            cell_source=caii_solution,
-            protocol=binding_protocol,
-            cell_concentration=0.010 * ureg.millimolar * cell_scaling,
-            buffer_source=buffer_trough,
-            cell_volume=cell_volume)
-        # optimize the syringe_concentration using heuristic equations and known binding constants
-        # TODO extract m, v and V0 from protocol somehow?
+    for cell_concentration in [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.040 * ureg.millimolar]:
+        for replicate in range(1):
+            name = '%s into CAII %d' % (ligand.name, replicate + 1 )
+            experiment = ITCHeuristicExperiment(
+                name=name,
+                syringe_source=ligand_solution,
+                cell_source=caii_solution,
+                protocol=binding_protocol,
+                cell_concentration=cell_concentration,
+                buffer_source=buffer_trough,
+                cell_volume=cell_volume)
+            # optimize the syringe_concentration using heuristic equations and known binding constants
+            # TODO extract m, v and V0 from protocol somehow?
 
-        # Warning, you're possibly not getting the setup you want. Consider not using the Heuristic Experiment
-        experiment.heuristic_syringe(ligand_ka, 10, strict=False)
-        # rescale if syringe > stock. Store factor.
-        #factors.append(experiment.rescale())
-        ligand_protein_experiments.append(experiment)
+            # Warning, you're possibly not getting the setup you want. Consider not using the Heuristic Experiment
+            experiment.heuristic_syringe(ligand_ka, 10, strict=False)
+            # rescale if syringe > stock. Store factor.
+            factors.append(experiment.rescale())
+            ligand_protein_experiments.append(experiment)
 
-    # Define ligand into buffer
-    for replicate in range(1):
-        name = '%s into buffer  %d' % (ligand.name, replicate + 1)
-        experiment = ITCHeuristicExperiment(
-            name=name,
-            syringe_source=ligand_solution,
-            cell_source=buffer_trough,
-            protocol=blank_protocol,
-            buffer_source=buffer_trough,
-            cell_volume=cell_volume)
-        # rescale to match ligand to protein experiment concentrations.
-        #experiment.rescale(tfactor=factors[replicate])
+    # Define corresponding ligand into buffer experiments
+    for experiment in ligand_protein_experiments:
+        experiment = copy.deepcopy(experiment)
+        experiment.cell_source = buffer_trough
+        experiment.cell_concentration *= 0
         ligand_buffer_experiments.append(experiment)
 
     # TODO, since we are changing ligands, we'd have to wash the syringe.
@@ -237,8 +231,8 @@ itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
 # For convenience, concentrations
 for ligand_solution in ligand_solutions:
-    print("%s %.4f mM" % (ligand_solution.name, ligand_solution.concentration / ureg.millimolar ))
-    print("CAII", caii_solution.concentration.to(ureg.millimolar))
+    print("%12s %.4f mM" % (ligand_solution.name, ligand_solution.concentration / ureg.millimolar ))
+    print("%12s %.4f mM" % ('CAII', caii_solution.concentration  / ureg.millimolar ))
 
 
 # Write Tecan EVO pipetting operations.

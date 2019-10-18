@@ -21,10 +21,9 @@ buffer = Solvent('buffer', density=1.014 * ureg.gram / ureg.milliliter) # TODO i
 # Define compounds.
 caii = Compound('CAII', molecular_weight=30000 * (ureg.gram / ureg.mole), purity=1.)
 cbs = Compound('CBS', molecular_weight=201.2 * (ureg.gram / ureg.mole), purity=0.97)
-naproxen_sodium = Compound('Naproxen Sodium', molecular_weight=252.24 * (ureg.gram / ureg.mole), purity=1.)
 
 #Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
-cbs_ka = 1.203e6 / ureg.molar  # http://omicsonline.org/2157-7544/2157-7544-2-107.pdf first site estimate
+cbs_ka = 1.203e6 / ureg.molar
 
 # Define troughs on the instrument
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
@@ -35,12 +34,13 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 
 # Define source solutions in the vial holder
 # TODO : Define solutions once prepared with the Quantos
-caii_solution = SimpleSolution(compound=caii, compound_mass=5 * ureg.milligram, solvent=buffer, solvent_mass=0.7 * ureg.gram, location=PipettingLocation(
+#caii_solution = SimpleSolution(compound=caii, compound_mass=5 * ureg.milligram, solvent=buffer, solvent_mass=0.7 * ureg.gram, location=PipettingLocation(
+caii_solution = SimpleSolution(compound=caii, compound_mass=5 * ureg.milligram, solvent=buffer, solvent_mass=3 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     1))
 
-cbs_solution = SimpleSolution(compound=cbs, compound_mass=10 * ureg.milligram, solvent=buffer, solvent_mass=10 * ureg.gram, location=PipettingLocation(
+cbs_solution = SimpleSolution(compound=cbs, compound_mass=8 * ureg.milligram, solvent=buffer, solvent_mass=14 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     2))
@@ -98,16 +98,12 @@ cleaning_protocol = ITCProtocol(
 # Define ITC Experiment.
 
 # use specified protocol by default
-itc_experiment_set = ITCExperimentSet(name='Human Serum Albumin experiments')
+itc_experiment_set = ITCExperimentSet(name='Bovine carbonic anhydrase (CAII) experiments')
 # Add available plates for experiments.
-itc_experiment_set.addDestinationPlate(
-    Labware(
-        RackLabel='DestinationPlate',
-        RackType='ITC Plate'))
-itc_experiment_set.addDestinationPlate(
-    Labware(
-        RackLabel='DestinationPlate2',
-        RackType='ITC Plate'))
+destination_plate = Labware(
+    RackLabel='DestinationPlate',
+    RackType='ITC Plate')
+itc_experiment_set.addDestinationPlate(destination_plate)
 
 nreplicates = 1  # number of replicates of each experiment
 

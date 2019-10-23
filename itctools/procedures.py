@@ -896,9 +896,7 @@ class ITCExperimentSet(object):
            or 'aLiHa' (air liquid handler)
 
         """
-        if not self._validated:
-            self.validate(liha=liha)
-
+        self.validate(liha=liha)
         outfile = open(filename, 'w')
         outfile.write(self.worklist)
         outfile.close()

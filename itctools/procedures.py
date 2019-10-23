@@ -603,7 +603,7 @@ class ITCExperimentSet(object):
                 location.WellName = WellName
                 self.destination_locations.append(location)
 
-    def validate(self, print_volumes=True, omit_zeroes=True, vlimit=10.0):
+    def validate(self, print_volumes=True, omit_zeroes=True, vlimit=10.0, liha='LiHa'):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
 
@@ -617,7 +617,13 @@ class ITCExperimentSet(object):
             Omit operations with volumes below vlimit (default = True)
         vlimit : float
             Minimal volume for pipetting operation in microliters (default = 10.0)
+        liha : str, optional, default='LiHa'
+           Either 'LiHa' (system fluid based liquid handler)
+           or 'aLiHa' (air liquid handler)
         """
+
+        if liha not in ['LiHa', 'aLiHa']:
+            raise Exception("'liha' must be one of ['LiHa', 'aLiHa']")
 
         # TODO: Try to set up experiment, throwing exception upon failure.
 
@@ -817,14 +823,16 @@ class ITCExperimentSet(object):
                 sflag, syringe_volume)
 
             # Finish worklist section.
-            worklist_script += 'B;\r\n'  # execute queued batch of commands
+            if liha == 'LiHa':
+                # Only valid for LiHa, not aLiHa
+                worklist_script += 'B;\r\n'  # execute queued batch of commands
 
             # Create datafile name.
             now = datetime.now()
             datecode = now.strftime("%Y%m%d")
             seriescode = 'a'  # TODO: Use intelligent coding?
             indexcode = '%d' % (experiment_number + 1)
-            itcdata.DataFile = datecode + seriescode + indexcode
+            itcdata.DataFile = datecode + seriescode + indexcode + '.itc'
 
             itcdata.SampleName = experiment.name
             itcdata.SamplePrepMethod = experiment.protocol.sample_prep_method
@@ -875,7 +883,7 @@ class ITCExperimentSet(object):
         # Set validated flag.
         self._validated = True
 
-    def writeTecanWorklist(self, filename):
+    def writeTecanWorklist(self, filename, liha='LiHa'):
         """
         Write the Tecan worklist for the specified experiment set.
 
@@ -883,10 +891,13 @@ class ITCExperimentSet(object):
         ----------
         filename : str
            The name of the Tecan worklist file to write.
+        liha : str, optional, default='LiHa'
+           Either 'LiHa' (system fluid based liquid handler)
+           or 'aLiHa' (air liquid handler)
 
         """
         if not self._validated:
-            self.validate()
+            self.validate(liha=liha)
 
         outfile = open(filename, 'w')
         outfile.write(self.worklist)

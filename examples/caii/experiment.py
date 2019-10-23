@@ -35,12 +35,12 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 # Define source solutions in the vial holder
 # TODO : Define solutions once prepared with the Quantos
 #caii_solution = SimpleSolution(compound=caii, compound_mass=5 * ureg.milligram, solvent=buffer, solvent_mass=0.7 * ureg.gram, location=PipettingLocation(
-caii_solution = SimpleSolution(compound=caii, compound_mass=5 * ureg.milligram, solvent=buffer, solvent_mass=3 * ureg.gram, location=PipettingLocation(
+caii_solution = SimpleSolution(compound=caii, compound_mass=4 * ureg.milligram, solvent=buffer, solvent_mass=3 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     1))
 
-cbs_solution = SimpleSolution(compound=cbs, compound_mass=8 * ureg.milligram, solvent=buffer, solvent_mass=14 * ureg.gram, location=PipettingLocation(
+cbs_solution = SimpleSolution(compound=cbs, compound_mass=8.36 * ureg.milligram, solvent=buffer, solvent_mass=14.659 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     2))
@@ -231,9 +231,11 @@ for ligand_solution in ligand_solutions:
     print("%12s %.4f mM" % ('CAII', caii_solution.concentration  / ureg.millimolar ))
 
 
-# Write Tecan EVO pipetting operations.
-worklist_filename = 'caii.gwl'
-itc_experiment_set.writeTecanWorklist(worklist_filename)
+# Write Tecan EVO pipetting operations for both liquid and air LiHas.
+worklist_filename = 'caii-LiHa.gwl'
+itc_experiment_set.writeTecanWorklist(worklist_filename, liha='LiHa')
+worklist_filename = 'caii-aLiHa.gwl'
+itc_experiment_set.writeTecanWorklist(worklist_filename, liha='aLiHa')
 
 # Write Auto iTC-200 experiment spreadsheet.
 excel_filename = 'caii.xlsx'

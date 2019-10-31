@@ -232,10 +232,8 @@ for ligand_solution in ligand_solutions:
 
 
 # Write Tecan EVO pipetting operations for both liquid and air LiHas.
-worklist_filename = 'caii-LiHa.gwl'
-itc_experiment_set.writeTecanWorklist(worklist_filename, liha='LiHa')
-worklist_filename = 'caii-aLiHa.gwl'
-itc_experiment_set.writeTecanWorklist(worklist_filename, liha='aLiHa')
+worklist_prefix = 'caii'
+itc_experiment_set.writeTecanWorklist(worklist_prefix)
 
 # Write Auto iTC-200 experiment spreadsheet.
 excel_filename = 'caii.xlsx'

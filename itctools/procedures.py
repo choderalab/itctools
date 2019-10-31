@@ -603,11 +603,14 @@ class ITCExperimentSet(object):
                 location.WellName = WellName
                 self.destination_locations.append(location)
 
-    def validate(self, print_volumes=True, omit_zeroes=True, vlimit=10.0, liha='LiHa'):
+    def validate(self, print_volumes=True, omit_zeroes=True, vlimit=10.0):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
 
         Additional experiment data fields (tecandata, itcdata)
+
+        This method splits pipetting operations into LiHa (buffer, receptor) and aLiHa (ligand).
+        The ``self.worklists[key]`` attribute contains the 'LiHa' and 'aLiHa' worklists indexed by 'key'
 
         Parameters
         ----------
@@ -617,21 +620,17 @@ class ITCExperimentSet(object):
             Omit operations with volumes below vlimit (default = True)
         vlimit : float
             Minimal volume for pipetting operation in microliters (default = 10.0)
-        liha : str, optional, default='LiHa'
-           Either 'LiHa' (system fluid based liquid handler)
-           or 'aLiHa' (air liquid handler)
         """
-
-        if liha not in ['LiHa', 'aLiHa']:
-            raise Exception("'liha' must be one of ['LiHa', 'aLiHa']")
 
         # TODO: Try to set up experiment, throwing exception upon failure.
 
         # Make a list of all the possible destination pipetting locations.
         self._allocate_destinations()
 
-        # Build worklist script.
-        worklist_script = ""
+        # Build worklist scripts
+        self.worklists = dict()
+        self.worklists['LiHa'] = ""
+        self.worklists['aLiHa'] = ""
 
         # Reset tracked quantities.
         self._resetTrackedQuantities()
@@ -685,17 +684,18 @@ class ITCExperimentSet(object):
 
                 # Schedule buffer transfer.
                 tipmask = 1
+                pipette = 'LiHa'
                 if buffer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                    self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         experiment.buffer_source.RackLabel, experiment.
                         buffer_source.RackType, 1, buffer_volume, tipmask)
-                    worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
+                    self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                         tecandata.cell_destination.RackLabel, tecandata.
                         cell_destination.RackType, tecandata.cell_destination.
                         Position, buffer_volume, tipmask)
 
                     # no wash if no actions taken
-                    worklist_script += 'W;\r\n'  # queue wash tips
+                    self.worklists[pipette] += 'W;\r\n'  # queue wash tips
                     self._trackQuantities(
                         experiment.buffer_source,
                         buffer_volume *
@@ -703,27 +703,32 @@ class ITCExperimentSet(object):
 
             # Schedule cell solution transfer.
             tipmask = 2
+            pipette = None
             try:
                 # Assume source is Solution.
+                pipette = 'LiHa'
                 if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                    self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         experiment.cell_source.location.RackLabel, experiment.
                         cell_source.location.RackType, experiment.cell_source.
                         location.Position, transfer_volume, tipmask)
             except:
                 # Assume source is Labware.
+                pipette = 'LiHa'
                 if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                    self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         experiment.cell_source.RackLabel, experiment.cell_source.RackType, 2, transfer_volume, tipmask)
 
             if transfer_volume > 0.01 or not omit_zeroes:
-                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
+                pipette = 'LiHa'
+                self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                     tecandata.cell_destination.RackLabel, tecandata.
                     cell_destination.RackType, tecandata.cell_destination.
                     Position, transfer_volume, tipmask)
 
                 # no wash if no actions taken
-                worklist_script += 'W;\r\n'  # queue wash tips
+                if pipette != None:
+                    self.worklists[pipette] += 'W;\r\n'  # wash tips / change DiTi
                 self._trackQuantities(
                     experiment.cell_source,
                     transfer_volume *
@@ -766,18 +771,20 @@ class ITCExperimentSet(object):
 
                 # Schedule buffer transfer.
                 tipmask = 4
-
+                pipette = None
                 if buffer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                    pipette = 'LiHa'
+                    self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         experiment.buffer_source.RackLabel, experiment.
                         buffer_source.RackType, 3, buffer_volume, tipmask)
-                    worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
+                    self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                         tecandata.syringe_destination.RackLabel, tecandata.
                         syringe_destination.RackType, tecandata.
                         syringe_destination.Position, buffer_volume, tipmask)
 
                     # no wash if no actions taken
-                    worklist_script += 'W;\r\n'  # queue wash tips
+                    if pipette != None:
+                        self.worklists[pipette] += 'W;\r\n'  # wash tips / change DiTi
                     self._trackQuantities(
                         experiment.buffer_source,
                         buffer_volume *
@@ -785,27 +792,30 @@ class ITCExperimentSet(object):
 
             # Schedule syringe solution transfer.
             tipmask = 8
+            pipette = None
             try:
-                # Assume source is Solution.
+                # Assume source is Solution' use aLiHa
                 if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                    pipette = 'aLiHa'
+                    self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         experiment.syringe_source.location.RackLabel,
                         experiment.syringe_source.location.RackType,
                         experiment.syringe_source.location.Position,
                         transfer_volume, tipmask)
             except:
-                # Assume source is Labware.
+                # Assume source is Labware; use LiHa
+                pipette = 'LiHa'
                 if transfer_volume > 0.01 or not omit_zeroes:
-                    worklist_script += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                    self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         experiment.syringe_source.RackLabel, experiment.
                         syringe_source.RackType, 4, transfer_volume, tipmask)
 
             if transfer_volume > 0.01 or not omit_zeroes:
-                worklist_script += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
+                self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                     tecandata.syringe_destination.RackLabel, tecandata.
                     syringe_destination.RackType, tecandata.
                     syringe_destination.Position, transfer_volume, tipmask)
-                worklist_script += 'W;\r\n'  # queue wash tips
+                self.worklists[pipette] += 'W;\r\n'  # wash tips / change DiTi
                 self._trackQuantities(
                     experiment.syringe_source,
                     transfer_volume *
@@ -823,9 +833,8 @@ class ITCExperimentSet(object):
                 sflag, syringe_volume)
 
             # Finish worklist section.
-            if liha == 'LiHa':
-                # Only valid for LiHa, not aLiHa
-                worklist_script += 'B;\r\n'  # execute queued batch of commands
+            if pipette == 'LiHa':
+                self.worklists[pipette] += 'B;\r\n'  # execute queued batch of commands
 
             # Create datafile name.
             now = datetime.now()
@@ -865,8 +874,6 @@ class ITCExperimentSet(object):
             experiment.itcdata = itcdata
             if print_volumes:
                 print(volume_report)
-        # Save Tecan worklist.
-        self.worklist = worklist_script
 
         # Report tracked quantities.
         print("Necessary volumes:")
@@ -883,23 +890,20 @@ class ITCExperimentSet(object):
         # Set validated flag.
         self._validated = True
 
-    def writeTecanWorklist(self, filename, liha='LiHa'):
+    def writeTecanWorklist(self, prefix):
         """
         Write the Tecan worklist for the specified experiment set.
 
         Parameters
         ----------
-        filename : str
-           The name of the Tecan worklist file to write.
-        liha : str, optional, default='LiHa'
-           Either 'LiHa' (system fluid based liquid handler)
-           or 'aLiHa' (air liquid handler)
+        prefix : str
+           The prefix of the Tecan worklist files to write.
 
         """
-        self.validate(liha=liha)
-        outfile = open(filename, 'w')
-        outfile.write(self.worklist)
-        outfile.close()
+        self.validate()
+        for key in self.worklists.keys():
+            with open(f'{prefix}-{key}.gwl', 'w') as outfile:
+                outfile.write(self.worklists[key])
 
     def writeAutoITCExcel(self, filename):
         """
@@ -987,7 +991,7 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         self._validated = False
 
     @staticmethod
-    def _worklist_line(operation, tipmask, labware, index, volume, worklist_script):
+    def _worklist_line(operation, tipmask, labware, index, volume):
         """
         Write an aspirate or dispense operation to the worklist.
 
@@ -1001,8 +1005,6 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         :type index: int
         :param volume: volume to be dispensed
         :type volume: pint.Quantity
-        :param worklist_script: String containing the worklist
-        :type worklist_script:  str
         :return: The worklist line
         :rtype: str
         """
@@ -1015,14 +1017,14 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         elif operation == "D":
             location = labware
 
-        worklist_script += '%s;%s;;%s;%d;;%f;;;%d\r\n' % (operation,
+        worklist_line = '%s;%s;;%s;%d;;%f;;;%d\r\n' % (operation,
                                                           location.RackLabel,
                                                           location.RackType,
                                                           location.Position,
                                                           volume[index],
                                                           tipmask)
 
-        return worklist_script
+        return worklist_line
 
     def populate_worklist(
             self,
@@ -1031,7 +1033,9 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             syringe_volume=120.0 *
             ureg.microliters):
         """
-        Build the worklist for heat of mixing experiments
+        Build the worklists for heat of mixing experiments.
+
+        This method only uses the `LiHa`.
 
         Parameters
         ----------
@@ -1045,7 +1049,8 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
         self._allocate_destinations()
 
         # Build worklist script.
-        worklist_script = ""
+        self.worklists = dict()
+        self.worklists['LiHa'] = ""
 
         # Reset tracked quantities.
         self._resetTrackedQuantities()
@@ -1093,11 +1098,11 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
 
             # Start mixing up our cell volume
             for i in range(len(experiment.cell_mixture.components)):
-                worklist_script = self._worklist_line('A', dictips[experiment.cell_mixture.components[i]], experiment.cell_mixture, i, cell_volumes, worklist_script)
+                self.worklists['LiHa'] += self._worklist_line('A', dictips[experiment.cell_mixture.components[i]], experiment.cell_mixture, i, cell_volumes)
 
-                worklist_script = self._worklist_line('D', dictips[experiment.cell_mixture.components[i]], tecandata.cell_destination, i, cell_volumes, worklist_script)
+                self.worklists['LiHa'] += self._worklist_line('D', dictips[experiment.cell_mixture.components[i]], tecandata.cell_destination, i, cell_volumes)
 
-                worklist_script += 'W;\r\n'  # queue wash tips
+                self.worklists['LiHa'] += 'W;\r\n'  # queue wash tips
 
                 self._trackQuantities(
                     experiment.cell_mixture.components[i],
@@ -1112,12 +1117,13 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
             tecandata.syringe_destination = self.destination_locations.pop(0)
 
             # Start mixing up our syringe volume
+            pipette = 'LiHa'
             for i in range(len(experiment.syringe_mixture.components)):
-                worklist_script = self._worklist_line('A', dictips[experiment.syringe_mixture.components[i]], experiment.syringe_mixture, i, syr_volumes, worklist_script)
+                self.worklists[pipette] += self._worklist_line('A', dictips[experiment.syringe_mixture.components[i]], experiment.syringe_mixture, i, syr_volumes)
 
-                worklist_script = self._worklist_line('D', dictips[experiment.syringe_mixture.components[i]], tecandata.syringe_destination, i, syr_volumes, worklist_script)
+                self.worklists[pipette] += self._worklist_line('D', dictips[experiment.syringe_mixture.components[i]], tecandata.syringe_destination, i, syr_volumes)
 
-                worklist_script += 'W;\r\n'  # queue wash tips
+                self.worklists[pipette] += 'W;\r\n'  # queue wash tips
 
                 self._trackQuantities(
                     experiment.syringe_mixture.components[i],
@@ -1125,13 +1131,12 @@ class HeatOfMixingExperimentSet(ITCExperimentSet):
                     ureg.microliters)
 
             # Finish worklist section.
-            worklist_script += 'B;\r\n'  # execute queued batch of commands
+            self.worklists[pipette] += 'B;\r\n'  # execute queued batch of commands
 
             # Store Tecan data for this experiment
             experiment.tecandata = tecandata
 
         # Store the completed worklist, containing all experiments
-        self.worklist = worklist_script
         self._worklist_complete = True
 
     def populate_autoitc_spreadsheet(self):

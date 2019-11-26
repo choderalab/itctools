@@ -902,7 +902,7 @@ class ITCExperimentSet(object):
         """
         self.validate()
         for key in self.worklists.keys():
-            with open(f'{prefix}-{key}.gwl', 'w') as outfile:
+            with open('%s-%s.gwl' % (prefix, key) , 'w') as outfile:
                 outfile.write(self.worklists[key])
 
     def writeAutoITCExcel(self, filename):

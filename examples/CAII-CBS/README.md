@@ -13,3 +13,4 @@ This script produces the input file for measuring the binding affinity of CBS to
 * `experiment.py` - script to generate experiment worklists and Excel spreadsheet
 * `caii.gwl` - a Tecan EVO worklist that produces buffer solutions for the CAII and CBS at the desired concentrations in a 96 well plate
 * `caii.xlsx` - a spreadsheet for the Auto-iTC200 that defines the cell and syringe sources for each titration series
+* `experiment-caii-and-phipa-pilot.py` - pilot experiment for combined CAII and PHIPA experiments

@@ -19,7 +19,7 @@ water = Solvent('water', density=0.9970479 * ureg.gram / ureg.milliliter)
 buffer = Solvent('buffer', density=1.014 * ureg.gram / ureg.milliliter) # TODO is our density the same as the HOST-GUEST buffer?
 
 # Define compounds.
-caii = Compound('CAII', molecular_weight=30000 * (ureg.gram / ureg.mole), purity=1.)
+caii = Compound('CAII', molecular_weight=29246.0 * (ureg.gram / ureg.mole), purity=1.)
 cbs = Compound('CBS', molecular_weight=201.2 * (ureg.gram / ureg.mole), purity=0.97)
 
 #Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
@@ -31,20 +31,21 @@ buffer_trough = Labware(RackLabel='Buffer', RackType='Trough 100ml')
 
 # Define source labware.
 source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
+protein_source_plate = Labware(RackLabel='ProteinSourcePlate', RackType='ITC Plate')
 
 # Define source solutions in the vial holder
 # TODO : Define solutions once prepared with the Quantos
 #caii_solution = SimpleSolution(compound=caii, compound_mass=5 * ureg.milligram, solvent=buffer, solvent_mass=0.7 * ureg.gram, location=PipettingLocation(
-caii_solution = SimpleSolution(compound=caii, compound_mass=4 * ureg.milligram, solvent=buffer, solvent_mass=3 * ureg.gram, location=PipettingLocation(
-    source_plate.RackLabel,
-    source_plate.RackType,
-    1))
+caii_solution = SimpleSolution(compound=caii, compound_mass=2.5 * ureg.milligram, solvent=buffer, solvent_mass=1.5 * ureg.gram, location=PipettingLocation(
+    protein_source_plate.RackLabel,
+    protein_source_plate.RackType,
+    1)) # Well A1 of ITC plate
 
 #cbs_solution = SimpleSolution(compound=cbs, compound_mass=8.36 * ureg.milligram, solvent=buffer, solvent_mass=14.659 * ureg.gram, location=PipettingLocation(
 cbs_solution = SimpleSolution(compound=cbs, compound_mass=10.0 * ureg.milligram, solvent=buffer, solvent_mass=10.0 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
-    2))
+    1)) # Well A1 of vial holder
 
 ligands = [cbs]
 ligand_solutions = [cbs_solution]
@@ -57,7 +58,7 @@ ligand_kas = [cbs_ka]
 
 control_protocol = ITCProtocol(
     'control_protocol',
-    sample_prep_method='Plates Quick.setup',
+    sample_prep_method='Plates Clean.setup', # thorough cleaning
     itc_method='ChoderaWaterWater.inj',
     analysis_method='Control',
     experimental_conditions=dict(target_temperature=25, equilibration_time=60, stir_rate=1000, reference_power=5),
@@ -89,7 +90,7 @@ binding_protocol = ITCProtocol(
 # Protocol for cleaning protocol
 cleaning_protocol = ITCProtocol(
     'cleaning protocol',
-    sample_prep_method='Plates Clean.setup',
+    sample_prep_method='Plates Clean.setup', # thorough cleaning
     itc_method='water5inj.inj',
     analysis_method='Control',
     experimental_conditions=dict(target_temperature=25, equilibration_time=60, stir_rate=1000, reference_power=5),
@@ -221,10 +222,10 @@ for replicate in range(nfinal):
             protocol=control_protocol,
             cell_volume=cell_volume))
 
-# Check that the experiment can be carried out using available solutions
-# and plates.
-
-itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
+# Check that the experiment can be carried out using available solutions and plates.
+# Also generate Tecan EVO worklists
+import sys
+itc_experiment_set.validate(print_volumes=True, omit_zeroes=True, human_readable_log=sys.stdout)
 
 # For convenience, concentrations
 for ligand_solution in ligand_solutions:

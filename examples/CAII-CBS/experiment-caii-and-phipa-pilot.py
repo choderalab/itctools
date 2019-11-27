@@ -50,11 +50,11 @@ caii_solution = SimpleSolution(compound=caii, compound_mass=2.5 * ureg.milligram
     protein_source_plate.RackType,
     1)) # Well A1 of ITC plate
 
-PHIPA_solution = SimpleSolution(compound=PHIPA, compound_mass=2.35 * ureg.milligram, solvent=PHIPA_buffer, solvent_mass=1.6 * ureg.gram, location=PipettingLocation(
+# 124 uM @ 1.5 mL
+PHIPA_solution = SimpleSolution(compound=PHIPA, compound_mass=2.6 * ureg.milligram, solvent=PHIPA_buffer, solvent_mass=1.5 * ureg.gram, location=PipettingLocation(
     protein_source_plate.RackLabel,
     protein_source_plate.RackType,
     2)) # Well B1 of ITC plate
-
 
 cbs_solution = SimpleSolution(compound=cbs, compound_mass=4.92 * ureg.milligram, solvent=PHIPA_buffer, solvent_mass=12.954 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
@@ -75,15 +75,15 @@ proteins = ['caii', 'PHIPA']
 
 ligands = dict()
 ligands['caii'] = [cbs]
-ligands['PHIPA'] = [cacl, hepes]
+ligands['PHIPA'] = [hepes]
 
 ligand_solutions = dict()
 ligand_solutions['caii'] = [cbs_solution]
-ligand_solutions['PHIPA'] = [cacl_solution, hepes_solution]
+ligand_solutions['PHIPA'] = [hepes_solution]
 
 ligand_kas = dict()
 ligand_kas['caii'] = [cbs_ka]
-ligand_kas['PHIPA'] = [cacl_ka, hepes_ka]
+ligand_kas['PHIPA'] = [hepes_ka]
 
 # Define ITC protocol.
 
@@ -353,10 +353,11 @@ for replicate in range(nfinal):
             protocol=control_protocol,
             cell_volume=cell_volume))
 
-# Check that the experiment can be carried out using available solutions
-# and plates.
-
-itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
+# Check that the experiment can be carried out using available solutions and plates.
+# Also generate Tecan EVO worklists
+import sys
+with open('experiment.txt', 'w') as outfile:
+    itc_experiment_set.validate(print_volumes=True, omit_zeroes=True, human_readable_log=outfile)
 
 # For convenience, concentrations
 for protein in proteins:

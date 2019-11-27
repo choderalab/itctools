@@ -603,7 +603,49 @@ class ITCExperimentSet(object):
                 location.WellName = WellName
                 self.destination_locations.append(location)
 
-    def validate(self, print_volumes=True, omit_zeroes=True, vlimit=10.0):
+    def _human_readable(self, source):
+        """
+        Generate a human-readable position name
+
+        Parameters
+        ----------
+        source : obj
+            Object with .RackLabel and .RackType fields
+
+        Returns
+        -------
+        description : str
+            The human-readable description
+            'SourcePlate well A1'
+            'Buffer trough'
+        """
+        positionless = False
+        if not hasattr(source, 'Position'):
+            positionless = True
+
+        if source.RackType == '5x3 Vial Holder':
+            ny = 3; nx = 5
+        elif source.RackType == 'Trough 100ml':
+            ny = 8; nx = 1
+        elif source.RackType == 'ITC Plate':
+            ny = 8; nx = 12
+        else:
+            raise Exception(f"Don't know racktype '{racktype}'")
+
+        description = ''
+        if positionless:
+            description = f'{source.RackLabel} trough'
+        else:
+            # TODO: Check that position is not outside range
+            wells = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            y = int((source.Position-1)/ny)
+            x = source.Position-y*ny
+            wellname = f'{wells[y]}{x}'
+            description = f'{source.RackLabel} well {wellname}'
+
+        return description
+
+    def validate(self, print_volumes=True, omit_zeroes=True, vlimit=10.0, human_readable_log=None):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
 
@@ -620,12 +662,20 @@ class ITCExperimentSet(object):
             Omit operations with volumes below vlimit (default = True)
         vlimit : float
             Minimal volume for pipetting operation in microliters (default = 10.0)
+        human_readable_log : file-like object, optional, default=None
+            If specified, will write a human-readable pipetting log to the specified file-like object
         """
 
         # TODO: Try to set up experiment, throwing exception upon failure.
 
         # Make a list of all the possible destination pipetting locations.
         self._allocate_destinations()
+
+        def transfer(source, dest, volume):
+            """Write human-readable quanties."""
+            if human_readable_log:
+                # TODO: Streamline this with a single transfer command
+                human_readable_log.write(f'Pipette {volume:.1f} from {self._human_readable(source)} to {self._human_readable(dest)}\n')
 
         # Build worklist scripts
         self.worklists = dict()
@@ -655,7 +705,7 @@ class ITCExperimentSet(object):
                     (experiment_number, len(self.experiments)))
             tecandata.cell_destination = self.destination_locations.pop(0)
 
-            cell_volume = 400.0  # microliters
+            cell_volume = 400.0  # microliters # TODO: Let this be a class field; manual recommends 370 uL
             transfer_volume = cell_volume
 
             if experiment.cell_dilution_factor is not None:
@@ -686,13 +736,16 @@ class ITCExperimentSet(object):
                 tipmask = 1
                 pipette = 'LiHa'
                 if buffer_volume > 0.01 or not omit_zeroes:
+                    source = experiment.buffer_source
+                    dest = tecandata.cell_destination
+
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        experiment.buffer_source.RackLabel, experiment.
-                        buffer_source.RackType, 1, buffer_volume, tipmask)
+                        source.RackLabel, source.RackType, 1,
+                        buffer_volume, tipmask)
                     self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        tecandata.cell_destination.RackLabel, tecandata.
-                        cell_destination.RackType, tecandata.cell_destination.
-                        Position, buffer_volume, tipmask)
+                        tecandata.cell_destination.RackLabel, dest.RackType, dest.Position,
+                        buffer_volume, tipmask)
+                    transfer(source, dest, buffer_volume)
 
                     # no wash if no actions taken
                     self.worklists[pipette] += 'W;\r\n'  # queue wash tips
@@ -708,23 +761,24 @@ class ITCExperimentSet(object):
                 # Assume source is Solution.
                 pipette = 'LiHa'
                 if transfer_volume > 0.01 or not omit_zeroes:
+                    source = experiment.cell_source.location
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        experiment.cell_source.location.RackLabel, experiment.
-                        cell_source.location.RackType, experiment.cell_source.
-                        location.Position, transfer_volume, tipmask)
+                        source.RackLabel, source.RackType, source.Position, transfer_volume, tipmask)
             except:
                 # Assume source is Labware.
                 pipette = 'LiHa'
                 if transfer_volume > 0.01 or not omit_zeroes:
+                    source = experiment.cell_source
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        experiment.cell_source.RackLabel, experiment.cell_source.RackType, 2, transfer_volume, tipmask)
+                        source.RackLabel, source.RackType, 2, transfer_volume, tipmask)
 
             if transfer_volume > 0.01 or not omit_zeroes:
                 pipette = 'LiHa'
+                dest = tecandata.cell_destination
                 self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
-                    tecandata.cell_destination.RackLabel, tecandata.
-                    cell_destination.RackType, tecandata.cell_destination.
-                    Position, transfer_volume, tipmask)
+                    dest.RackLabel, dest.RackType, dest.Position, transfer_volume, tipmask)
+
+                transfer(source, dest, transfer_volume)
 
                 # no wash if no actions taken
                 if pipette != None:
@@ -774,13 +828,14 @@ class ITCExperimentSet(object):
                 pipette = None
                 if buffer_volume > 0.01 or not omit_zeroes:
                     pipette = 'LiHa'
+                    source = experiment.buffer_source
+                    dest = tecandata.syringe_destination
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        experiment.buffer_source.RackLabel, experiment.
-                        buffer_source.RackType, 3, buffer_volume, tipmask)
+                        source.RackLabel, source.RackType, 3, buffer_volume, tipmask)
                     self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        tecandata.syringe_destination.RackLabel, tecandata.
-                        syringe_destination.RackType, tecandata.
-                        syringe_destination.Position, buffer_volume, tipmask)
+                        dest.RackLabel, dest.RackType, dest.Position, buffer_volume, tipmask)
+
+                    transfer(source, dest, buffer_volume)
 
                     # no wash if no actions taken
                     if pipette != None:
@@ -805,21 +860,22 @@ class ITCExperimentSet(object):
             except:
                 # Assume source is Labware; use LiHa
                 pipette = 'LiHa'
+                source = experiment.syringe_source
                 if transfer_volume > 0.01 or not omit_zeroes:
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        experiment.syringe_source.RackLabel, experiment.
-                        syringe_source.RackType, 4, transfer_volume, tipmask)
+                        source.RackLabel, source.RackType, 4, transfer_volume, tipmask)
 
             if transfer_volume > 0.01 or not omit_zeroes:
+                dest = tecandata.syringe_destination
                 self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
-                    tecandata.syringe_destination.RackLabel, tecandata.
-                    syringe_destination.RackType, tecandata.
-                    syringe_destination.Position, transfer_volume, tipmask)
+                    dest.RackLabel, dest.RackType, dest.Position, transfer_volume, tipmask)
                 self.worklists[pipette] += 'W;\r\n'  # wash tips / change DiTi
                 self._trackQuantities(
                     experiment.syringe_source,
                     transfer_volume *
                     ureg.microliters)
+
+            transfer(source, dest, transfer_volume)
 
             # volume logging
             sflag = ""

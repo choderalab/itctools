@@ -852,10 +852,11 @@ class ITCExperimentSet(object):
                 # Assume source is Solution' use aLiHa
                 if transfer_volume > 0.01 or not omit_zeroes:
                     pipette = 'aLiHa'
+                    source = experiment.syringe_source.location
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        experiment.syringe_source.location.RackLabel,
-                        experiment.syringe_source.location.RackType,
-                        experiment.syringe_source.location.Position,
+                        source.RackLabel,
+                        source.RackType,
+                        source.Position,
                         transfer_volume, tipmask)
             except:
                 # Assume source is Labware; use LiHa
@@ -875,6 +876,7 @@ class ITCExperimentSet(object):
                     transfer_volume *
                     ureg.microliters)
 
+            print(source.RackLabel)
             transfer(source, dest, transfer_volume)
 
             # volume logging

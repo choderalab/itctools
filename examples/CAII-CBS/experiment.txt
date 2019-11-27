@@ -10,27 +10,27 @@ Pipette 400.0 from Buffer trough to DestinationPlate well A8
 Pipette 330.8 dimensionless from Buffer trough to DestinationPlate well B1
 Pipette 69.2 dimensionless from ProteinSourcePlate well A1 to DestinationPlate well B1
 Pipette 98.6 dimensionless from Buffer trough to DestinationPlate well B2
-Pipette 21.4 dimensionless from Buffer trough to DestinationPlate well B2
+Pipette 21.4 dimensionless from SourcePlate well A1 to DestinationPlate well B2
 Pipette 261.6 dimensionless from Buffer trough to DestinationPlate well B3
 Pipette 138.4 dimensionless from ProteinSourcePlate well A1 to DestinationPlate well B3
 Pipette 86.2 dimensionless from Buffer trough to DestinationPlate well B4
-Pipette 33.8 dimensionless from Buffer trough to DestinationPlate well B4
+Pipette 33.8 dimensionless from SourcePlate well A1 to DestinationPlate well B4
 Pipette 123.1 dimensionless from Buffer trough to DestinationPlate well B5
 Pipette 276.9 dimensionless from ProteinSourcePlate well A1 to DestinationPlate well B5
 Pipette 64.6 dimensionless from Buffer trough to DestinationPlate well B6
-Pipette 55.4 dimensionless from Buffer trough to DestinationPlate well B6
+Pipette 55.4 dimensionless from SourcePlate well A1 to DestinationPlate well B6
 Pipette 330.8 dimensionless from Buffer trough to DestinationPlate well B7
 Pipette 69.2 dimensionless from Buffer trough to DestinationPlate well B7
 Pipette 98.6 dimensionless from Buffer trough to DestinationPlate well B8
-Pipette 21.4 dimensionless from Buffer trough to DestinationPlate well B8
+Pipette 21.4 dimensionless from SourcePlate well A1 to DestinationPlate well B8
 Pipette 261.6 dimensionless from Buffer trough to DestinationPlate well C1
 Pipette 138.4 dimensionless from Buffer trough to DestinationPlate well C1
 Pipette 86.2 dimensionless from Buffer trough to DestinationPlate well C2
-Pipette 33.8 dimensionless from Buffer trough to DestinationPlate well C2
+Pipette 33.8 dimensionless from SourcePlate well A1 to DestinationPlate well C2
 Pipette 123.1 dimensionless from Buffer trough to DestinationPlate well C3
 Pipette 276.9 dimensionless from Buffer trough to DestinationPlate well C3
 Pipette 64.6 dimensionless from Buffer trough to DestinationPlate well C4
-Pipette 55.4 dimensionless from Buffer trough to DestinationPlate well C4
+Pipette 55.4 dimensionless from SourcePlate well A1 to DestinationPlate well C4
 Pipette 400.0 from Water trough to DestinationPlate well C5
 Pipette 400.0 from Water trough to DestinationPlate well C6
 Pipette 400.0 from Water trough to DestinationPlate well C7
@@ -43,27 +43,27 @@ Pipette 400.0 from SecondBuffer trough to DestinationPlate well D4
 Pipette 367.9 dimensionless from SecondBuffer trough to DestinationPlate well D5
 Pipette 32.1 dimensionless from ProteinSourcePlate well A2 to DestinationPlate well D5
 Pipette 81.2 dimensionless from SecondBuffer trough to DestinationPlate well D6
-Pipette 38.8 dimensionless from SecondBuffer trough to DestinationPlate well D6
+Pipette 38.8 dimensionless from SourcePlate well A3 to DestinationPlate well D6
 Pipette 335.7 dimensionless from SecondBuffer trough to DestinationPlate well D7
 Pipette 64.3 dimensionless from ProteinSourcePlate well A2 to DestinationPlate well D7
 Pipette 79.2 dimensionless from SecondBuffer trough to DestinationPlate well D8
-Pipette 40.8 dimensionless from SecondBuffer trough to DestinationPlate well D8
+Pipette 40.8 dimensionless from SourcePlate well A3 to DestinationPlate well D8
 Pipette 271.5 dimensionless from SecondBuffer trough to DestinationPlate well E1
 Pipette 128.5 dimensionless from ProteinSourcePlate well A2 to DestinationPlate well E1
 Pipette 75.5 dimensionless from SecondBuffer trough to DestinationPlate well E2
-Pipette 44.5 dimensionless from SecondBuffer trough to DestinationPlate well E2
+Pipette 44.5 dimensionless from SourcePlate well A3 to DestinationPlate well E2
 Pipette 367.9 dimensionless from SecondBuffer trough to DestinationPlate well E3
 Pipette 32.1 dimensionless from SecondBuffer trough to DestinationPlate well E3
 Pipette 81.2 dimensionless from SecondBuffer trough to DestinationPlate well E4
-Pipette 38.8 dimensionless from SecondBuffer trough to DestinationPlate well E4
+Pipette 38.8 dimensionless from SourcePlate well A3 to DestinationPlate well E4
 Pipette 335.7 dimensionless from SecondBuffer trough to DestinationPlate well E5
 Pipette 64.3 dimensionless from SecondBuffer trough to DestinationPlate well E5
 Pipette 79.2 dimensionless from SecondBuffer trough to DestinationPlate well E6
-Pipette 40.8 dimensionless from SecondBuffer trough to DestinationPlate well E6
+Pipette 40.8 dimensionless from SourcePlate well A3 to DestinationPlate well E6
 Pipette 271.5 dimensionless from SecondBuffer trough to DestinationPlate well E7
 Pipette 128.5 dimensionless from SecondBuffer trough to DestinationPlate well E7
 Pipette 75.5 dimensionless from SecondBuffer trough to DestinationPlate well E8
-Pipette 44.5 dimensionless from SecondBuffer trough to DestinationPlate well E8
+Pipette 44.5 dimensionless from SourcePlate well A3 to DestinationPlate well E8
 Pipette 400.0 from Water trough to DestinationPlate well F1
 Pipette 400.0 from Water trough to DestinationPlate well F2
 Pipette 400.0 from Water trough to DestinationPlate well F3

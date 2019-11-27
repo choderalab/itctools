@@ -40,7 +40,8 @@ caii_solution = SimpleSolution(compound=caii, compound_mass=4 * ureg.milligram, 
     source_plate.RackType,
     1))
 
-cbs_solution = SimpleSolution(compound=cbs, compound_mass=8.36 * ureg.milligram, solvent=buffer, solvent_mass=14.659 * ureg.gram, location=PipettingLocation(
+#cbs_solution = SimpleSolution(compound=cbs, compound_mass=8.36 * ureg.milligram, solvent=buffer, solvent_mass=14.659 * ureg.gram, location=PipettingLocation(
+cbs_solution = SimpleSolution(compound=cbs, compound_mass=10.0 * ureg.milligram, solvent=buffer, solvent_mass=10.0 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     2))

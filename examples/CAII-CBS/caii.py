@@ -42,7 +42,8 @@ caii_solution = SimpleSolution(compound=caii, compound_mass=5.0 * ureg.milligram
     protein_source_plate.RackType,
     1)) # Well A1 of ITC plate
 
-cbs_solution = SimpleSolution(compound=cbs, compound_mass=10.0 * ureg.milligram, solvent=buffer, solvent_mass=10.0 * ureg.gram, location=PipettingLocation(
+# aqueous solubility of CBS is 453 mg/L---stay well below this!
+cbs_solution = SimpleSolution(compound=cbs, compound_mass=4 * ureg.milligram, solvent=buffer, solvent_mass=10.0 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     1)) # Well A1 of vial holder
@@ -52,6 +53,9 @@ ligand_solutions = [cbs_solution]
 ligand_kas = [cbs_ka]
 
 # Define ITC protocol.
+
+# CAII cell concentrations to evaluate
+cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.040 * ureg.millimolar]
 
 # Protocol for 'control' titrations (water-water, buffer-buffer,
 # titrations into buffer, etc.)
@@ -107,7 +111,7 @@ destination_plate = Labware(
     RackType='ITC Plate')
 itc_experiment_set.addDestinationPlate(destination_plate)
 
-nreplicates = 1  # number of replicates of each experiment
+nreplicates = 2  # number of replicates of each experiment
 
 # Add cleaning experiment.
 name = 'initial cleaning water titration'
@@ -141,18 +145,19 @@ for replicate in range(1):
             protocol=control_protocol,
             cell_volume=cell_volume))
 
-# buffer into CAII
-for replicate in range(1):
-    name = 'buffer into CAII %d' % (replicate + 1)
-    itc_experiment_set.addExperiment(
-        ITCExperiment(
-            name=name,
-            syringe_source=buffer_trough,
-            cell_source=caii_solution,
-            protocol=control_protocol,
-            cell_concentration=0.010 * ureg.millimolar,
-            buffer_source=buffer_trough,
-            cell_volume=cell_volume))
+# buffer into CAII at all cell concentrations
+for cell_concentration in cell_concentrations:
+    for replicate in range(1):
+        name = 'buffer into CAII %d' % (replicate + 1)
+        itc_experiment_set.addExperiment(
+            ITCExperiment(
+                name=name,
+                syringe_source=buffer_trough,
+                cell_source=caii_solution,
+                protocol=control_protocol,
+                cell_concentration=cell_concentration,
+                buffer_source=buffer_trough,
+                cell_volume=cell_volume))
 
 # ligands/CAII
 # scale cell concentration to fix necessary syringe concentrations
@@ -167,8 +172,8 @@ for ligand, ligand_solution, ligand_ka in zip(ligands, ligand_solutions, ligand_
     factors = list()
 
     # Define ligand to protein experiments
-    for cell_concentration in [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.040 * ureg.millimolar]:
-        for replicate in range(1):
+    for cell_concentration in cell_concentrations:
+        for replicate in range(nreplicates):
             name = '%s into CAII %d' % (ligand.name, replicate + 1 )
             experiment = ITCHeuristicExperiment(
                 name=name,

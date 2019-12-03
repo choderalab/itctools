@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 """
 Script for generation of input files for CAII:CBS ITC.
+
+CAII is loaded into well A1 of ITC plate
+CBS is loaded into well 1 of vial holder
 """
 
 from itctools.itctools import ureg, Quantity
@@ -34,14 +37,11 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 protein_source_plate = Labware(RackLabel='ProteinSourcePlate', RackType='ITC Plate')
 
 # Define source solutions in the vial holder
-# TODO : Define solutions once prepared with the Quantos
-#caii_solution = SimpleSolution(compound=caii, compound_mass=5 * ureg.milligram, solvent=buffer, solvent_mass=0.7 * ureg.gram, location=PipettingLocation(
-caii_solution = SimpleSolution(compound=caii, compound_mass=2.5 * ureg.milligram, solvent=buffer, solvent_mass=1.5 * ureg.gram, location=PipettingLocation(
+caii_solution = SimpleSolution(compound=caii, compound_mass=5.0 * ureg.milligram, solvent=buffer, solvent_mass=1.5 * ureg.gram, location=PipettingLocation(
     protein_source_plate.RackLabel,
     protein_source_plate.RackType,
     1)) # Well A1 of ITC plate
 
-#cbs_solution = SimpleSolution(compound=cbs, compound_mass=8.36 * ureg.milligram, solvent=buffer, solvent_mass=14.659 * ureg.gram, location=PipettingLocation(
 cbs_solution = SimpleSolution(compound=cbs, compound_mass=10.0 * ureg.milligram, solvent=buffer, solvent_mass=10.0 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,

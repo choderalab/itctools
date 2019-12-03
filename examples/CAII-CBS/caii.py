@@ -43,7 +43,7 @@ caii_solution = SimpleSolution(compound=caii, compound_mass=5.0 * ureg.milligram
     1)) # Well A1 of ITC plate
 
 # aqueous solubility of CBS is 453 mg/L---stay well below this!
-cbs_solution = SimpleSolution(compound=cbs, compound_mass=4 * ureg.milligram, solvent=buffer, solvent_mass=10.0 * ureg.gram, location=PipettingLocation(
+cbs_solution = SimpleSolution(compound=cbs, compound_mass=3 * ureg.milligram, solvent=buffer, solvent_mass=10.0 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     1)) # Well A1 of vial holder

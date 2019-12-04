@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 """
-Script for generation of input files for CAII:CBS ITC.
+Script for generation of input files for human hCAII:CBS ITC.
 
 CAII is loaded into well A1 of ITC plate
 CBS is loaded into well 1 of vial holder
@@ -26,7 +26,7 @@ caii = Compound('CAII', molecular_weight=29246.0 * (ureg.gram / ureg.mole), puri
 cbs = Compound('CBS', molecular_weight=201.2 * (ureg.gram / ureg.mole), purity=0.97)
 
 #Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
-cbs_ka = 1.203e6 / ureg.molar
+cbs_ka = 10 * 1.203e6 / ureg.molar
 
 # Define troughs on the instrument
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
@@ -37,13 +37,14 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 protein_source_plate = Labware(RackLabel='ProteinSourcePlate', RackType='ITC Plate')
 
 # Define source solutions in the vial holder
-caii_solution = SimpleSolution(compound=caii, compound_mass=5.0 * ureg.milligram, solvent=buffer, solvent_mass=1.5 * ureg.gram, location=PipettingLocation(
+caii_mass = 48.913e-6 * ureg.moles/ureg.liter * 29246 * ureg.grams/ureg.moles * 1.58 * ureg.milliliters
+caii_solution = SimpleSolution(compound=caii, compound_mass=caii_mass, solvent=buffer, solvent_mass=1.58 * ureg.grams, location=PipettingLocation(
     protein_source_plate.RackLabel,
     protein_source_plate.RackType,
     1)) # Well A1 of ITC plate
 
 # aqueous solubility of CBS is 453 mg/L---stay well below this!
-cbs_solution = SimpleSolution(compound=cbs, compound_mass=3 * ureg.milligram, solvent=buffer, solvent_mass=10.0 * ureg.gram, location=PipettingLocation(
+cbs_solution = SimpleSolution(compound=cbs, compound_mass=5.43 * ureg.milligram, solvent=buffer, solvent_mass=12.0006 * ureg.gram, location=PipettingLocation(
     source_plate.RackLabel,
     source_plate.RackType,
     1)) # Well A1 of vial holder
@@ -111,7 +112,7 @@ destination_plate = Labware(
     RackType='ITC Plate')
 itc_experiment_set.addDestinationPlate(destination_plate)
 
-nreplicates = 2  # number of replicates of each experiment
+nreplicates = 1  # number of replicates of each experiment
 
 # Add cleaning experiment.
 name = 'initial cleaning water titration'
@@ -216,7 +217,7 @@ name = 'final cleaning water titration'
 itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol, cell_volume=cell_volume) )
 
 # Water control titrations.
-nfinal = 2
+nfinal = 1
 for replicate in range(nfinal):
     name = 'final water into water test %d' % (replicate + 1)
     itc_experiment_set.addExperiment(
@@ -235,13 +236,13 @@ itc_experiment_set.validate(print_volumes=True, omit_zeroes=True, human_readable
 # For convenience, concentrations
 for ligand_solution in ligand_solutions:
     print("%12s %.4f mM" % (ligand_solution.name, ligand_solution.concentration / ureg.millimolar ))
-    print("%12s %.4f mM" % ('CAII', caii_solution.concentration  / ureg.millimolar ))
+    print("%12s %.4f mM" % ('hCAII', caii_solution.concentration  / ureg.millimolar ))
 
 
 # Write Tecan EVO pipetting operations for both liquid and air LiHas.
-worklist_prefix = 'caii'
+worklist_prefix = 'hCAII'
 itc_experiment_set.writeTecanWorklist(worklist_prefix)
 
 # Write Auto iTC-200 experiment spreadsheet.
-excel_filename = 'caii.xlsx'
+excel_filename = 'hCAII.xlsx'
 itc_experiment_set.writeAutoITCExcel(excel_filename)

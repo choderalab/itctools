@@ -26,7 +26,7 @@ caii = Compound('CAII', molecular_weight=29246.0 * (ureg.gram / ureg.mole), puri
 cbs = Compound('CBS', molecular_weight=201.2 * (ureg.gram / ureg.mole), purity=0.97)
 
 #Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
-cbs_ka = 10 * 1.203e6 / ureg.molar
+cbs_ka = 50 * 1.203e6 / ureg.molar
 
 # Define troughs on the instrument
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')

@@ -21,6 +21,7 @@ For the `caii` experiment:
 
 * `bCAII.py` - bovine CAII:CBS experiment
 * `hCAII.py` - human CAII:CBS experiment
+* `bCAII-SIM.py` - bovine CAII:CBS experiment with standard and SIM titrations
 
 * `*-LiHa.gwl` - a Tecan EVO LiHa worklist to pipette buffer and protein
 * `*-aLiHa.gwl` - a Tecan EVO aLiHa worklist to pipette ligand

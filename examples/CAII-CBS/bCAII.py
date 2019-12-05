@@ -22,7 +22,7 @@ water = Solvent('water', density=0.9970479 * ureg.gram / ureg.milliliter)
 buffer = Solvent('buffer', density=1.014 * ureg.gram / ureg.milliliter) # TODO is our density the same as the HOST-GUEST buffer?
 
 # Define compounds.
-caii = Compound('bCAII', molecular_weight=29246.0 * (ureg.gram / ureg.mole), purity=1.)
+caii = Compound('bCAII', molecular_weight=30000.0 * (ureg.gram / ureg.mole), purity=1.)
 cbs = Compound('CBS', molecular_weight=201.2 * (ureg.gram / ureg.mole), purity=0.97)
 
 #Ka (association constants) TODO Add this to the compound properties? (maybe a dict with protein as key)
@@ -216,7 +216,7 @@ name = 'final cleaning water titration'
 itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol, cell_volume=cell_volume) )
 
 # Water control titrations.
-nfinal = 2
+nfinal = 1
 for replicate in range(nfinal):
     name = 'final water into water test %d' % (replicate + 1)
     itc_experiment_set.addExperiment(

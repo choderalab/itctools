@@ -672,10 +672,12 @@ class ITCExperimentSet(object):
         self._allocate_destinations()
 
         def transfer(source, dest, volume):
-            """Write human-readable quanties."""
+            """Write human-readable quanties if desired."""
+            operation = f'* Transfer {volume:.1f} uL from {self._human_readable(source)} to {self._human_readable(dest)}\n'
             if human_readable_log:
                 # TODO: Streamline this with a single transfer command
-                human_readable_log.write(f'Pipette {volume:.1f} from {self._human_readable(source)} to {self._human_readable(dest)}\n')
+                human_readable_log.write(operation)
+            return operation
 
         # Build worklist scripts
         self.worklists = dict()
@@ -692,8 +694,7 @@ class ITCExperimentSet(object):
             experiment.experiment_number = experiment_number
 
             # volume logging
-            volume_report += "Experiment: %d\n" % (
-                experiment.experiment_number + 1)
+            volume_report += f"Experiment {experiment.experiment_number+1} : {experiment.name} : \n"
 
             itcdata = ITCExperimentSet.ITCData()
             tecandata = ITCExperimentSet.TecanData()
@@ -727,11 +728,6 @@ class ITCExperimentSet(object):
                     else:
                         tflag = "\033[5;41m !!!"
 
-                volume_report += "%s Buffer   (ul):%.2f\033[0;0m \n" % (
-                    bflag, buffer_volume)
-                volume_report += "%s Transfer (ul):%.2f\033[0;0m \n" % (
-                    tflag, transfer_volume)
-
                 # Schedule buffer transfer.
                 tipmask = 1
                 pipette = 'LiHa'
@@ -745,7 +741,8 @@ class ITCExperimentSet(object):
                     self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                         tecandata.cell_destination.RackLabel, dest.RackType, dest.Position,
                         buffer_volume, tipmask)
-                    transfer(source, dest, buffer_volume)
+
+                    volume_report += transfer(source, dest, buffer_volume)
 
                     # no wash if no actions taken
                     self.worklists[pipette] += 'W;\r\n'  # queue wash tips
@@ -778,7 +775,7 @@ class ITCExperimentSet(object):
                 self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                     dest.RackLabel, dest.RackType, dest.Position, transfer_volume, tipmask)
 
-                transfer(source, dest, transfer_volume)
+                volume_report += transfer(source, dest, transfer_volume)
 
                 # no wash if no actions taken
                 if pipette != None:
@@ -818,11 +815,6 @@ class ITCExperimentSet(object):
                     else:
                         sflag = "\033[5;41m !!!"
 
-                volume_report += "%s Buffer  (ul):%.2f \033[0;0m \n" % (
-                    bflag, buffer_volume)
-                volume_report += "%s Syringe (ul):%.2f \033[0;0m \n\n" % (
-                    sflag, syringe_volume)
-
                 # Schedule buffer transfer.
                 tipmask = 4
                 pipette = None
@@ -835,7 +827,7 @@ class ITCExperimentSet(object):
                     self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                         dest.RackLabel, dest.RackType, dest.Position, buffer_volume, tipmask)
 
-                    transfer(source, dest, buffer_volume)
+                    volume_report += transfer(source, dest, buffer_volume)
 
                     # no wash if no actions taken
                     if pipette != None:
@@ -876,19 +868,15 @@ class ITCExperimentSet(object):
                     transfer_volume *
                     ureg.microliters)
 
-            print(source.RackLabel)
-            transfer(source, dest, transfer_volume)
+            volume_report += transfer(source, dest, transfer_volume)
 
-            # volume logging
+            # Sanity checks on pipetting volume
             sflag = ""
             if syringe_volume < vlimit:
                 if syringe_volume < 0.01 and omit_zeroes:
                     sflag = "\033[5;31m !!!"
                 else:
                     sflag = "\033[5;41m !!!"
-
-            volume_report += "%s Syringe (ul):%.2f \033[0;0m \n\n" % (
-                sflag, syringe_volume)
 
             # Finish worklist section.
             if pipette == 'LiHa':

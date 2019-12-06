@@ -838,12 +838,22 @@ class ITCExperimentSet(object):
                         ureg.microliters)
 
             # Schedule syringe solution transfer.
+            aLiHa_max_volume = 50 # 50 uL tips
             tipmask = 8
             pipette = None
             try:
-                # Assume source is Solution' use aLiHa
-                if transfer_volume > 0.01 or not omit_zeroes:
+                # Assume source is Solution: use aLiHa
+                print(transfer_volume)
+                if ((transfer_volume > 0.01) or not omit_zeroes) and (transfer_volume <= aLiHa_max_volume):
                     pipette = 'aLiHa'
+                    source = experiment.syringe_source.location
+                    self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
+                        source.RackLabel,
+                        source.RackType,
+                        source.Position,
+                        transfer_volume, tipmask)
+                elif ((transfer_volume > 0.01) or not omit_zeroes) and (transfer_volume > aLiHa_max_volume):
+                    pipette = 'LiHa'
                     source = experiment.syringe_source.location
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         source.RackLabel,

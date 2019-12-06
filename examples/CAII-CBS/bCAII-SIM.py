@@ -62,7 +62,7 @@ cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.040 *
 
 control_protocol = ITCProtocol(
     'control_protocol',
-    sample_prep_method='Plates Clean.setup', # thorough cleaning
+    sample_prep_method='Plates Quick.setup', # thorough cleaning
     itc_method='ChoderaWaterWater.inj',
     analysis_method='Control',
     experimental_conditions=dict(target_temperature=25, equilibration_time=60, stir_rate=1000, reference_power=5),

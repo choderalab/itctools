@@ -20,7 +20,7 @@ purities_df = pd.read_csv('compound_list.csv')
 purities_df.set_index('Identifier', inplace=True)
 
 # Compound IDs from CSV
-compound_ids = [1, 2]
+compound_ids = [46, 3, 19, 24]
 
 # The sample cell volume in microliters
 cell_volume = 202.8
@@ -37,11 +37,11 @@ for compound_id in compound_ids:
     molecular_weight = solubilities_df.loc[compound_id]['MW'] * (ureg.gram / ureg.mole)
     purity = purities_df.loc[compound_id]['Purity'] / 100.0
     solubility = solubilities_df.loc[compound_id]['ESOL Solubility (mg/ml)'] * (ureg.milligram / ureg.milliliter)
-    compound = Compound(f'{compound_id}', molecular_weight=molecular_weight, purity=purity, solubility=solubility)
+    compound = Compound(f'Compound {compound_id}', molecular_weight=molecular_weight, purity=purity, solubility=solubility)
     ligands.append(compound)
     Ka = 1.203e6 / ureg.molar
     ligand_kas.append(Ka)
-    print(f"Compound {compound_id:8} : MW {(molecular_weight/(ureg.gram / ureg.mole)):8.3f} g/mol,  purity {purity:.3f}, solubility = {(solubility.to('milligrams/milliliter')):8.3f}, Kd = {((1/Ka).to('micromolar')):8.3f}")
+    print(f"{compound.name:8} : MW {(molecular_weight/(ureg.gram / ureg.mole)):8.3f} g/mol,  purity {purity:.3f}, solubility = {(solubility.to('milligrams/milliliter')):8.3f}, Kd = {((1/Ka).to('micromolar')):8.3f}")
 
 # Define troughs on the instrument
 water_trough = Labware(RackLabel='Water', RackType='Trough 100ml')
@@ -77,7 +77,7 @@ cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.040 *
 
 control_protocol = ITCProtocol(
     'control_protocol',
-    sample_prep_method='Plates Clean.setup', # thorough cleaning
+    sample_prep_method='Plates Quick.setup', # thorough cleaning
     itc_method='ChoderaWaterWater.inj',
     analysis_method='Control',
     experimental_conditions=dict(target_temperature=25, equilibration_time=60, stir_rate=1000, reference_power=5),
@@ -163,7 +163,7 @@ for replicate in range(1):
 # buffer into receptor at all cell concentrations
 for cell_concentration in cell_concentrations:
     for replicate in range(1):
-        name = 'buffer into receptor %d' % (replicate + 1)
+        name = 'buffer into receptor (replicate %d)' % (replicate + 1)
         itc_experiment_set.addExperiment(
             ITCExperiment(
                 name=name,
@@ -242,16 +242,17 @@ for replicate in range(nfinal):
             protocol=control_protocol,
             cell_volume=cell_volume))
 
+# For convenience, report concentrations
+print('STOCK SOLUTION CONCENTRATIONS:')
+print("%12s %.4f mM" % ('receptor', receptor_solution.concentration  / ureg.millimolar ))
+for ligand_solution in ligand_solutions:
+    print("%12s %.4f mM" % (ligand_solution.name, ligand_solution.concentration / ureg.millimolar ))
+print('')
+
 # Check that the experiment can be carried out using available solutions and plates.
 # Also generate Tecan EVO worklists
 import sys
-itc_experiment_set.validate(print_volumes=True, omit_zeroes=True, human_readable_log=sys.stdout)
-
-# For convenience, concentrations
-for ligand_solution in ligand_solutions:
-    print("%12s %.4f mM" % (ligand_solution.name, ligand_solution.concentration / ureg.millimolar ))
-    print("%12s %.4f mM" % ('receptor', receptor_solution.concentration  / ureg.millimolar ))
-
+itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
 
 # Write Tecan EVO pipetting operations for both liquid and air LiHas.
 worklist_prefix = 'experiments'

@@ -25,7 +25,7 @@ compound_ids = [
     #24, # displaces water network
     ]
 
-nreplicates = 2  # number of replicates of each protein-ligand experiment
+nreplicates = 1  # number of replicates of each protein-ligand experiment
 
 # The sample cell volume in microliters
 cell_volume = 202.8
@@ -47,9 +47,10 @@ for compound_id in compound_ids:
     solubility = solubilities_df.loc[compound_id]['ESOL Solubility (mg/ml)'] * (ureg.milligram / ureg.milliliter)
     compound = Compound(f'Compound {compound_id}', molecular_weight=molecular_weight, purity=purity, solubility=solubility)
     ligands.append(compound)
-    Ka = 1.203e6 / ureg.molar
+    Kd = 50 * ureg.micromolar
+    Ka = 1.0 / Kd
     ligand_kas.append(Ka)
-    print(f"{compound.name:20} : MW {(molecular_weight/(ureg.gram / ureg.mole)):8.3f} g/mol,  purity {purity:.3f}, solubility = {(solubility.to('milligrams/milliliter')):8.3f}, Kd = {((1/Ka).to('micromolar')):8.3f}")
+    print(f"{compound.name:20} : MW {molecular_weight.to('gram/mole')},  purity {purity:.3f}, solubility = {(solubility.to('milligrams/milliliter')):8.3f}, Kd = {((1/Ka).to('micromolar')):8.3f}")
 print('')
 
 # Define troughs on the instrument
@@ -61,15 +62,15 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 protein_source_plate = Labware(RackLabel='ProteinSourcePlate', RackType='ITC Plate')
 
 # Define source solutions in the vial holder
-protein_mass = (2.486 * ureg.milligram / ureg.milliliter) * (1.3 * ureg.milliliter)
-solvent_mass = 1.3 * ureg.milliliters * buffer.density
+protein_mass = (1.7325  * ureg.milligram / ureg.milliliter) * (0.35 * ureg.milliliter)
+solvent_mass = 0.35 * ureg.milliliters * buffer.density
 receptor_solution = SimpleSolution(compound=receptor, compound_mass=protein_mass, solvent=buffer, solvent_mass=solvent_mass, location=PipettingLocation(
     protein_source_plate.RackLabel,
     protein_source_plate.RackType,
     1)) # Well A1 of ITC plate
 
 solubility_safety = 0.5 # fraction of solubility to prepare solution for
-max_compound_mass = 10.0 * ureg.milligram
+max_compound_mass = 15.0 * ureg.milligram # maximum mass we may want to dispense
 
 ligand_solutions = list()
 for ligand in ligands:
@@ -86,15 +87,17 @@ for ligand in ligands:
 
 # For convenience, report concentrations
 print('STOCK SOLUTION CONCENTRATIONS:')
-print(f"{receptor_solution.name:20} : {receptor_solution.compound_mass.to('milligrams')} receptor in {receptor_solution.solvent_mass.to('grams')} solvent : {receptor_solution.concentration.to('millimolar'):30}")
+location = ITCExperimentSet.human_readable(receptor_solution.location)
+print(f"{receptor_solution.name:20} in {location:32} : {receptor_solution.compound_mass.to('milligrams')} receptor in {receptor_solution.solvent_mass.to('grams')} solvent : {receptor_solution.concentration.to('millimolar'):30}")
 for ligand_solution in ligand_solutions:
-    print(f"{ligand_solution.name:20} : {ligand_solution.compound_mass.to('milligrams')} compound in {ligand_solution.solvent_mass.to('grams')} solvent : {ligand_solution.concentration.to('millimolar'):30}")
+    location = ITCExperimentSet.human_readable(ligand_solution.location)
+    print(f"{ligand_solution.name:20} in {location:32} : {ligand_solution.compound_mass.to('milligrams')} compound in {ligand_solution.solvent_mass.to('grams')} solvent : {ligand_solution.concentration.to('millimolar'):30}")
 print('')
 
 # Define ITC protocol.
 
 # Receptor cell concentrations to evaluate
-cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.040 * ureg.millimolar]
+cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar]
 
 # Protocol for 'control' titrations (water-water, buffer-buffer,
 # titrations into buffer, etc.)
@@ -119,6 +122,16 @@ binding_protocol = ITCProtocol(
         10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
     )
 
+binding_protocol_with_cleaning = ITCProtocol(
+    '1:1 binding protocol',
+    sample_prep_method='Plates Clean.setup',
+    itc_method='ChoderaHSA.inj',
+    analysis_method='Onesite',
+    experimental_conditions=dict(target_temperature=25, equilibration_time=300, stir_rate=1000, reference_power=5),
+    injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
+        10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
+    )
+
 sim_protocol = ITCProtocol(
     'SIM protocol',
     sample_prep_method='Plates Quick.setup',
@@ -129,6 +142,23 @@ sim_protocol = ITCProtocol(
     injections=[dict(volume_inj=0.2, duration_inj=0.4, spacing=60, filter_period=0.5)] +
         10 * [dict(volume_inj=3.0, duration_inj=6, spacing=120, filter_period=0.5)],
     )
+
+hdr_protocol = ITCProtocol(
+    'HDR protocol',
+    sample_prep_method='Plates Quick.setup',
+    itc_method='ChoderaHDR.inj',
+    analysis_method='Onesite',
+    experimental_conditions=dict(target_temperature=25, equilibration_time=300, stir_rate=1000, reference_power=5),
+    injections=[
+        dict(volume_inj=0.1, duration_inj=0.2, spacing=120, filter_period=0.5),
+        dict(volume_inj=0.2, duration_inj=0.4, spacing=120, filter_period=0.5),
+        dict(volume_inj=0.4, duration_inj=0.8, spacing=120, filter_period=0.5),
+        dict(volume_inj=0.8, duration_inj=1.6, spacing=120, filter_period=0.5),
+        dict(volume_inj=1.6, duration_inj=3.2, spacing=120, filter_period=0.5),
+        dict(volume_inj=3.2, duration_inj=6.4, spacing=120, filter_period=0.5),
+        dict(volume_inj=6.4, duration_inj=12.8, spacing=120, filter_period=0.5),
+        dict(volume_inj=12.8, duration_inj=25.6, spacing=120, filter_period=0.5),
+    ])
 
 # Protocol for cleaning protocol
 cleaning_protocol = ITCProtocol(
@@ -150,7 +180,6 @@ destination_plate = Labware(
     RackLabel='DestinationPlate',
     RackType='ITC Plate')
 itc_experiment_set.addDestinationPlate(destination_plate)
-
 
 # Add cleaning experiment.
 name = 'initial cleaning water titration'
@@ -198,35 +227,15 @@ for cell_concentration in cell_concentrations:
         cell_concentration=cell_concentration,
         buffer_source=buffer_trough,
         cell_volume=cell_volume)
-    itc_experiment_set.addExperiment(experiment)
+    # itc_experiment_set.addExperiment(experiment) # SKIP FOR NOW
 
     for ligand, ligand_solution, ligand_ka in zip(ligands, ligand_solutions, ligand_kas):
         # Perform specified number of replicates
         for replicate in range(nreplicates):
 
-            # SIM ligand into buffer with highest concentration of ligand
-            name = f'SIM {ligand.name} into buffer (replicate {replicate+1})'
-            experiment = ITCExperiment(
-                name=name,
-                syringe_source=ligand_solution,
-                cell_source=buffer_trough,
-                protocol=sim_protocol,
-                cell_concentration=None,
-                buffer_source=buffer_trough,
-                cell_volume=cell_volume)
-            itc_experiment_set.addExperiment(experiment)
-
-            # SIM ligand into receptor with highest concetration of ligand
-            name = f'SIM {ligand.name} into receptor (replicate {replicate+1})'
-            experiment = ITCExperiment(
-                name=name,
-                syringe_source=ligand_solution,
-                cell_source=receptor_solution,
-                protocol=sim_protocol,
-                cell_concentration=cell_concentration,
-                buffer_source=buffer_trough,
-                cell_volume=cell_volume)
-            itc_experiment_set.addExperiment(experiment)
+            #
+            # Injection protocol
+            #
 
             # Titrate ligand into protein experiment based on guess of affinity
             name = f'titration of {ligand.name} into {receptor.name} (replicate {replicate+1})'
@@ -234,7 +243,7 @@ for cell_concentration in cell_concentrations:
                 name=name,
                 syringe_source=ligand_solution,
                 cell_source=receptor_solution,
-                protocol=binding_protocol,
+                protocol=binding_protocol_with_cleaning,
                 cell_concentration=cell_concentration,
                 buffer_source=buffer_trough,
                 cell_volume=cell_volume)
@@ -245,16 +254,52 @@ for cell_concentration in cell_concentrations:
             ligand_experiment = copy.deepcopy(receptor_experiment)
             ligand_experiment.name = f'titration of {ligand.name} into buffer (replicate {replicate+1})'
             ligand_experiment.cell_source = buffer_trough
+            ligand_experiment.cell_dilution_factor = 0
             ligand_experiment.cell_concentration = None
 
-            # Add experiemnt
+            ligand_experiment.protocol = binding_protocol
+
+            # Add injection-based experiments
             itc_experiment_set.addExperiment(ligand_experiment)
             itc_experiment_set.addExperiment(receptor_experiment)
 
+            #
+            # SIM protocol
+            #
+
+            # SIM ligand into receptor with highest concetration of ligand
+            sim_ligand_experiment = copy.deepcopy(ligand_experiment)
+            sim_ligand_experiment.name = f'SIM {ligand.name} into buffer (replicate {replicate+1})'
+
+            sim_receptor_experiment = copy.deepcopy(receptor_experiment)
+            sim_receptor_experiment.name = f'SIM {ligand.name} into receptor (replicate {replicate+1})'
+
+            itc_experiment_set.addExperiment(sim_ligand_experiment)
+            itc_experiment_set.addExperiment(sim_receptor_experiment)
+
+            #
+            # HDR protocol
+            #
+
+            # HDR ligand into receptor with highest concetration of ligand
+            sim_ligand_experiment = copy.deepcopy(ligand_experiment)
+            sim_ligand_experiment.name = f'HDR {ligand.name} into buffer (replicate {replicate+1})'
+
+            sim_receptor_experiment = copy.deepcopy(receptor_experiment)
+            sim_receptor_experiment.name = f'HDR {ligand.name} into receptor (replicate {replicate+1})'
+
+            itc_experiment_set.addExperiment(sim_ligand_experiment)
+            itc_experiment_set.addExperiment(sim_receptor_experiment)
+
 # Add cleaning experiment.
 name = 'final cleaning water titration'
-ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol, cell_volume=cell_volume)
-itc_experiment_set.addExperiment(experiment)
+experiment = ITCExperiment(
+            name=name,
+            syringe_source=water_trough,
+            cell_source=water_trough,
+            protocol=cleaning_protocol,
+            cell_volume=cell_volume)
+#itc_experiment_set.addExperiment(experiment) # SKIP
 
 # Water control titrations.
 nfinal = 1

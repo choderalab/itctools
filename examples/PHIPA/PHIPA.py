@@ -270,9 +270,11 @@ for cell_concentration in cell_concentrations:
             # SIM ligand into receptor with highest concetration of ligand
             sim_ligand_experiment = copy.deepcopy(ligand_experiment)
             sim_ligand_experiment.name = f'SIM {ligand.name} into buffer (replicate {replicate+1})'
+            sim_ligand_experiment.protocol = sim_protocol
 
             sim_receptor_experiment = copy.deepcopy(receptor_experiment)
             sim_receptor_experiment.name = f'SIM {ligand.name} into receptor (replicate {replicate+1})'
+            sim_receptor_experiment.protocol = sim_protocol
 
             itc_experiment_set.addExperiment(sim_ligand_experiment)
             itc_experiment_set.addExperiment(sim_receptor_experiment)
@@ -284,9 +286,11 @@ for cell_concentration in cell_concentrations:
             # HDR ligand into receptor with highest concetration of ligand
             sim_ligand_experiment = copy.deepcopy(ligand_experiment)
             sim_ligand_experiment.name = f'HDR {ligand.name} into buffer (replicate {replicate+1})'
+            sim_ligand_experiment.protocol = hdr_protocol
 
             sim_receptor_experiment = copy.deepcopy(receptor_experiment)
             sim_receptor_experiment.name = f'HDR {ligand.name} into receptor (replicate {replicate+1})'
+            sim_receptor_experiment.protocol = hdr_protocol
 
             itc_experiment_set.addExperiment(sim_ligand_experiment)
             itc_experiment_set.addExperiment(sim_receptor_experiment)

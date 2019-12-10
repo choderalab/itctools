@@ -603,7 +603,8 @@ class ITCExperimentSet(object):
                 location.WellName = WellName
                 self.destination_locations.append(location)
 
-    def _human_readable(self, source):
+    @staticmethod
+    def human_readable(source):
         """
         Generate a human-readable position name
 
@@ -645,7 +646,7 @@ class ITCExperimentSet(object):
 
         return description
 
-    def validate(self, print_volumes=True, omit_zeroes=True, vlimit=10.0, human_readable_log=None):
+    def validate(self, print_volumes=False, omit_zeroes=True, vlimit=10.0, human_readable_log=None):
         """
         Validate that the specified set of ITC experiments can actually be set up, raising an exception if not.
 
@@ -673,7 +674,7 @@ class ITCExperimentSet(object):
 
         def transfer(source, dest, volume):
             """Write human-readable quanties if desired."""
-            operation = f'* Transfer {volume:.1f} uL from {self._human_readable(source)} to {self._human_readable(dest)}\n'
+            operation = f'* Transfer {volume:.1f} uL from {self.human_readable(source)} to {self.human_readable(dest)}\n'
             if human_readable_log:
                 # TODO: Streamline this with a single transfer command
                 human_readable_log.write(operation)
@@ -699,6 +700,10 @@ class ITCExperimentSet(object):
             itcdata = ITCExperimentSet.ITCData()
             tecandata = ITCExperimentSet.TecanData()
 
+            #
+            # Cell contents
+            #
+
             # Find a place to put cell contents.
             if len(self.destination_locations) == 0:
                 raise Exception(
@@ -714,19 +719,6 @@ class ITCExperimentSet(object):
                 buffer_volume = cell_volume * (
                     1.0 - experiment.cell_dilution_factor)
                 transfer_volume = cell_volume - buffer_volume
-
-                # volume logging
-                bflag = tflag = ""
-                if buffer_volume < vlimit:
-                    if buffer_volume < 0.01 and omit_zeroes:
-                        bflag = "\033[5;31m !!!"
-                    else:
-                        bflag = "\033[5;41m !!!"
-                if transfer_volume < vlimit:
-                    if transfer_volume < 0.01 and omit_zeroes:
-                        tflag = "\033[5;31m !!!"
-                    else:
-                        tflag = "\033[5;41m !!!"
 
                 # Schedule buffer transfer.
                 tipmask = 1
@@ -753,24 +745,21 @@ class ITCExperimentSet(object):
 
             # Schedule cell solution transfer.
             tipmask = 2
-            pipette = None
+            pipette = 'LiHa'
             try:
                 # Assume source is Solution.
-                pipette = 'LiHa'
                 if transfer_volume > 0.01 or not omit_zeroes:
                     source = experiment.cell_source.location
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         source.RackLabel, source.RackType, source.Position, transfer_volume, tipmask)
             except:
                 # Assume source is Labware.
-                pipette = 'LiHa'
                 if transfer_volume > 0.01 or not omit_zeroes:
                     source = experiment.cell_source
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         source.RackLabel, source.RackType, 2, transfer_volume, tipmask)
 
             if transfer_volume > 0.01 or not omit_zeroes:
-                pipette = 'LiHa'
                 dest = tecandata.cell_destination
                 self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                     dest.RackLabel, dest.RackType, dest.Position, transfer_volume, tipmask)
@@ -785,6 +774,10 @@ class ITCExperimentSet(object):
                     transfer_volume *
                     ureg.microliters)
 
+            #
+            # Syringe contents
+            #
+
             # Find a place to put syringe contents.
             if len(self.destination_locations) == 0:
                 raise Exception(
@@ -793,27 +786,16 @@ class ITCExperimentSet(object):
             tecandata.syringe_destination = self.destination_locations.pop(0)
 
             syringe_volume = 120.0  # microliters
-            transfer_volume = cell_volume
+            transfer_volume = syringe_volume
 
             if experiment.syringe_dilution_factor is not None:
+                if (experiment.syringe_dilution_factor > 1.0) or (experiment.syringe_dilution_factor < 0.0):
+                    raise Exception(f'experiment.syringe_dilution_factor = {experiment.syringe_dilution_factor}')
+                    
                 # Compute buffer volume needed.
                 buffer_volume = syringe_volume * (
                     1.0 - experiment.syringe_dilution_factor)
                 transfer_volume = syringe_volume - buffer_volume
-
-                # volume logging
-                bflag = sflag = ""
-
-                if buffer_volume < vlimit:
-                    if buffer_volume < 0.01 and omit_zeroes:
-                        bflag = "\033[5;31m !!!"
-                    else:
-                        bflag = "\033[5;41m !!!"
-                if syringe_volume < vlimit:
-                    if syringe_volume < 0.01 and omit_zeroes:
-                        sflag = "\033[5;31m !!!"
-                    else:
-                        sflag = "\033[5;41m !!!"
 
                 # Schedule buffer transfer.
                 tipmask = 4
@@ -843,7 +825,6 @@ class ITCExperimentSet(object):
             pipette = None
             try:
                 # Assume source is Solution: use aLiHa
-                print(transfer_volume)
                 if ((transfer_volume > 0.01) or not omit_zeroes) and (transfer_volume <= aLiHa_max_volume):
                     pipette = 'aLiHa'
                     source = experiment.syringe_source.location
@@ -879,14 +860,6 @@ class ITCExperimentSet(object):
                     ureg.microliters)
 
             volume_report += transfer(source, dest, transfer_volume)
-
-            # Sanity checks on pipetting volume
-            sflag = ""
-            if syringe_volume < vlimit:
-                if syringe_volume < 0.01 and omit_zeroes:
-                    sflag = "\033[5;31m !!!"
-                else:
-                    sflag = "\033[5;41m !!!"
 
             # Finish worklist section.
             if pipette == 'LiHa':

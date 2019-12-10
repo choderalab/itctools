@@ -234,7 +234,13 @@ for ligand, ligand_solution, ligand_ka in zip(ligands, ligand_solutions, ligand_
 
 # Add cleaning experiment.
 name = 'final cleaning water titration'
-itc_experiment_set.addExperiment( ITCExperiment(name=name, syringe_source=water_trough, cell_source=water_trough, protocol=cleaning_protocol, cell_volume=cell_volume) )
+itc_experiment_set.addExperiment(
+    ITCExperiment(
+        name=name,
+        syringe_source=water_trough,
+        cell_source=water_trough,
+        protocol=cleaning_protocol,
+        cell_volume=cell_volume))
 
 # Water control titrations.
 nfinal = 1

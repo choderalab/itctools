@@ -785,13 +785,13 @@ class ITCExperimentSet(object):
                     (experiment_number, len(self.experiments)))
             tecandata.syringe_destination = self.destination_locations.pop(0)
 
-            syringe_volume = 120.0  # microliters
+            syringe_volume = 150.0  # microliters (120 uL minimimum)
             transfer_volume = syringe_volume
 
             if experiment.syringe_dilution_factor is not None:
                 if (experiment.syringe_dilution_factor > 1.0) or (experiment.syringe_dilution_factor < 0.0):
                     raise Exception(f'experiment.syringe_dilution_factor = {experiment.syringe_dilution_factor}')
-                    
+
                 # Compute buffer volume needed.
                 buffer_volume = syringe_volume * (
                     1.0 - experiment.syringe_dilution_factor)

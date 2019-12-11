@@ -1,109 +1,142 @@
 COMPOUNDS
-Compound 46          : MW 261.15 gram / mole,  purity 0.950, solubility = 68.500 milligram / milliliter, Kd = 50.000 micromolar
+Compound 46          : MW 261.15 gram / mole,  purity 0.950, solubility = 68.500 milligram / milliliter, Kd = 40.000 micromolar
 
 STOCK SOLUTION CONCENTRATIONS:
-receptor             in ProteinSourcePlate well A1       : 0.6063749999999999 milligram receptor in 0.3549 gram solvent : 0.12272437486718141 millimolar
+receptor             in ProteinSourcePlate well A1       : 1.22895 milligram receptor in 0.6083999999999999 gram solvent : 0.14509102500531273 millimolar
 Compound 46          in SourcePlate well A1              : 15.0 milligram compound in 10.0 gram solvent : 5.533026995979323 millimolar
 
 Experiment 1 : initial cleaning water titration : 
 * Transfer 400.0 uL from Water trough to DestinationPlate well A1
-* Transfer 120.0 uL from Water trough to DestinationPlate well A2
+* Transfer 150.0 uL from Water trough to DestinationPlate well A2
 
 Experiment 2 : water into water : 
 * Transfer 400.0 uL from Water trough to DestinationPlate well A3
-* Transfer 120.0 uL from Water trough to DestinationPlate well A4
+* Transfer 150.0 uL from Water trough to DestinationPlate well A4
 
 Experiment 3 : buffer into buffer : 
 * Transfer 400.0 uL from Buffer trough to DestinationPlate well A5
-* Transfer 120.0 uL from Buffer trough to DestinationPlate well A6
+* Transfer 150.0 uL from Buffer trough to DestinationPlate well A6
 
 Experiment 4 : titration of Compound 46 into buffer (replicate 1) : 
 * Transfer 400.0 uL from Buffer trough to DestinationPlate well A7
-* Transfer 13.4 uL from Buffer trough to DestinationPlate well A8
-* Transfer 106.6 uL from SourcePlate well A1 to DestinationPlate well A8
+* Transfer 40.9 uL from Buffer trough to DestinationPlate well A8
+* Transfer 109.1 uL from SourcePlate well A1 to DestinationPlate well A8
 
 Experiment 5 : titration of Compound 46 into receptor (replicate 1) : 
-* Transfer 367.4 dimensionless uL from Buffer trough to DestinationPlate well B1
-* Transfer 32.6 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well B1
-* Transfer 13.4 uL from Buffer trough to DestinationPlate well B2
-* Transfer 106.6 uL from SourcePlate well A1 to DestinationPlate well B2
+* Transfer 372.4 dimensionless uL from Buffer trough to DestinationPlate well B1
+* Transfer 27.6 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well B1
+* Transfer 40.9 uL from Buffer trough to DestinationPlate well B2
+* Transfer 109.1 uL from SourcePlate well A1 to DestinationPlate well B2
 
 Experiment 6 : SIM Compound 46 into buffer (replicate 1) : 
 * Transfer 400.0 uL from Buffer trough to DestinationPlate well B3
-* Transfer 13.4 uL from Buffer trough to DestinationPlate well B4
-* Transfer 106.6 uL from SourcePlate well A1 to DestinationPlate well B4
+* Transfer 40.9 uL from Buffer trough to DestinationPlate well B4
+* Transfer 109.1 uL from SourcePlate well A1 to DestinationPlate well B4
 
 Experiment 7 : SIM Compound 46 into receptor (replicate 1) : 
-* Transfer 367.4 dimensionless uL from Buffer trough to DestinationPlate well B5
-* Transfer 32.6 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well B5
-* Transfer 13.4 uL from Buffer trough to DestinationPlate well B6
-* Transfer 106.6 uL from SourcePlate well A1 to DestinationPlate well B6
+* Transfer 372.4 dimensionless uL from Buffer trough to DestinationPlate well B5
+* Transfer 27.6 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well B5
+* Transfer 40.9 uL from Buffer trough to DestinationPlate well B6
+* Transfer 109.1 uL from SourcePlate well A1 to DestinationPlate well B6
 
 Experiment 8 : HDR Compound 46 into buffer (replicate 1) : 
 * Transfer 400.0 uL from Buffer trough to DestinationPlate well B7
-* Transfer 13.4 uL from Buffer trough to DestinationPlate well B8
-* Transfer 106.6 uL from SourcePlate well A1 to DestinationPlate well B8
+* Transfer 40.9 uL from Buffer trough to DestinationPlate well B8
+* Transfer 109.1 uL from SourcePlate well A1 to DestinationPlate well B8
 
 Experiment 9 : HDR Compound 46 into receptor (replicate 1) : 
-* Transfer 367.4 dimensionless uL from Buffer trough to DestinationPlate well C1
-* Transfer 32.6 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well C1
-* Transfer 13.4 uL from Buffer trough to DestinationPlate well C2
-* Transfer 106.6 uL from SourcePlate well A1 to DestinationPlate well C2
+* Transfer 372.4 dimensionless uL from Buffer trough to DestinationPlate well C1
+* Transfer 27.6 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well C1
+* Transfer 40.9 uL from Buffer trough to DestinationPlate well C2
+* Transfer 109.1 uL from SourcePlate well A1 to DestinationPlate well C2
 
 Experiment 10 : titration of Compound 46 into buffer (replicate 1) : 
 * Transfer 400.0 uL from Buffer trough to DestinationPlate well C3
-* Transfer 3.9 uL from Buffer trough to DestinationPlate well C4
-* Transfer 116.1 uL from SourcePlate well A1 to DestinationPlate well C4
+* Transfer 29.6 uL from Buffer trough to DestinationPlate well C4
+* Transfer 120.4 uL from SourcePlate well A1 to DestinationPlate well C4
 
 Experiment 11 : titration of Compound 46 into receptor (replicate 1) : 
-* Transfer 334.8 dimensionless uL from Buffer trough to DestinationPlate well C5
-* Transfer 65.2 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well C5
-* Transfer 3.9 uL from Buffer trough to DestinationPlate well C6
-* Transfer 116.1 uL from SourcePlate well A1 to DestinationPlate well C6
+* Transfer 344.9 dimensionless uL from Buffer trough to DestinationPlate well C5
+* Transfer 55.1 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well C5
+* Transfer 29.6 uL from Buffer trough to DestinationPlate well C6
+* Transfer 120.4 uL from SourcePlate well A1 to DestinationPlate well C6
 
 Experiment 12 : SIM Compound 46 into buffer (replicate 1) : 
 * Transfer 400.0 uL from Buffer trough to DestinationPlate well C7
-* Transfer 3.9 uL from Buffer trough to DestinationPlate well C8
-* Transfer 116.1 uL from SourcePlate well A1 to DestinationPlate well C8
+* Transfer 29.6 uL from Buffer trough to DestinationPlate well C8
+* Transfer 120.4 uL from SourcePlate well A1 to DestinationPlate well C8
 
 Experiment 13 : SIM Compound 46 into receptor (replicate 1) : 
-* Transfer 334.8 dimensionless uL from Buffer trough to DestinationPlate well D1
-* Transfer 65.2 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well D1
-* Transfer 3.9 uL from Buffer trough to DestinationPlate well D2
-* Transfer 116.1 uL from SourcePlate well A1 to DestinationPlate well D2
+* Transfer 344.9 dimensionless uL from Buffer trough to DestinationPlate well D1
+* Transfer 55.1 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well D1
+* Transfer 29.6 uL from Buffer trough to DestinationPlate well D2
+* Transfer 120.4 uL from SourcePlate well A1 to DestinationPlate well D2
 
 Experiment 14 : HDR Compound 46 into buffer (replicate 1) : 
 * Transfer 400.0 uL from Buffer trough to DestinationPlate well D3
-* Transfer 3.9 uL from Buffer trough to DestinationPlate well D4
-* Transfer 116.1 uL from SourcePlate well A1 to DestinationPlate well D4
+* Transfer 29.6 uL from Buffer trough to DestinationPlate well D4
+* Transfer 120.4 uL from SourcePlate well A1 to DestinationPlate well D4
 
 Experiment 15 : HDR Compound 46 into receptor (replicate 1) : 
-* Transfer 334.8 dimensionless uL from Buffer trough to DestinationPlate well D5
-* Transfer 65.2 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well D5
-* Transfer 3.9 uL from Buffer trough to DestinationPlate well D6
-* Transfer 116.1 uL from SourcePlate well A1 to DestinationPlate well D6
+* Transfer 344.9 dimensionless uL from Buffer trough to DestinationPlate well D5
+* Transfer 55.1 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well D5
+* Transfer 29.6 uL from Buffer trough to DestinationPlate well D6
+* Transfer 120.4 uL from SourcePlate well A1 to DestinationPlate well D6
 
-Experiment 16 : water into water : 
-* Transfer 400.0 uL from Water trough to DestinationPlate well D7
-* Transfer 120.0 uL from Water trough to DestinationPlate well D8
+Experiment 16 : titration of Compound 46 into buffer (replicate 1) : 
+* Transfer 400.0 uL from Buffer trough to DestinationPlate well D7
+* Transfer 19.4 uL from Buffer trough to DestinationPlate well D8
+* Transfer 130.6 uL from SourcePlate well A1 to DestinationPlate well D8
+
+Experiment 17 : titration of Compound 46 into receptor (replicate 1) : 
+* Transfer 317.3 dimensionless uL from Buffer trough to DestinationPlate well E1
+* Transfer 82.7 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well E1
+* Transfer 19.4 uL from Buffer trough to DestinationPlate well E2
+* Transfer 130.6 uL from SourcePlate well A1 to DestinationPlate well E2
+
+Experiment 18 : SIM Compound 46 into buffer (replicate 1) : 
+* Transfer 400.0 uL from Buffer trough to DestinationPlate well E3
+* Transfer 19.4 uL from Buffer trough to DestinationPlate well E4
+* Transfer 130.6 uL from SourcePlate well A1 to DestinationPlate well E4
+
+Experiment 19 : SIM Compound 46 into receptor (replicate 1) : 
+* Transfer 317.3 dimensionless uL from Buffer trough to DestinationPlate well E5
+* Transfer 82.7 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well E5
+* Transfer 19.4 uL from Buffer trough to DestinationPlate well E6
+* Transfer 130.6 uL from SourcePlate well A1 to DestinationPlate well E6
+
+Experiment 20 : HDR Compound 46 into buffer (replicate 1) : 
+* Transfer 400.0 uL from Buffer trough to DestinationPlate well E7
+* Transfer 19.4 uL from Buffer trough to DestinationPlate well E8
+* Transfer 130.6 uL from SourcePlate well A1 to DestinationPlate well E8
+
+Experiment 21 : HDR Compound 46 into receptor (replicate 1) : 
+* Transfer 317.3 dimensionless uL from Buffer trough to DestinationPlate well F1
+* Transfer 82.7 dimensionless uL from ProteinSourcePlate well A1 to DestinationPlate well F1
+* Transfer 19.4 uL from Buffer trough to DestinationPlate well F2
+* Transfer 130.6 uL from SourcePlate well A1 to DestinationPlate well F2
+
+Experiment 22 : water into water : 
+* Transfer 400.0 uL from Water trough to DestinationPlate well F3
+* Transfer 150.0 uL from Water trough to DestinationPlate well F4
 
 Necessary volumes:
-                          Buffer        5.130 mL
-                     Compound 46        1.336 mL
-                           Water        1.560 mL
-                        receptor        0.293 mL
+                          Buffer        7.793 mL
+                     Compound 46        2.161 mL
+                           Water        1.650 mL
+                        receptor        0.496 mL
 Expected waste (3% of total):
-                          Buffer        0.154 mL
-                     Compound 46        0.040 mL
-                           Water        0.047 mL
-                        receptor        0.009 mL
+                          Buffer        0.234 mL
+                     Compound 46        0.065 mL
+                           Water        0.050 mL
+                        receptor        0.015 mL
 Necessary volumes:
-                          Buffer        5.130 mL
-                     Compound 46        1.336 mL
-                           Water        1.560 mL
-                        receptor        0.293 mL
+                          Buffer        7.793 mL
+                     Compound 46        2.161 mL
+                           Water        1.650 mL
+                        receptor        0.496 mL
 Expected waste (3% of total):
-                          Buffer        0.154 mL
-                     Compound 46        0.040 mL
-                           Water        0.047 mL
-                        receptor        0.009 mL
+                          Buffer        0.234 mL
+                     Compound 46        0.065 mL
+                           Water        0.050 mL
+                        receptor        0.015 mL

@@ -47,7 +47,7 @@ for compound_id in compound_ids:
     solubility = solubilities_df.loc[compound_id]['ESOL Solubility (mg/ml)'] * (ureg.milligram / ureg.milliliter)
     compound = Compound(f'Compound {compound_id}', molecular_weight=molecular_weight, purity=purity, solubility=solubility)
     ligands.append(compound)
-    Kd = 50 * ureg.micromolar
+    Kd = 40 * ureg.micromolar
     Ka = 1.0 / Kd
     ligand_kas.append(Ka)
     print(f"{compound.name:20} : MW {molecular_weight.to('gram/mole')},  purity {purity:.3f}, solubility = {(solubility.to('milligrams/milliliter')):8.3f}, Kd = {((1/Ka).to('micromolar')):8.3f}")
@@ -62,8 +62,10 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 protein_source_plate = Labware(RackLabel='ProteinSourcePlate', RackType='ITC Plate')
 
 # Define source solutions in the vial holder
-protein_mass = (1.7325  * ureg.milligram / ureg.milliliter) * (0.35 * ureg.milliliter)
-solvent_mass = 0.35 * ureg.milliliters * buffer.density
+protein_volume = 0.6 * ureg.milliliter
+protein_concentration = (2.04825 * ureg.milligram / ureg.milliliter)
+protein_mass =  protein_concentration * protein_volume
+solvent_mass = protein_volume * buffer.density
 receptor_solution = SimpleSolution(compound=receptor, compound_mass=protein_mass, solvent=buffer, solvent_mass=solvent_mass, location=PipettingLocation(
     protein_source_plate.RackLabel,
     protein_source_plate.RackType,
@@ -97,7 +99,7 @@ print('')
 # Define ITC protocol.
 
 # Receptor cell concentrations to evaluate
-cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar]
+cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.030 * ureg.millimolar]
 
 # Protocol for 'control' titrations (water-water, buffer-buffer,
 # titrations into buffer, etc.)

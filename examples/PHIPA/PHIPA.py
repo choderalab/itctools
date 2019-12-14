@@ -76,7 +76,7 @@ solubility_safety = 0.5 # fraction of solubility to prepare solution for
 max_compound_mass = 15.0 * ureg.milligram # maximum mass we may want to dispense
 
 ligand_solutions = list()
-for ligand in ligands:
+for (index, ligand) in enumerate(ligands):
     target_concentration = solubility_safety * ligand.solubility
     target_buffer_mass = 10.0 * ureg.gram
     target_buffer_volume = target_buffer_mass / buffer.density
@@ -85,7 +85,7 @@ for ligand in ligands:
     ligand_solution = SimpleSolution(compound=ligand, compound_mass=target_compound_mass, solvent=buffer, solvent_mass=target_buffer_mass, location=PipettingLocation(
         source_plate.RackLabel,
         source_plate.RackType,
-        1)) # Well A1 of vial holder
+        index+1))
     ligand_solutions.append(ligand_solution)
 
 # For convenience, report concentrations

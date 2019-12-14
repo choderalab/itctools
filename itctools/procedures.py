@@ -684,6 +684,7 @@ class ITCExperimentSet(object):
         self.worklists = dict()
         self.worklists['LiHa'] = ""
         self.worklists['aLiHa'] = ""
+        aLiHa_max_volume = 50 # 50 uL tips
 
         # Reset tracked quantities.
         self._resetTrackedQuantities()
@@ -722,8 +723,15 @@ class ITCExperimentSet(object):
 
                 # Schedule buffer transfer.
                 tipmask = 1
-                pipette = 'LiHa'
-                if buffer_volume > 0.01 or not omit_zeroes:
+
+                if (buffer_volume > 0.01 or not omit_zeroes):
+                    # TODO: Remove duplicated code by rolling this into a method
+                    if (buffer_volume < aLiHa_max_volume):
+                        # Use aLiHa for better precision
+                        pipette = 'aLiHa'
+                    else:
+                        pipette = 'LiHa'
+                    
                     source = experiment.buffer_source
                     dest = tecandata.cell_destination
 
@@ -745,21 +753,30 @@ class ITCExperimentSet(object):
 
             # Schedule cell solution transfer.
             tipmask = 2
-            pipette = 'LiHa'
             try:
                 # Assume source is Solution.
-                if transfer_volume > 0.01 or not omit_zeroes:
+                if (transfer_volume > 0.01 or not omit_zeroes):
+                    if (transfer_volume < aLiHa_max_volume):
+                        # Use aLiHa for better precision
+                        pipette = 'aLiHa'
+                    else:
+                        pipette = 'LiHa'
                     source = experiment.cell_source.location
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        source.RackLabel, source.RackType, source.Position, transfer_volume, tipmask)
+                            source.RackLabel, source.RackType, source.Position, transfer_volume, tipmask)
             except:
                 # Assume source is Labware.
-                if transfer_volume > 0.01 or not omit_zeroes:
+                if (transfer_volume > 0.01 or not omit_zeroes):
+                    if (transfer_volume < aLiHa_max_volume):
+                        # Use aLiHa for better precision
+                        pipette = 'aLiHa'
+                    else:
+                        pipette = 'LiHa'
                     source = experiment.cell_source
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         source.RackLabel, source.RackType, 2, transfer_volume, tipmask)
 
-            if transfer_volume > 0.01 or not omit_zeroes:
+            if (transfer_volume > 0.01 or not omit_zeroes):
                 dest = tecandata.cell_destination
                 self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                     dest.RackLabel, dest.RackType, dest.Position, transfer_volume, tipmask)
@@ -800,8 +817,14 @@ class ITCExperimentSet(object):
                 # Schedule buffer transfer.
                 tipmask = 4
                 pipette = None
-                if buffer_volume > 0.01 or not omit_zeroes:
-                    pipette = 'LiHa'
+                if (buffer_volume > 0.01 or not omit_zeroes):
+
+                    if (buffer_volume < aLiHa_max_volume):
+                        # Use aLiHa for better precision
+                        pipette = 'aLiHa'
+                    else:
+                        pipette = 'LiHa'
+
                     source = experiment.buffer_source
                     dest = tecandata.syringe_destination
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
@@ -820,21 +843,16 @@ class ITCExperimentSet(object):
                         ureg.microliters)
 
             # Schedule syringe solution transfer.
-            aLiHa_max_volume = 50 # 50 uL tips
             tipmask = 8
             pipette = None
             try:
                 # Assume source is Solution: use aLiHa
-                if ((transfer_volume > 0.01) or not omit_zeroes) and (transfer_volume <= aLiHa_max_volume):
-                    pipette = 'aLiHa'
-                    source = experiment.syringe_source.location
-                    self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
-                        source.RackLabel,
-                        source.RackType,
-                        source.Position,
-                        transfer_volume, tipmask)
-                elif ((transfer_volume > 0.01) or not omit_zeroes) and (transfer_volume > aLiHa_max_volume):
-                    pipette = 'LiHa'
+                if (transfer_volume > 0.01 or not omit_zeroes):
+                    if (transfer_volume < aLiHa_max_volume):
+                        # Use aLiHa for better precision
+                        pipette = 'aLiHa'
+                    else:
+                        pipette = 'LiHa'
                     source = experiment.syringe_source.location
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         source.RackLabel,
@@ -842,14 +860,18 @@ class ITCExperimentSet(object):
                         source.Position,
                         transfer_volume, tipmask)
             except:
-                # Assume source is Labware; use LiHa
-                pipette = 'LiHa'
+                if (transfer_volume < aLiHa_max_volume):
+                    # Use aLiHa for better precision
+                    pipette = 'aLiHa'
+                else:
+                    pipette = 'LiHa'
+                # Assume source is Labware
                 source = experiment.syringe_source
                 if transfer_volume > 0.01 or not omit_zeroes:
                     self.worklists[pipette] += 'A;%s;;%s;%d;;%f;;;%d\r\n' % (
                         source.RackLabel, source.RackType, 4, transfer_volume, tipmask)
 
-            if transfer_volume > 0.01 or not omit_zeroes:
+            if (transfer_volume > 0.01 or not omit_zeroes):
                 dest = tecandata.syringe_destination
                 self.worklists[pipette] += 'D;%s;;%s;%d;;%f;;;%d\r\n' % (
                     dest.RackLabel, dest.RackType, dest.Position, transfer_volume, tipmask)
@@ -862,8 +884,8 @@ class ITCExperimentSet(object):
             volume_report += transfer(source, dest, transfer_volume)
 
             # Finish worklist section.
-            if pipette == 'LiHa':
-                self.worklists[pipette] += 'B;\r\n'  # execute queued batch of commands
+            pipette = 'LiHa'
+            self.worklists[pipette] += 'B;\r\n'  # execute queued batch of commands
 
             # Create datafile name.
             now = datetime.now()

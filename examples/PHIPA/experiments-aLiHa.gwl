@@ -1,0 +1,117 @@
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;9;;5.301662;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;13;;5.301662;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;17;;5.301662;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;21;;5.301662;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;25;;5.301662;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;29;;5.301662;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;33;;5.301662;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;37;;5.301662;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;5.301662;;;2
+D;DestinationPlate1;;ITC Plate;41;;5.301662;;;2
+W;
+A;Buffer;;Trough 100ml;3;;47.068534;;;4
+D;DestinationPlate1;;ITC Plate;44;;47.068534;;;4
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;45;;10.603324;;;2
+W;
+A;Buffer;;Trough 100ml;3;;47.068534;;;4
+D;DestinationPlate1;;ITC Plate;46;;47.068534;;;4
+W;
+A;Buffer;;Trough 100ml;3;;47.068534;;;4
+D;DestinationPlate1;;ITC Plate;48;;47.068534;;;4
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;49;;10.603324;;;2
+W;
+A;Buffer;;Trough 100ml;3;;47.068534;;;4
+D;DestinationPlate1;;ITC Plate;50;;47.068534;;;4
+W;
+A;Buffer;;Trough 100ml;3;;47.068534;;;4
+D;DestinationPlate1;;ITC Plate;52;;47.068534;;;4
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;53;;10.603324;;;2
+W;
+A;Buffer;;Trough 100ml;3;;47.068534;;;4
+D;DestinationPlate1;;ITC Plate;54;;47.068534;;;4
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;57;;10.603324;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;61;;10.603324;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;65;;10.603324;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;69;;10.603324;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;73;;10.603324;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;10.603324;;;2
+D;DestinationPlate1;;ITC Plate;77;;10.603324;;;2
+W;
+A;Buffer;;Trough 100ml;3;;38.374951;;;4
+D;DestinationPlate1;;ITC Plate;80;;38.374951;;;4
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate1;;ITC Plate;81;;15.904985;;;2
+W;
+A;Buffer;;Trough 100ml;3;;38.374951;;;4
+D;DestinationPlate1;;ITC Plate;82;;38.374951;;;4
+W;
+A;Buffer;;Trough 100ml;3;;38.374951;;;4
+D;DestinationPlate1;;ITC Plate;84;;38.374951;;;4
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate1;;ITC Plate;85;;15.904985;;;2
+W;
+A;Buffer;;Trough 100ml;3;;38.374951;;;4
+D;DestinationPlate1;;ITC Plate;86;;38.374951;;;4
+W;
+A;Buffer;;Trough 100ml;3;;38.374951;;;4
+D;DestinationPlate1;;ITC Plate;88;;38.374951;;;4
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate1;;ITC Plate;89;;15.904985;;;2
+W;
+A;Buffer;;Trough 100ml;3;;38.374951;;;4
+D;DestinationPlate1;;ITC Plate;90;;38.374951;;;4
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate1;;ITC Plate;93;;15.904985;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate2;;ITC Plate;1;;15.904985;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate2;;ITC Plate;5;;15.904985;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate2;;ITC Plate;9;;15.904985;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate2;;ITC Plate;13;;15.904985;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;15.904985;;;2
+D;DestinationPlate2;;ITC Plate;17;;15.904985;;;2
+W;

@@ -21,8 +21,9 @@ purities_df.set_index('Identifier', inplace=True)
 
 # Compound IDs from CSV
 compound_ids = [
-    46, # acetyllysine
-    #24, # displaces water network
+    10,
+    26,
+    34,
     ]
 
 nreplicates = 1  # number of replicates of each protein-ligand experiment
@@ -63,7 +64,7 @@ protein_source_plate = Labware(RackLabel='ProteinSourcePlate', RackType='ITC Pla
 
 # Define source solutions in the vial holder
 protein_volume = 0.6 * ureg.milliliter
-protein_concentration = (2.04825 * ureg.milligram / ureg.milliliter)
+protein_concentration = (10.651 * ureg.milligram / ureg.milliliter)
 protein_mass =  protein_concentration * protein_volume
 solvent_mass = protein_volume * buffer.density
 receptor_solution = SimpleSolution(compound=receptor, compound_mass=protein_mass, solvent=buffer, solvent_mass=solvent_mass, location=PipettingLocation(
@@ -178,10 +179,12 @@ cleaning_protocol = ITCProtocol(
 # use specified protocol by default
 itc_experiment_set = ITCExperimentSet(name='Receptor-ligand experiments')
 # Add available plates for experiments.
-destination_plate = Labware(
-    RackLabel='DestinationPlate',
-    RackType='ITC Plate')
-itc_experiment_set.addDestinationPlate(destination_plate)
+number_of_itc_plates = 2 # number of ITC plates to use (up to 4)
+for plate_index in range(number_of_itc_plates):
+    destination_plate = Labware(
+        RackLabel=f'DestinationPlate{plate_index+1}',
+        RackType='ITC Plate')
+    itc_experiment_set.addDestinationPlate(destination_plate)
 
 # Add cleaning experiment.
 name = 'initial cleaning water titration'

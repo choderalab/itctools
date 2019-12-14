@@ -731,7 +731,7 @@ class ITCExperimentSet(object):
                         pipette = 'aLiHa'
                     else:
                         pipette = 'LiHa'
-                    
+
                     source = experiment.buffer_source
                     dest = tecandata.cell_destination
 
@@ -884,8 +884,8 @@ class ITCExperimentSet(object):
             volume_report += transfer(source, dest, transfer_volume)
 
             # Finish worklist section.
-            pipette = 'LiHa'
-            self.worklists[pipette] += 'B;\r\n'  # execute queued batch of commands
+            #pipette = 'LiHa'
+            #self.worklists[pipette] += 'B;\r\n'  # execute queued batch of commands
 
             # Create datafile name.
             now = datetime.now()

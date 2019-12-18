@@ -22,8 +22,8 @@ purities_df.set_index('Identifier', inplace=True)
 # Compound IDs from CSV
 compound_ids = [
     10,
-    26,
-    34,
+    #26,
+    #34,
     ]
 
 nreplicates = 1  # number of replicates of each protein-ligand experiment
@@ -63,8 +63,8 @@ source_plate = Labware(RackLabel='SourcePlate', RackType='5x3 Vial Holder')
 protein_source_plate = Labware(RackLabel='ProteinSourcePlate', RackType='ITC Plate')
 
 # Define source solutions in the vial holder
-protein_volume = 0.6 * ureg.milliliter
-protein_concentration = (10.651 * ureg.milligram / ureg.milliliter)
+protein_volume = 0.5 * ureg.milliliter
+protein_concentration = (7.701 * ureg.milligram / ureg.milliliter)
 protein_mass =  protein_concentration * protein_volume
 solvent_mass = protein_volume * buffer.density
 receptor_solution = SimpleSolution(compound=receptor, compound_mass=protein_mass, solvent=buffer, solvent_mass=solvent_mass, location=PipettingLocation(
@@ -232,7 +232,7 @@ for cell_concentration in cell_concentrations:
         cell_concentration=cell_concentration,
         buffer_source=buffer_trough,
         cell_volume=cell_volume)
-    # itc_experiment_set.addExperiment(experiment) # SKIP FOR NOW
+    itc_experiment_set.addExperiment(experiment)
 
     for ligand, ligand_solution, ligand_ka in zip(ligands, ligand_solutions, ligand_kas):
         # Perform specified number of replicates

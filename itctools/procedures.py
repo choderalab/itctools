@@ -892,7 +892,8 @@ class ITCExperimentSet(object):
             datecode = now.strftime("%Y%m%d")
             seriescode = 'a'  # TODO: Use intelligent coding?
             indexcode = '%d' % (experiment_number + 1)
-            itcdata.DataFile = datecode + seriescode + indexcode + '.itc'
+            prefix = 'CHODERA' # TODO: Allow user to specify, and reduce code duplication
+            itcdata.DataFile = prefix + datecode + seriescode + indexcode + '.itc'
 
             itcdata.SampleName = experiment.name
             itcdata.SamplePrepMethod = experiment.protocol.sample_prep_method

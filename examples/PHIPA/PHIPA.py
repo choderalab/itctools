@@ -64,7 +64,7 @@ protein_source_plate = Labware(RackLabel='ProteinSourcePlate', RackType='ITC Pla
 
 # Define source solutions in the vial holder
 protein_volume = 0.5 * ureg.milliliter
-protein_concentration = (7.701 * ureg.milligram / ureg.milliliter)
+protein_concentration = (1.872 * ureg.milligram / ureg.milliliter)
 protein_mass =  protein_concentration * protein_volume
 solvent_mass = protein_volume * buffer.density
 receptor_solution = SimpleSolution(compound=receptor, compound_mass=protein_mass, solvent=buffer, solvent_mass=solvent_mass, location=PipettingLocation(
@@ -88,6 +88,17 @@ for (index, ligand) in enumerate(ligands):
         index+1))
     ligand_solutions.append(ligand_solution)
 
+# masses
+buffer_masses = { 'Compound 10' : 10.065*ureg.gram }
+compound_masses = { 'Compound 10' : 15.05*ureg.milligram }
+ligand_solutions = list()
+for (index, ligand) in enumerate(ligands):
+    ligand_solution = SimpleSolution(compound=ligand, compound_mass=compound_masses[ligand.name], solvent=buffer, solvent_mass=buffer_masses[ligand.name], location=PipettingLocation(
+        source_plate.RackLabel,
+        source_plate.RackType,
+        index+1))
+    ligand_solutions.append(ligand_solution)
+
 # For convenience, report concentrations
 print('STOCK SOLUTION CONCENTRATIONS:')
 location = ITCExperimentSet.human_readable(receptor_solution.location)
@@ -100,8 +111,10 @@ print('')
 # Define ITC protocol.
 
 # Receptor cell concentrations to evaluate
-cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.030 * ureg.millimolar]
-
+#cell_concentrations = [0.010 * ureg.millimolar, 0.020 * ureg.millimolar, 0.030 * ureg.millimolar]
+#cell_concentrations = [0.020 * ureg.millimolar]
+cell_concentrations = [0.025 * ureg.millimolar]
+#
 # Protocol for 'control' titrations (water-water, buffer-buffer,
 # titrations into buffer, etc.)
 
@@ -232,7 +245,7 @@ for cell_concentration in cell_concentrations:
         cell_concentration=cell_concentration,
         buffer_source=buffer_trough,
         cell_volume=cell_volume)
-    itc_experiment_set.addExperiment(experiment)
+    #itc_experiment_set.addExperiment(experiment)
 
     for ligand, ligand_solution, ligand_ka in zip(ligands, ligand_solutions, ligand_kas):
         # Perform specified number of replicates

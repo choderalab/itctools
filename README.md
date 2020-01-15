@@ -32,7 +32,7 @@ python setup.py install
 
 ## Requires
 -
-`anaconda` or `miniconda` with `python` 2.7 or 3.3
+`anaconda` or `miniconda` with `python` 3.5 through 3.8
 Using `conda`, install:
 `setuptools`
 `numpy`

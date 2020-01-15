@@ -40,7 +40,7 @@ class Compound(object):
 
     """
 
-    def __init__(self, name, molecular_weight=None, purity=1.0):
+    def __init__(self, name, molecular_weight=None, purity=1.0, solubility=None):
         """
         Parameters
         ----------
@@ -50,6 +50,8 @@ class Compound(object):
            The molecular weight of the compound.
         purity : float, optional, default=1.0
            The mass purity used for computing actual quantity of compound.
+        solubility : pint Quantity with units compatible with mg/ml, optional, default=None
+           The compound solubility, if known.
 
         Examples
         --------
@@ -66,11 +68,18 @@ class Compound(object):
 
         >>> compound1 = Compound('compound1', molecular_weight=209.12*ureg.grams/ureg.mole, purity=0.975)
 
+        Define a compound with known solubility
+
+        >>> mw = 201.2 * ureg.gram / ureg.mole
+        >>> purity = 0.97
+        >>> solubility = 453 * ureg.milligrams / ureg.liter
+        >>> cbs = Compound('CBS', molecular_weight=mw, purity=purity, solubility=solubility)
+
         """
         self.name = name
         self.molecular_weight = molecular_weight
         self.purity = purity
-
+        self.solubility = solubility
 
 class PureLiquid(Compound):
 

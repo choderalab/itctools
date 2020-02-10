@@ -630,8 +630,9 @@ class ITCExperimentSet(object):
             ny = 8; nx = 1
         elif source.RackType == 'ITC Plate':
             ny = 8; nx = 12
+            raise Exception(f'Don\'t know racktype "{racktype}"')
         else:
-            raise Exception(f"Don't know racktype '{racktype}'")
+            pass
 
         description = ''
         if positionless:

@@ -976,7 +976,7 @@ class ITCExperimentSet(object):
         wb = Workbook()
 
         # Create plate sheet.
-        ws = wb.get_active_sheet()
+        ws = wb.active
         ws.title = 'plate'
 
         # Openpyxl version incompatibility fix

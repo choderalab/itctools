@@ -1,0 +1,6 @@
+include LICENSE
+include MANIFEST.in
+include versioneer.py
+
+graft itctools2
+global-exclude *.py[cod] __pycache__ *.so

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # itctools
 
 [![Build Status](https://travis-ci.org/choderalab/itctools.svg)](https://travis-ci.org/choderalab/itctools)

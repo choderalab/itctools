@@ -2,6 +2,6 @@ API Documentation
 =================
 
 .. autosummary::
-   :toctree: autosummary
+    :toctree: autosummary
 
-   itctools.canvas
+    itctools.ITCProtocol

@@ -15,10 +15,6 @@ dependencies:
   - setuptools
   - matplotlib
   - seaborn
-  - behave
-  - pint
-  - python-coveralls
-  - rednose
 
     # Testing
   - pytest
@@ -26,6 +22,8 @@ dependencies:
   - codecov
 
     # Pip-only installs
-  #- pip:
-  #  - codecov
+  - behave
+  - pint
+  - python-coveralls
+  - rednose
 

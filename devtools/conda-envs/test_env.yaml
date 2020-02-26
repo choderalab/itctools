@@ -11,14 +11,9 @@ dependencies:
   - nose
   - numpy
   - openpyxl
-  - pip
   - setuptools
   - matplotlib
   - seaborn
-  - behave
-  - pint
-  - python-coveralls
-  - rednose
 
     # Testing
   - pytest
@@ -26,6 +21,9 @@ dependencies:
   - codecov
 
     # Pip-only installs
-  #- pip:
-  #  - codecov
+  - pip:
+    - behave
+    - pint
+    - python-coveralls
+    - rednose
 

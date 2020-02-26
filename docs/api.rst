@@ -4,4 +4,4 @@ API Documentation
 .. autosummary::
     :toctree: autosummary
 
-    itctools.ITCProtocol
+    itctools.procedures.ITCProtocol

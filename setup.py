@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 try:
     from setuptools import setup
 except ImportError:
@@ -97,11 +96,11 @@ setup(
     ],
     install_requires=['nose>=1.0', 'pint', 'rednose', 'behave', 'mock', 'coverage', 'openpyxl'],
     tests_require=['nose', 'behave', 'rednose', 'pint', 'mock', 'coverage']
-=======
+)
 """
 itctools2
 An itctools repo based on the molssi cookiecutter
-"""
+
 import sys
 from setuptools import setup, find_packages
 import versioneer
@@ -155,6 +154,5 @@ setup(
 
     # Manual control if final package is compressible or not, set False to prevent the .egg from being made
     # zip_safe=False,
-
->>>>>>> Initial commit after CMS Cookiecutter creation, version 1.1
-)
+    )
+"""

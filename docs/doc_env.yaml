@@ -22,8 +22,9 @@ dependencies:
   - codecov
 
     # Pip-only installs
-  - behave
-  - pint
-  - python-coveralls
-  - rednose
+  - pip:
+    - behave
+    - pint
+    - python-coveralls
+    - rednose
 

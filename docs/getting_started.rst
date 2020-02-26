@@ -1,4 +1,4 @@
 Getting Started
 ===============
 
-This page details how to get started with itctools2. 
+This page details how to get started with itctools.

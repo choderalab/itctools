@@ -98,7 +98,7 @@ setup(
     tests_require=['nose', 'behave', 'rednose', 'pint', 'mock', 'coverage']
 )
 """
-itctools2
+itctools
 An itctools repo based on the molssi cookiecutter
 
 import sys
@@ -120,7 +120,7 @@ except:
 
 setup(
     # Self-descriptive entries which should always be present
-    name='itctools2',
+    name='itctools',
     author='Chodera Lab',
     author_email='john.chodera@choderalab.org',
     description=short_description[0],

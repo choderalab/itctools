@@ -1,5 +1,17 @@
+"""
+Unit and regression test for the itctools package.
+"""
+
+# Import package, test suite, and other packages as needed
+import itctools
+import pytest
+import sys
 import unittest
 from itctools import itctools as itc
+
+def test_itctools_imported():
+    """Sample test, will always pass so long as import statement worked"""
+    assert "itctools" in sys.modules
 
 
 class TestPermutation(unittest.TestCase):

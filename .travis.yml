@@ -74,7 +74,7 @@ install:
 
 
 script:
-  - pytest -v --cov=itctools2 itctools2/tests/
+  - pytest -v --cov=itctools itctools/tests/
 
 notifications:
     email: false

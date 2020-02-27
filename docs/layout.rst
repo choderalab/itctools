@@ -1,7 +1,7 @@
-Directory Layout
+Library Contents
 ================
 
-`itctools`
+itctools
 ___________
 
 A library for setting up experiments
@@ -15,7 +15,7 @@ A library for setting up experiments
   - `itctools.py`
     - Contains useful functions that don't fall into any other category.
 
-`examples`
+examples
 __________
 
 Some example scripts that use the library.
@@ -29,13 +29,12 @@ Some example scripts that use the library.
   -  `mixture_heats.py` prepares a worklist and xlsx file for performing heat of mixing experiments.
 
 
-`tests`
+tests
 _______
 
 Tests that are used to maintain the integrity of the library.
 
  - `tests/behave`
-
     Tests that use `behave` to make sure the example scripts are functional. Run `behave` from the root directory of the repository to run these tests. See also the `.behaverc` file.
 
  - `tests/behave/features`

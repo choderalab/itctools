@@ -5,7 +5,9 @@ except ImportError:
 
 import subprocess
 import os
+import versioneer
 
+# TODO: I think all of this version stuff can be removed and replaced with the current ways of doing this
 VERSION = '0.0.1'
 __version__ = VERSION
 ISRELEASED = False
@@ -94,13 +96,17 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
     ],
-    install_requires=['nose>=1.0', 'pint', 'rednose', 'behave', 'mock', 'coverage', 'openpyxl'],
-    tests_require=['nose', 'behave', 'rednose', 'pint', 'mock', 'coverage']
+    install_requires=['behave', 'coverage', 'mock', 'numpy', 'nose',
+                      'openpyxl', 'pint', 'pytest-cov', 'rednose', 'seaborn', 'setuptools', 'matplotlib'],
+    # TODO: Need to decide which packages are really necessary for installation and which are required for testing
+    tests_require=['behave', 'coverage', 'mock', 'numpy', 'nose',
+                      'openpyxl', 'pint', 'rednose', 'seaborn', 'setuptools', 'matplotlib']
 )
 """
 itctools
 An itctools repo based on the molssi cookiecutter
-
+"""
+"""
 import sys
 from setuptools import setup, find_packages
 import versioneer

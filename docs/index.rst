@@ -11,6 +11,7 @@ Welcome to itctools's documentation!
    :caption: Contents:
 
    getting_started
+   layout
    api
 
 

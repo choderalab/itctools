@@ -1,4 +1,4 @@
-name: test
+name: documentation
 channels:
 dependencies:
     # Base depends
@@ -11,7 +11,6 @@ dependencies:
   - nose
   - numpy
   - openpyxl
-  - pip
   - setuptools
   - matplotlib
   - seaborn

@@ -96,11 +96,13 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
     ],
+
+    # TODO: Need to decide which packages are necessary for installation and which are required for testing
     install_requires=['behave', 'coverage', 'mock', 'numpy', 'nose',
                       'openpyxl', 'pint', 'pytest-cov', 'rednose', 'seaborn', 'setuptools', 'matplotlib'],
-    # TODO: Need to decide which packages are really necessary for installation and which are required for testing
+
     tests_require=['behave', 'coverage', 'mock', 'numpy', 'nose',
-                      'openpyxl', 'pint', 'rednose', 'seaborn', 'setuptools', 'matplotlib']
+                      'openpyxl', 'pint', 'pytest-cov', 'rednose', 'seaborn', 'setuptools', 'matplotlib']
 )
 """
 itctools

@@ -3,13 +3,17 @@ Getting Started
 
 This page details how to get started with itctools.
 
-A library for setting up experiments
+Installation
+------------
+** This installation guide assumes you have the python package manager `conda` installed**
 
-  - `materials.py`
-    - Contains the objects to define chemical compounds, solutions and mixtures
-  - `procedures.py`
-    - Contains classes that set up experimental procedures, like binding experiments or heat of mixing.
-  - `labware.py`
-    - Defines chemical containers and their locations on the EVO Deck.
-  - `itctools.py`
-    - Contains useful functions that don't fall into any other category.
+1) Create a new conda environment with Python 3.7.
+2) Clone the "itctools" repository from `GitHub <https://www.github.com/YOUR_GITHUB_USERNAME/molecool>`_.
+3) Navigate to the newly created "itctools" directory and run `python setup.py install`
+
+This command will automatically install all necessary packages.
+
+Usage
+_____
+!! TODO !!
+

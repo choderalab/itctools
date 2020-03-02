@@ -10,24 +10,13 @@ dependencies:
   - pip
 
     # Dependencies
-  - coverage
-  - mock
-  - nose
   - numpy
   - openpyxl
   - setuptools
   - matplotlib
   - seaborn
 
-    # Testing
-  - pytest
-  - pytest-cov
-  - codecov
-
     # Pip-only installs
   - pip:
-    - behave
     - pint
-    - python-coveralls
-    - rednose
 

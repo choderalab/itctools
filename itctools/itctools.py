@@ -1,3 +1,10 @@
+"""
+itctools.py
+An itctools repo based on the molssi cookiecutter
+
+Handles the primary functions
+"""
+
 import itertools
 from pint import UnitRegistry
 import numpy

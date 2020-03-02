@@ -1,36 +1,27 @@
-A;SourcePlate;;5x3 Vial Holder;1;;27.091819;;;8
-D;DestinationPlate;;ITC Plate;14;;27.091819;;;8
+A;ProteinSourcePlate;;ITC Plate;1;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;7;;35.502959;;;2
 W;
-A;SourcePlate;;5x3 Vial Holder;1;;27.091819;;;8
-D;DestinationPlate;;ITC Plate;16;;27.091819;;;8
+A;ProteinSourcePlate;;ITC Plate;1;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;13;;35.502959;;;2
 W;
-A;SourcePlate;;5x3 Vial Holder;1;;42.806016;;;8
-D;DestinationPlate;;ITC Plate;18;;42.806016;;;8
+A;SourcePlate;;5x3 Vial Holder;1;;33.864774;;;8
+D;DestinationPlate;;ITC Plate;14;;33.864774;;;8
 W;
-A;SourcePlate;;5x3 Vial Holder;1;;42.806016;;;8
-D;DestinationPlate;;ITC Plate;20;;42.806016;;;8
+A;ProteinSourcePlate;;ITC Plate;1;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;15;;35.502959;;;2
 W;
-A;SourcePlate;;5x3 Vial Holder;1;;70.166022;;;8
-D;DestinationPlate;;ITC Plate;22;;70.166022;;;8
+A;SourcePlate;;5x3 Vial Holder;1;;33.864774;;;8
+D;DestinationPlate;;ITC Plate;16;;33.864774;;;8
 W;
-A;SourcePlate;;5x3 Vial Holder;1;;70.166022;;;8
-D;DestinationPlate;;ITC Plate;24;;70.166022;;;8
+A;Buffer;;Trough 100ml;2;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;25;;35.502959;;;2
 W;
-A;SourcePlate;;5x3 Vial Holder;1;;27.091819;;;8
-D;DestinationPlate;;ITC Plate;26;;27.091819;;;8
+A;SourcePlate;;5x3 Vial Holder;1;;33.864774;;;8
+D;DestinationPlate;;ITC Plate;26;;33.864774;;;8
 W;
-A;SourcePlate;;5x3 Vial Holder;1;;27.091819;;;8
-D;DestinationPlate;;ITC Plate;28;;27.091819;;;8
+A;Buffer;;Trough 100ml;2;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;27;;35.502959;;;2
 W;
-A;SourcePlate;;5x3 Vial Holder;1;;42.806016;;;8
-D;DestinationPlate;;ITC Plate;30;;42.806016;;;8
-W;
-A;SourcePlate;;5x3 Vial Holder;1;;42.806016;;;8
-D;DestinationPlate;;ITC Plate;32;;42.806016;;;8
-W;
-A;SourcePlate;;5x3 Vial Holder;1;;70.166022;;;8
-D;DestinationPlate;;ITC Plate;34;;70.166022;;;8
-W;
-A;SourcePlate;;5x3 Vial Holder;1;;70.166022;;;8
-D;DestinationPlate;;ITC Plate;36;;70.166022;;;8
+A;SourcePlate;;5x3 Vial Holder;1;;33.864774;;;8
+D;DestinationPlate;;ITC Plate;28;;33.864774;;;8
 W;

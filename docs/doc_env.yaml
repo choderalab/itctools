@@ -1,5 +1,9 @@
 name: documentation
 channels:
+  - conda-forge
+  - omnia
+  - openeye
+  - defaults
 dependencies:
     # Base depends
   - python

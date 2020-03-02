@@ -1,0 +1,27 @@
+A;ProteinSourcePlate;;ITC Plate;1;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;7;;35.502959;;;2
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;13;;35.502959;;;2
+W;
+A;SourcePlate;;5x3 Vial Holder;1;;33.864774;;;8
+D;DestinationPlate;;ITC Plate;14;;33.864774;;;8
+W;
+A;ProteinSourcePlate;;ITC Plate;1;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;15;;35.502959;;;2
+W;
+A;SourcePlate;;5x3 Vial Holder;1;;33.864774;;;8
+D;DestinationPlate;;ITC Plate;16;;33.864774;;;8
+W;
+A;Buffer;;Trough 100ml;2;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;25;;35.502959;;;2
+W;
+A;SourcePlate;;5x3 Vial Holder;1;;33.864774;;;8
+D;DestinationPlate;;ITC Plate;26;;33.864774;;;8
+W;
+A;Buffer;;Trough 100ml;2;;35.502959;;;2
+D;DestinationPlate;;ITC Plate;27;;35.502959;;;2
+W;
+A;SourcePlate;;5x3 Vial Holder;1;;33.864774;;;8
+D;DestinationPlate;;ITC Plate;28;;33.864774;;;8
+W;

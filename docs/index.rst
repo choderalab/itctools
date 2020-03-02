@@ -12,6 +12,7 @@ Welcome to itctools's documentation!
 
    getting_started
    layout
+   api/index
    api
 
 

@@ -294,9 +294,9 @@ for guest_index in range(nguests):
     # Add host to guest experiment(s) to set
     for host_guest_experiment in host_guest_experiments:
         itc_experiment_set.addExperiment(host_guest_experiment)
-        host_guest_experiment.simulate(guest_compound_Ka[guest_index], macromol_titrant=True,
-                        filename='%s-simulation.png' % guests[guest_index].name)
-
+        # host_guest_experiment.simulate_concentrations(guest_compound_Ka[guest_index], macromol_titrant=True,
+        #                 filename='%s-simulation.png' % guests[guest_index].name)
+        host_guest_experiment.simulate_heats(guest_compound_Ka[guest_index])
 
 # Add cleaning experiment.
 #name = 'final cleaning water titration'
@@ -317,15 +317,23 @@ for replicate in range(nfinal):
 # Check that the experiment can be carried out using available solutions
 # and plates.
 
-itc_experiment_set.validate(print_volumes=True, omit_zeroes=True)
+itc_experiment_set.validate(print_volumes=False, omit_zeroes=True)
 
 # Get effective Rm
 actual_Rm = list()
 for experiment in itc_experiment_set.experiments:
     try:
-        guest_mol = ((experiment.cell_concentration * 202.8 * Quantity('microliter')).to('millimole'))
-        host_mol = ((experiment.syringe_concentration * 30 * Quantity('microliter')).to('millimole'))
-        Rm = host_mol/guest_mol
+        total_dilution_factor = 1.0
+        for index, injection in enumerate(experiment.protocol.injections[1:]):
+            total_dilution_factor *= 1 - (injection['volume_inj'] / experiment.cell_volume)
+
+        # Using the perfusion model from http://dx.doi.org/10.1021/jp053550y
+        # [M]0,i = [M]0*d^i
+        titrand_concentration = experiment.cell_concentration * total_dilution_factor
+        # [X]0,i = [X]0*(1-d^i)
+        titrant_concentration = experiment.syringe_concentration * (1 - total_dilution_factor)
+
+        Rm = titrant_concentration.to('mole per liter')/ titrand_concentration.to('mole per liter')
         actual_Rm.append(Rm)
 
     except (AttributeError, TypeError):
